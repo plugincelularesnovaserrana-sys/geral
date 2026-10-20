@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Plugin Celulares · Admin da vitrine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --papel:#F4F4F6; --card:#FFFFFF; --tinta:#16181D; --tinta-2:#5E6470; --linha:#E3E5EA;
+    --azul:#1B3FE0; --zap:#17A34A; --zap-hover:#128A3D; --erro:#C8332F; --ok-bg:#E6F6EC; --erro-bg:#FCEBEA; --foto-bg:#F0F1F4;
+    --display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
+    --texto:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --papel:#0E1015; --card:#171A21; --tinta:#EEF0F4; --tinta-2:#9AA0AD; --linha:#262A33;
+           --azul:#8AA2FF; --ok-bg:#12281B; --erro-bg:#321816; --foto-bg:#1F232C; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papel);color:var(--tinta);font-family:var(--texto);line-height:1.4}
+  :focus-visible{outline:3px solid var(--azul);outline-offset:2px}
+  main{max-width:720px;margin:0 auto;padding:16px 16px 80px;display:grid;gap:16px}
+  h1{font-family:var(--display);font-weight:800;font-size:1.7rem;letter-spacing:-.02em;margin:8px 0 0}
+  h2{font-family:var(--display);font-weight:700;font-size:1.2rem;margin:0 0 12px}
+  .sub{margin:0;color:var(--tinta-2);font-size:.9rem}
+  section,details.painel{background:var(--card);border:1px solid var(--linha);border-radius:16px;padding:16px}
+  details.painel>summary{font-family:var(--display);font-weight:700;font-size:1.1rem;cursor:pointer}
+  details.painel[open]>summary{margin-bottom:12px}
+
+  label{display:block;font-weight:600;font-size:.88rem;margin:12px 0 4px}
+  .dica{font-weight:400;color:var(--tinta-2)}
+  input[type=text],input[type=password],input[type=search],select{width:100%;padding:12px 14px;border:1px solid var(--linha);border-radius:10px;background:var(--papel);color:var(--tinta);font:inherit;font-size:16px}
+  .duas{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .check{display:flex;gap:8px;align-items:center;font-weight:600;margin-top:14px}
+  .check input{width:20px;height:20px}
+
+  button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:12px 16px;cursor:pointer}
+  button:disabled{opacity:.55;cursor:default}
+  .sec{background:var(--foto-bg);color:var(--tinta);border:1px solid var(--linha)}
+  .pri{background:var(--azul);color:#fff}
+  .envia{background:var(--zap);color:#fff}
+  .envia:hover:not(:disabled){background:var(--zap-hover)}
+  .acoes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+  .linha-btn{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .mini{padding:8px 12px;font-size:.85rem}
+
+  .miniaturas{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .mini-foto{position:relative;width:72px;height:72px;border-radius:10px;background:var(--foto-bg);border:1px solid var(--linha);display:grid;place-items:center;overflow:hidden;font-size:.65rem;text-align:center;padding:4px;word-break:break-all}
+  .mini-foto img{width:100%;height:100%;object-fit:cover}
+  .mini-foto button{position:absolute;top:2px;right:2px;width:22px;height:22px;padding:0;border-radius:50%;background:rgba(0,0,0,.65);color:#fff;font-size:.8rem;line-height:1}
+
+  .auto-foto{display:flex;gap:12px;align-items:center;margin-top:10px;padding:10px;border:1px dashed var(--linha);border-radius:12px;background:var(--papel)}
+  .auto-foto img{width:64px;height:64px;object-fit:contain;border-radius:8px;background:var(--foto-bg);flex:none}
+  .auto-foto p{margin:0;font-size:.82rem;color:var(--tinta-2)}
+  .auto-foto .vazia{width:64px;height:64px;border-radius:8px;background:var(--foto-bg);display:grid;place-items:center;font-size:.65rem;text-align:center;color:var(--tinta-2);flex:none}
+  .auto-foto.falta{border-color:var(--erro)}
+  .auto-foto.falta p{color:var(--erro)}
+  .item{border:1px solid var(--linha);border-radius:12px;padding:12px;display:grid;gap:6px;margin-top:10px}
+  .item.off{opacity:.6}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .chip{border:2px solid var(--linha);background:var(--papel);color:var(--tinta);border-radius:999px;padding:9px 16px;font-weight:600}
+  .chip[aria-pressed=true]{border-color:var(--azul);background:var(--foto-bg);color:var(--azul)}
+  .chip[aria-pressed=true]::after{content:" ✓"}
+  .tres{display:grid;grid-template-columns:1fr .7fr 1fr;gap:10px}
+  .tres label{margin-top:4px;font-weight:500;color:var(--tinta-2)}
+  .item b{font-family:var(--display);font-size:1.05rem}
+  .item small{color:var(--tinta-2)}
+  .preco{font-weight:800}
+  .vazio{color:var(--tinta-2);margin:0}
+
+  #status{position:sticky;bottom:12px;z-index:5;border-radius:12px;padding:12px 14px;font-weight:600;border:1px solid var(--linha);background:var(--card);display:none}
+  #status.ok{display:block;background:var(--ok-bg);border-color:var(--zap)}
+  #status.erro{display:block;background:var(--erro-bg);border-color:var(--erro)}
+  #status.info{display:block}
+  pre{background:var(--papel);border:1px solid var(--linha);border-radius:10px;padding:12px;overflow:auto;font-size:.8rem;max-height:320px}
+  .url{display:flex;gap:8px}
+  .url input{flex:1}
+
+  .cores{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+  .cor{display:inline-flex;align-items:center;gap:8px;padding:8px 14px 8px 10px;border:2px solid var(--linha);background:var(--papel);color:var(--tinta);border-radius:999px;font-size:.9rem;font-weight:600}
+  .cor .bolinha{width:20px;height:20px;border-radius:50%;border:1px solid rgba(128,128,128,.55);flex:none;display:grid;place-items:center;font-size:.7rem;line-height:1;color:#fff}
+  .cor[aria-pressed=true]{border-color:var(--azul);background:var(--foto-bg)}
+  .cor[aria-pressed=true]::after{content:"✓";font-weight:800;color:var(--azul)}
+  .cor-outra{display:flex;gap:8px;margin-top:10px}
+  .cor-outra input{flex:1}
+
+  /* seletor Apple / Android */
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+  .seg button{display:flex;align-items:center;justify-content:center;gap:8px;border:2px solid var(--linha);padding:11px 12px}
+  .seg button[aria-pressed=true]{border-color:var(--azul);background:var(--card);color:var(--azul)}
+
+  /* gaveta de cores */
+  details.gaveta{margin-top:14px;border:1px solid var(--linha);border-radius:12px;background:var(--papel)}
+  details.gaveta>summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;font-weight:600;font-size:.88rem}
+  details.gaveta>summary::-webkit-details-marker{display:none}
+  details.gaveta>summary::after{content:"▾";color:var(--tinta-2);transition:transform .15s}
+  details.gaveta[open]>summary::after{transform:rotate(180deg)}
+  .gaveta .corpo{padding:0 14px 14px}
+  .gaveta .resumo{margin-left:auto;display:flex;align-items:center;gap:6px;min-width:0;font-weight:500;color:var(--tinta-2)}
+  .gaveta .resumo .bolinha{width:16px;height:16px;border-radius:50%;border:1px solid rgba(128,128,128,.55);flex:none}
+  .gaveta .resumo .txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:46vw}
+
+  /* bloco de preços */
+  fieldset.precos{border:0;padding:0;margin:16px 0 0;min-width:0}
+  fieldset.precos legend{font-family:var(--display);font-weight:700;font-size:1.05rem;padding:0}
+  .bloco-preco{border:1px solid var(--linha);border-radius:12px;padding:12px 14px;margin-top:10px;background:var(--papel)}
+  .bloco-preco h3{margin:0;font-size:.95rem;font-weight:700}
+  .bloco-preco label{margin-top:8px}
+  .bloco-preco input[type=text]{background:var(--card)}
+  .bloco-preco .sub{font-size:.8rem;margin-top:6px}
+</style>
+</head>
+<body>
+<main>
+  <div>
+    <h1>Atualizar vitrine</h1>
+    <p class="sub">Plugin Celulares · preencha os aparelhos, confira a lista e envie para o GitHub.</p>
+  </div>
+
+  <!-- 1. GitHub -->
+  <details class="painel" id="painelGit">
+    <summary>Conexão com o GitHub</summary>
+    <label for="gOwner">Usuário ou organização</label>
+    <input type="text" id="gOwner" autocomplete="off" autocapitalize="off" value="plugincelularesnovaserrana-sys" placeholder="minha-loja">
+    <label for="gRepo">Repositório</label>
+    <input type="text" id="gRepo" autocomplete="off" autocapitalize="off" value="Vitrine" placeholder="vitrine">
+    <div class="duas">
+      <div>
+        <label for="gBranch">Branch</label>
+        <input type="text" id="gBranch" autocomplete="off" autocapitalize="off" value="main">
+      </div>
+      <div>
+        <label for="gPath">Arquivo da lista</label>
+        <input type="text" id="gPath" autocomplete="off" autocapitalize="off" value="produtos.json">
+      </div>
+    </div>
+    <label for="gPasta">Pasta das fotos</label>
+    <input type="text" id="gPasta" autocomplete="off" autocapitalize="off" value="assets">
+    <label for="gToken">Token do GitHub <span class="dica">(permissão Contents: leitura e escrita, só neste repositório)</span></label>
+    <input type="password" id="gToken" autocomplete="off" placeholder="github_pat_...">
+    <label class="check"><input type="checkbox" id="gLembrar"> Lembrar token neste aparelho</label>
+
+    <label for="gUrl">Endereço da lista (já configurado em <code>listaUrl</code> do index.html)</label>
+    <div class="url">
+      <input type="text" id="gUrl" readonly>
+      <button type="button" class="sec mini" id="copiarUrl">Copiar</button>
+    </div>
+
+    <div class="linha-btn">
+      <button type="button" class="pri" id="salvarCfg">Salvar e carregar lista</button>
+    </div>
+  </details>
+
+  <!-- 2. Formulário -->
+  <section aria-labelledby="tFormulario">
+    <h2 id="tFormulario">Novo aparelho</h2>
+
+    <label id="lPlat">Tipo de aparelho</label>
+    <div class="seg" role="group" aria-labelledby="lPlat">
+      <button type="button" class="sec" id="plApple" aria-pressed="true">Apple · iPhone</button>
+      <button type="button" class="sec" id="plAndroid" aria-pressed="false">Android</button>
+    </div>
+
+    <div id="boxMarca" hidden>
+      <label for="fMarca">Marca</label>
+      <input type="text" id="fMarca" list="marcasAndroid" autocomplete="off" placeholder="Samsung">
+      <datalist id="marcasAndroid"></datalist>
+    </div>
+
+    <label for="fModelo">Modelo</label>
+    <input type="text" id="fModelo" list="modelosIphone" autocomplete="off" placeholder="iPhone 13 Pro Max">
+    <datalist id="modelosIphone"></datalist>
+
+    <label id="lArm">Armazenamento <span class="dica" id="dicaDetalhes">(toque para marcar)</span></label>
+    <div class="chips" id="chipsArm" role="group" aria-labelledby="lArm"></div>
+    <div id="boxRam" hidden>
+      <label id="lRam">Memória RAM <span class="dica">(opcional)</span></label>
+      <div class="chips" id="chipsRam" role="group" aria-labelledby="lRam"></div>
+    </div>
+    <input type="hidden" id="fDetalhes">
+
+    <label for="fCond">Condição</label>
+    <select id="fCond">
+      <option value="Seminovo">Seminovo</option>
+      <option value="Novo">Novo</option>
+    </select>
+
+    <div id="boxBateria" hidden>
+      <label for="fBateria">Bateria (%) <span class="dica">(saúde da bateria do iPhone seminovo)</span></label>
+      <input type="text" id="fBateria" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="89">
+    </div>
+
+    <label for="fObs">Observação <span class="dica">(opcional, aparece para o cliente)</span></label>
+    <input type="text" id="fObs" autocomplete="off" maxlength="160" placeholder="Ex.: pequeno risco na lateral, tela original">
+
+    <fieldset class="precos" aria-labelledby="lPrecos">
+      <legend id="lPrecos">Preços</legend>
+
+      <div class="bloco-preco">
+        <h3>À vista <span class="dica">(PIX ou dinheiro, já com desconto)</span></h3>
+        <label for="fPreco">Preço à vista (R$)</label>
+        <input type="text" id="fPreco" inputmode="decimal" autocomplete="off" placeholder="2890,00">
+        <p class="sub">Aparece no catálogo do cartão e no catálogo completo.</p>
+      </div>
+
+      <div class="bloco-preco">
+        <h3>Cartão de crédito <span class="dica">(calculado sozinho · vale para todos os aparelhos)</span></h3>
+        <div class="duas">
+          <div><label for="fTaxa10">Acréscimo em 10x (%)</label><input type="text" id="fTaxa10" inputmode="decimal" autocomplete="off" placeholder="8"></div>
+          <div><label for="fTaxa18">Acréscimo em 18x (%)</label><input type="text" id="fTaxa18" inputmode="decimal" autocomplete="off" placeholder="15"></div>
+        </div>
+        <p class="sub" id="resumoCartao" aria-live="polite" style="margin-top:6px"></p>
+        <p class="sub">O site soma o % ao preço à vista e divide pelas parcelas. Deixe em branco para não mostrar aquela opção. Mudou a taxa? Toque em Atualizar lista.</p>
+      </div>
+
+      <div class="bloco-preco">
+        <h3 id="lBoleto">Boleto <span class="dica">(opcional · entrada + parcelas · iPhone 15x, Android 11x)</span></h3>
+        <div class="tres" role="group" aria-labelledby="lBoleto">
+          <div><label for="fEntrada">Entrada mínima (R$)</label><input type="text" id="fEntrada" inputmode="decimal" autocomplete="off" placeholder="500,00"></div>
+          <div><label for="fParcN">Parcelas</label><input type="text" id="fParcN" inputmode="numeric" maxlength="2" autocomplete="off" value="15"></div>
+          <div><label for="fParcVal">Valor da parcela (R$)</label><input type="text" id="fParcVal" inputmode="decimal" autocomplete="off" placeholder="190,00"></div>
+        </div>
+        <p class="sub" id="resumoBoleto" aria-live="polite" style="margin-top:6px"></p>
+        <p class="sub">Aparece no catálogo do boleto e no catálogo completo. Sem boleto preenchido, o aparelho não aparece no catálogo do boleto.</p>
+      </div>
+    </fieldset>
+
+    <input type="hidden" id="fCores">
+    <details class="gaveta" id="gavetaCores">
+      <summary>
+        <span id="lCores">Cores <span class="dica" id="dicaCores">(toque para marcar)</span></span>
+        <span class="resumo" id="resumoCores"></span>
+      </summary>
+      <div class="corpo">
+        <div class="cores" id="coresBox" role="group" aria-labelledby="lCores"></div>
+        <div class="cor-outra">
+          <input type="text" id="fCorOutra" autocomplete="off" placeholder="Outra cor (se não estiver acima)" aria-label="Outra cor">
+          <button type="button" class="sec mini" id="btnCorOutra">Adicionar</button>
+        </div>
+      </div>
+    </details>
+
+    <label for="fFotos">Fotos</label>
+    <input type="file" id="fFotos" accept="image/*" multiple>
+    <div class="miniaturas" id="miniaturas"></div>
+    <div id="fotoAuto" hidden></div>
+
+    <label class="check"><input type="checkbox" id="fDisp" checked> Disponível na loja</label>
+
+    <input type="hidden" id="fParcelado">
+
+    <div class="acoes">
+      <button type="button" class="sec" id="btnAdicionar">Adicionar aparelho</button>
+      <button type="button" class="envia" id="btnEnviar">Atualizar lista</button>
+    </div>
+    <p class="sub" style="margin-top:10px">Adicionar guarda este aparelho e abre os campos para o próximo. Atualizar lista envia tudo para o GitHub.
+      A mesma lista alimenta os catálogos <b>boleto.html</b>, <b>cartao.html</b> e o completo (index.html).</p>
+  </section>
+
+  <!-- 3. Lista -->
+  <section aria-labelledby="tLista">
+    <h2 id="tLista">Lista atual (<span id="qtd">0</span>)</h2>
+    <div id="lista"></div>
+    <details style="margin-top:14px">
+      <summary class="dica" style="cursor:pointer">Ver JSON</summary>
+      <pre id="previa"></pre>
+    </details>
+  </section>
+
+  <div id="status" role="status" aria-live="polite"></div>
+</main>
+
+<script>
+/* ============ ESTADO ============ */
+const $ = id => document.getElementById(id);
+const S = { itens: [], taxas: {}, carregada: false, editando: -1, fotosForm: [], novasForm: [], ocupado: false, plat: "Apple" };
+const LS = "vitrine-admin";
+const PADRAO = {owner: "plugincelularesnovaserrana-sys", repo: "Vitrine"};
+
+/* ============ UTILITÁRIOS ============ */
+const brl = n => Number(n).toLocaleString("pt-BR", {style:"currency", currency:"BRL"});
+function paraNumero(v){
+  let s = String(v ?? "").replace(/[^\d,.-]/g, "");
+  if (s.includes(",")) s = s.replace(/\./g, "").replace(",", ".");
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+const listaDe = v => String(v ?? "").split(",").map(x => x.trim()).filter(Boolean);
+const enc = p => p.split("/").map(encodeURIComponent).join("/");
+const limpaPasta = p => p.trim().replace(/^\/+|\/+$/g, "");
+const semAcento = t => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const arquivoDoModelo = (m, cor) => semAcento((m + (cor ? " " + cor : "")).toLowerCase()).replace(/\s+/g, " ").trim() + ".png";
+const MODELOS = [];
+[12,13,14,15,16,17].forEach(n => ["", " Pro", " Pro Max"].forEach(x => MODELOS.push("iPhone " + n + x)));
+["", " Pro", " Pro Max"].slice(1).forEach(x => MODELOS.push("iPhone 18" + x));
+
+const MARCAS_ANDROID = ["Samsung","Motorola","Xiaomi","Redmi","Poco","Realme","Asus","Infinix","Google Pixel","LG","OnePlus","Honor","Nokia"];
+const platDe = p => p.plataforma || (/^iphone/i.test(p.modelo || "") ? "Apple" : "Android");
+
+function aviso(tipo, texto){
+  const s = $("status"); s.className = tipo; s.textContent = texto;
+  if (tipo === "ok") clearTimeout(aviso.t), aviso.t = setTimeout(() => { if (s.className === "ok") s.className = ""; }, 7000);
+}
+function ocupar(b){
+  S.ocupado = b;
+  ["btnAdicionar","btnEnviar","salvarCfg"].forEach(id => $(id).disabled = b);
+}
+
+/* ============ CONFIGURAÇÃO ============ */
+function lerCfg(){
+  return {
+    owner: $("gOwner").value.trim(), repo: $("gRepo").value.trim(),
+    branch: $("gBranch").value.trim() || "main",
+    path: limpaPasta($("gPath").value) || "produtos.json",
+    pasta: limpaPasta($("gPasta").value),
+    token: $("gToken").value.trim(), lembrar: $("gLembrar").checked
+  };
+}
+function guardarCfg(){
+  const c = lerCfg();
+  try {
+    const copia = {...c}; if (!c.lembrar) copia.token = "";
+    localStorage.setItem(LS, JSON.stringify(copia));
+  } catch (e) {}
+}
+function restaurarCfg(){
+  try {
+    const c = JSON.parse(localStorage.getItem(LS) || "null"); if (!c) return false;
+    $("gOwner").value = c.owner || PADRAO.owner; $("gRepo").value = c.repo || PADRAO.repo;
+    $("gBranch").value = c.branch || "main"; $("gPath").value = c.path || "produtos.json";
+    $("gPasta").value = c.pasta ?? "assets"; $("gToken").value = c.token || "";
+    $("gLembrar").checked = !!c.lembrar;
+    return true;
+  } catch (e) { return false; }
+}
+function atualizarUrl(){
+  const c = lerCfg();
+  $("gUrl").value = (c.owner && c.repo) ? `https://raw.githubusercontent.com/${c.owner}/${c.repo}/${c.branch}/${c.path}` : "";
+}
+function cfgCompleta(){
+  const c = lerCfg();
+  if (!c.owner || !c.repo || !c.token){
+    $("painelGit").open = true;
+    aviso("erro", "Preencha usuário, repositório e token na conexão com o GitHub.");
+    return null;
+  }
+  return c;
+}
+
+/* ============ GITHUB ============ */
+async function gh(c, metodo, caminho, corpo){
+  const url = `https://api.github.com/repos/${c.owner}/${c.repo}/contents/${enc(caminho)}` + (metodo === "GET" ? `?ref=${encodeURIComponent(c.branch)}` : "");
+  const r = await fetch(url, {
+    method: metodo,
+    headers: {
+      "Authorization": "Bearer " + c.token,
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      ...(corpo ? {"Content-Type": "application/json"} : {})
+    },
+    body: corpo ? JSON.stringify(corpo) : undefined,
+    cache: "no-store"
+  });
+  let dados = null; try { dados = await r.json(); } catch (e) {}
+  if (!r.ok){
+    const e = new Error(dados?.message || ("Erro " + r.status)); e.status = r.status; throw e;
+  }
+  return dados;
+}
+function traduz(e){
+  if (e.status === 401) return "Token inválido ou expirado.";
+  if (e.status === 403) return "O token não tem permissão de escrita neste repositório (Contents: Read and write).";
+  if (e.status === 404) return "Repositório ou branch não encontrado. Confira usuário, repositório e branch.";
+  if (e.status === 409 || e.status === 422) return "A lista mudou no GitHub enquanto você editava. Toque em \"Salvar e carregar lista\" e tente de novo.";
+  return e.message || "Falha na conexão.";
+}
+const utf8ParaB64 = txt => { const b = new TextEncoder().encode(txt); let s = ""; b.forEach(x => s += String.fromCharCode(x)); return btoa(s); };
+const b64ParaUtf8 = b64 => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\s/g, "")), ch => ch.charCodeAt(0)));
+
+async function carregarLista(){
+  const c = cfgCompleta(); if (!c) return;
+  ocupar(true); aviso("info", "Carregando a lista do GitHub...");
+  try {
+    let itens = [];
+    try {
+      const d = await gh(c, "GET", c.path);
+      const j = JSON.parse(b64ParaUtf8(d.content || ""));
+      itens = (Array.isArray(j) ? j : (j.produtos || j.items || [])).map(p => { const {cartao, ...resto} = p; return {...resto, novas: []}; });
+      const tx = (!Array.isArray(j) && j.cartao) || {};
+      $("fTaxa10").value = tx.taxa10 != null ? String(tx.taxa10).replace(".", ",") : "";
+      $("fTaxa18").value = tx.taxa18 != null ? String(tx.taxa18).replace(".", ",") : "";
+      lerTaxas();
+    } catch (e) {
+      if (e.status !== 404) throw e;
+    }
+    S.itens = itens; S.carregada = true; S.editando = -1;
+    limparForm(); desenharLista();
+    aviso("ok", itens.length ? `Lista carregada: ${itens.length} aparelho(s).` : "Nenhuma lista encontrada ainda. Ela será criada no primeiro envio.");
+  } catch (e) {
+    S.carregada = false;
+    aviso("erro", traduz(e));
+  } finally { ocupar(false); }
+}
+
+/* ============ FOTOS ============ */
+function slug(t){
+  return (t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")) || "aparelho";
+}
+async function fotoParaBase64(file){
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((ok, falha) => {
+      const i = new Image(); i.onload = () => ok(i);
+      i.onerror = () => falha(new Error("Não consegui ler a foto " + file.name));
+      i.src = url;
+    });
+    const k = Math.min(1, 1200 / Math.max(img.naturalWidth, img.naturalHeight));
+    const cv = document.createElement("canvas");
+    cv.width = Math.round(img.naturalWidth * k); cv.height = Math.round(img.naturalHeight * k);
+    const ctx = cv.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.drawImage(img, 0, 0, cv.width, cv.height);
+    const blob = await new Promise(r => cv.toBlob(r, "image/jpeg", 0.85));
+    return await new Promise((ok, falha) => {
+      const fr = new FileReader(); fr.onload = () => ok(String(fr.result).split(",")[1]);
+      fr.onerror = () => falha(new Error("Falha ao preparar a foto.")); fr.readAsDataURL(blob);
+    });
+  } finally { URL.revokeObjectURL(url); }
+}
+
+let tokenFoto = 0;
+const testaImagem = url => new Promise(ok => { const i = new Image(); i.onload = () => ok(true); i.onerror = () => ok(false); i.src = url; });
+function agendaFotoAuto(){ clearTimeout(agendaFotoAuto.t); agendaFotoAuto.t = setTimeout(atualizarFotoAuto, 350); }
+
+/* Busca a foto no repositório pelo modelo + cor. Sem a combinação no banco: fica sem imagem, para enviar uma nova. */
+async function atualizarFotoAuto(){
+  const box = $("fotoAuto"), modelo = $("fModelo").value.trim(), meu = ++tokenFoto;
+  if (!modelo || S.fotosForm.length || S.novasForm.length){ box.hidden = true; box.replaceChildren(); return; }
+  const c = lerCfg(), cores = listaDe($("fCores").value);
+  box.hidden = false; box.replaceChildren();
+  const alvos = cores.length ? cores : [null];
+
+  if (!(c.owner && c.repo)){
+    const r = document.createElement("div"); r.className = "auto-foto";
+    const p = document.createElement("p"); p.textContent = "Conecte ao GitHub para procurar a foto no banco."; r.append(p); box.append(r); return;
+  }
+  const base = `https://raw.githubusercontent.com/${c.owner}/${c.repo}/${c.branch}/` + (c.pasta ? enc(c.pasta) + "/" : "");
+  const linhas = alvos.map(cor => {
+    const row = document.createElement("div"); row.className = "auto-foto"; row.style.marginTop = "8px";
+    const ph = document.createElement("div"); ph.className = "vazia"; ph.textContent = "...";
+    const p = document.createElement("p"); p.textContent = "Procurando " + (cor ? `${modelo} ${cor}` : modelo) + "...";
+    row.append(ph, p); box.append(row);
+    return {cor, row, ph, p};
+  });
+
+  for (const l of linhas){
+    const arq = arquivoDoModelo(modelo, l.cor);
+    const cand = [arq, arq.replace(/\.png$/, ".jpg"), arq.replace(/\.png$/, ".webp")];
+    let achou = null;
+    for (const nome of cand){
+      const url = base + encodeURIComponent(nome) + "?t=" + Date.now();
+      if (await testaImagem(url)){ achou = url; break; }
+      if (meu !== tokenFoto) return;
+    }
+    if (meu !== tokenFoto) return;
+    if (achou){
+      const img = document.createElement("img"); img.alt = ""; img.src = achou;
+      l.ph.replaceWith(img);
+      l.p.textContent = l.cor ? `${l.cor}: foto encontrada no banco (${arq}).` : `Foto encontrada no banco (${arq}).`;
+    } else {
+      l.row.classList.add("falta"); l.ph.textContent = "sem imagem";
+      l.p.textContent = l.cor
+        ? `${l.cor}: não há foto desse modelo nessa cor no banco (${arq}). Envie a nova foto no campo acima.`
+        : `Não achei ${arq} no banco. Envie uma foto no campo acima.`;
+    }
+  }
+}
+
+function desenharMiniaturas(){
+  atualizarFotoAuto();
+  const box = $("miniaturas"); box.replaceChildren();
+  S.fotosForm.forEach((nome, i) => {
+    const d = document.createElement("div"); d.className = "mini-foto"; d.textContent = nome;
+    const x = document.createElement("button"); x.type = "button"; x.textContent = "×"; x.setAttribute("aria-label", "Remover foto " + nome);
+    x.onclick = () => { S.fotosForm.splice(i, 1); desenharMiniaturas(); };
+    d.append(x); box.append(d);
+  });
+  S.novasForm.forEach((f, i) => {
+    const d = document.createElement("div"); d.className = "mini-foto";
+    const img = document.createElement("img"); img.alt = f.name; img.src = URL.createObjectURL(f);
+    img.onload = () => URL.revokeObjectURL(img.src);
+    const x = document.createElement("button"); x.type = "button"; x.textContent = "×"; x.setAttribute("aria-label", "Remover foto " + f.name);
+    x.onclick = () => { S.novasForm.splice(i, 1); desenharMiniaturas(); };
+    d.append(img, x); box.append(d);
+  });
+}
+$("fFotos").addEventListener("change", e => {
+  S.novasForm.push(...e.target.files); e.target.value = ""; desenharMiniaturas();
+});
+
+/* ============ CORES (botões) ============ */
+const PALETA = [
+  ["Preto","#111111"],["Branco","#FFFFFF"],["Cinza","#8A8F98"],["Prata","#C9CCD1"],
+  ["Dourado","#D4AF37"],["Vermelho","#E02424"],["Rosa","#F472B6"],["Roxo","#7C3AED"],
+  ["Lilás","#C4A1FF"],["Azul","#2563EB"],["Azul-claro","#7DD3FC"],["Verde","#16A34A"],
+  ["Amarelo","#FACC15"],["Laranja","#F97316"],["Bege","#E8D8B8"],["Marrom","#7A4A2A"]
+];
+const mesmaCor = (a, b) => a.toLowerCase() === b.toLowerCase();
+const corUnica = () => $("fCond").value === "Seminovo";   /* seminovo = peça única, só 1 cor */
+function atualizarResumoCores(sel){
+  const r = $("resumoCores"); r.replaceChildren();
+  $("dicaCores").textContent = corUnica() ? "(peça única: escolha só 1)" : "(toque para marcar quantas quiser)";
+  if (!sel.length){ r.textContent = "nenhuma"; return; }
+  sel.forEach(n => {
+    const d = document.createElement("span"); d.className = "bolinha";
+    const hex = (PALETA.find(p => mesmaCor(p[0], n)) || [])[1];
+    d.style.background = hex || "var(--foto-bg)"; r.append(d);
+  });
+  const t = document.createElement("span"); t.className = "txt"; t.textContent = sel.join(", "); r.append(t);
+}
+function aplicarRegraCor(){
+  const sel = listaDe($("fCores").value);
+  if (corUnica() && sel.length > 1){
+    $("fCores").value = sel[0];
+    aviso("info", `Seminovo é peça única: mantive só a cor ${sel[0]}.`);
+  }
+  desenharCores();
+}
+function desenharCores(){
+  const sel = listaDe($("fCores").value), box = $("coresBox");
+  atualizarResumoCores(sel); agendaFotoAuto();
+  box.replaceChildren();
+  const extras = sel.filter(c => !PALETA.some(p => mesmaCor(p[0], c))).map(c => [c, null]);
+  [...PALETA, ...extras].forEach(([nome, hex]) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "cor sec";
+    b.setAttribute("aria-pressed", sel.some(c => mesmaCor(c, nome)) ? "true" : "false");
+    const d = document.createElement("span"); d.className = "bolinha";
+    d.style.background = hex || "var(--foto-bg)"; if (!hex) d.textContent = "?", d.style.color = "var(--tinta-2)";
+    b.append(d, document.createTextNode(nome));
+    b.onclick = () => alternarCor(nome);
+    box.append(b);
+  });
+}
+function alternarCor(nome){
+  let atual = listaDe($("fCores").value);
+  const jaTem = atual.some(c => mesmaCor(c, nome));
+  if (corUnica()) atual = jaTem ? [] : [nome];
+  else atual = jaTem ? atual.filter(c => !mesmaCor(c, nome)) : [...atual, nome];
+  $("fCores").value = atual.join(", ");
+  desenharCores();
+}
+function addCorOutra(){
+  const v = $("fCorOutra").value.trim();
+  if (!v) return;
+  const nome = (PALETA.find(p => mesmaCor(p[0], v)) || [v])[0];
+  if (!listaDe($("fCores").value).some(c => mesmaCor(c, nome))) alternarCor(nome);
+  $("fCorOutra").value = "";
+}
+$("btnCorOutra").addEventListener("click", addCorOutra);
+$("fCorOutra").addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); addCorOutra(); } });
+desenharCores();
+
+/* ============ ARMAZENAMENTO (botões) ============ */
+const ARMAZENAMENTOS = ["64GB","128GB","256GB","512GB","1TB","2TB"];
+const RAMS = ["4GB","6GB","8GB","12GB","16GB"];
+let armSel = "", ramSel = "";
+function lerDetalhes(){                       /* lê o texto salvo (ex.: "256GB · 8GB RAM") e marca os botões */
+  const t = $("fDetalhes").value;
+  const mr = t.match(/(\d+)\s*GB\s*RAM/i);
+  ramSel = mr ? mr[1] + "GB" : "";
+  const m = t.replace(/(\d+)\s*GB\s*RAM/i, "").match(/(\d+)\s*(GB|TB)/i);
+  armSel = m ? m[1] + m[2].toUpperCase() : "";
+}
+function gravarDetalhes(){
+  $("fDetalhes").value = [armSel, ramSel ? ramSel + " RAM" : ""].filter(Boolean).join(" · ");
+}
+function chips(boxId, opcoes, atual, aoClicar){
+  const box = $(boxId); box.replaceChildren();
+  const todas = atual && !opcoes.includes(atual) ? [...opcoes, atual] : opcoes;   /* valor antigo fora da lista continua marcado */
+  todas.forEach(v => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = v;
+    b.setAttribute("aria-pressed", v === atual ? "true" : "false");
+    b.onclick = () => aoClicar(v === atual ? "" : v);
+    box.append(b);
+  });
+}
+function desenharChips(){
+  chips("chipsArm", ARMAZENAMENTOS, armSel, v => { armSel = v; gravarDetalhes(); desenharChips(); });
+  chips("chipsRam", RAMS, ramSel, v => { ramSel = v; gravarDetalhes(); desenharChips(); });
+}
+function desenharArmazenamento(){ lerDetalhes(); desenharChips(); }
+
+/* ============ APPLE x ANDROID ============ */
+function definirPlat(plat){
+  S.plat = plat;
+  const apple = plat === "Apple";
+  $("plApple").setAttribute("aria-pressed", apple);
+  $("plAndroid").setAttribute("aria-pressed", !apple);
+  $("boxMarca").hidden = apple;
+  if (apple) $("fModelo").setAttribute("list", "modelosIphone"); else $("fModelo").removeAttribute("list");
+  $("fModelo").placeholder = apple ? "iPhone 13 Pro Max" : "Galaxy S23 Ultra";
+  $("fDetalhes").placeholder = apple ? "128GB" : "256GB · 8GB RAM";
+  $("boxRam").hidden = apple;                                /* RAM só para Android */
+  if (apple){ ramSel = ""; gravarDetalhes(); }
+  desenharArmazenamento();
+  atualizarCamposSemi();
+  parcelasPadraoBoleto();
+}
+$("plApple").onclick = () => definirPlat("Apple");
+$("plAndroid").onclick = () => { definirPlat("Android"); $("fMarca").focus(); };
+
+/* ============ BATERIA, OBSERVAÇÃO E BOLETO ============ */
+function atualizarCamposSemi(){
+  $("boxBateria").hidden = !($("fCond").value === "Seminovo" && S.plat === "Apple");   /* bateria: só iPhone seminovo */
+}
+function atualizarBoleto(){
+  const e = paraNumero($("fEntrada").value), v = paraNumero($("fParcVal").value);
+  const n = parseInt($("fParcN").value.replace(/\D/g, ""), 10) || 0;
+  $("resumoBoleto").textContent = (v > 0 && n > 0)
+    ? `Total a prazo: ${brl(e + v * n)} (${e > 0 ? "entrada " + brl(e) + " + " : ""}${n}x de ${brl(v)})`
+    : "";
+}
+/* parcelas padrão do boleto: iPhone 15x, Android 11x */
+const PARC_BOLETO = {Apple: 15, Android: 11};
+function parcelasPadraoBoleto(){
+  const atual = $("fParcN").value.trim();
+  if (atual === "" || Object.values(PARC_BOLETO).map(String).includes(atual)){
+    $("fParcN").value = String(PARC_BOLETO[S.plat] || 15);
+    atualizarBoleto();
+  }
+}
+/* cartão: % de acréscimo sobre o preço à vista, igual para todos os aparelhos (mesma conta do site) */
+function lerTaxas(){
+  S.taxas = {};
+  [10, 18].forEach(n => {
+    const v = $("fTaxa" + n).value.trim();
+    if (v !== "" && paraNumero(v) >= 0) S.taxas["taxa" + n] = paraNumero(v);
+  });
+}
+function calcCartao(preco){
+  if (!(preco > 0)) return [];
+  return [10, 18].filter(n => S.taxas["taxa" + n] != null).map(n => {
+    const total = Math.round(preco * (1 + S.taxas["taxa" + n] / 100) * 100) / 100;
+    return `${n}x de ${brl(Math.ceil(+(total / n * 100).toFixed(6)) / 100)}`;
+  });
+}
+function atualizarCartao(){
+  const avista = paraNumero($("fPreco").value);
+  const c = calcCartao(avista);
+  $("resumoCartao").textContent = !Object.keys(S.taxas).length ? "Preencha os % para o cartão aparecer no site."
+    : (c.length ? `Este aparelho no cartão: ${c.join(" ou ")}` : "Preencha o preço à vista para ver as parcelas.");
+}
+
+/* ============ FORMULÁRIO ============ */
+function limparForm(){
+  ["fModelo","fMarca","fDetalhes","fPreco","fCores","fParcelado","fBateria","fObs","fEntrada","fParcVal"].forEach(id => $(id).value = "");
+  $("fParcN").value = String(PARC_BOLETO[S.plat] || 15);
+  $("fCond").value = "Seminovo"; $("fDisp").checked = true;
+  desenharArmazenamento();
+  atualizarCamposSemi(); atualizarBoleto(); atualizarCartao();
+  S.fotosForm = []; S.novasForm = []; S.editando = -1;
+  $("gavetaCores").open = false;
+  desenharCores();
+  $("tFormulario").textContent = "Novo aparelho";
+  $("btnAdicionar").textContent = "Adicionar aparelho";
+  desenharMiniaturas();
+}
+const formTemConteudo = () => $("fModelo").value.trim() !== "";
+
+function adicionar(){
+  const modelo = $("fModelo").value.trim();
+  const preco = paraNumero($("fPreco").value);
+  if (!modelo){ aviso("erro", "Preencha o modelo."); $("fModelo").focus(); return false; }
+  if (preco <= 0){ aviso("erro", "Preencha o preço à vista."); $("fPreco").focus(); return false; }
+  const marca = $("fMarca").value.trim();
+  if (S.plat === "Android" && !marca){ aviso("erro", "Preencha a marca do aparelho Android."); $("fMarca").focus(); return false; }
+  let cores = listaDe($("fCores").value);
+  const semi = $("fCond").value === "Seminovo";
+  if (semi && cores.length > 1) cores = [cores[0]];
+
+  let bateria;
+  if (semi && S.plat === "Apple" && $("fBateria").value.trim() !== ""){
+    bateria = parseInt($("fBateria").value.replace(/\D/g, ""), 10);
+    if (!(bateria >= 1 && bateria <= 100)){ aviso("erro", "Bateria deve ser um número de 1 a 100."); $("fBateria").focus(); return false; }
+  }
+  const observacao = $("fObs").value.trim();
+
+  let boleto;
+  const entrada = paraNumero($("fEntrada").value), parcVal = paraNumero($("fParcVal").value);
+  const parcN = parseInt($("fParcN").value.replace(/\D/g, ""), 10);
+  if (entrada > 0 || parcVal > 0){
+    if (!(parcVal > 0)){ aviso("erro", "Informe o valor da parcela do boleto."); $("fParcVal").focus(); return false; }
+    if (!(parcN >= 1 && parcN <= 60)){ aviso("erro", "Informe o número de parcelas do boleto (ex.: 15)."); $("fParcN").focus(); return false; }
+    boleto = {entrada: entrada > 0 ? entrada : 0, parcelas: parcN, parcela: parcVal};
+  }
+
+  const item = {
+    plataforma: S.plat,
+    modelo,
+    detalhes: $("fDetalhes").value.trim(),
+    condicao: $("fCond").value,
+    preco,
+    fotos: [...S.fotosForm],
+    cores,
+    bateria,                                   /* undefined = não vai para o JSON */
+    observacao: observacao || undefined,
+    boleto,
+    disponivel: $("fDisp").checked,
+    novas: [...S.novasForm]
+  };
+  const parc = paraNumero($("fParcelado").value);
+  if (parc > 0) item.parcelado = parc;
+
+  if (S.editando >= 0){
+    const orig = S.itens[S.editando];
+    const novo = {...orig, ...item};
+    if (!(parc > 0)) delete novo.parcelado;
+    if (S.plat === "Android") novo.marca = marca; else delete novo.marca;
+    S.itens[S.editando] = novo;
+    aviso("ok", `Alterações salvas em ${modelo}. Toque em Atualizar lista para enviar.`);
+  } else {
+    if (S.plat === "Android") item.marca = marca;
+    S.itens.push(item);
+    aviso("ok", `${modelo} adicionado. Preencha o próximo ou toque em Atualizar lista.`);
+  }
+  limparForm(); desenharLista();
+  $("fModelo").focus();
+  return true;
+}
+
+function editar(i){
+  const p = S.itens[i];
+  S.editando = i;
+  definirPlat(platDe(p)); $("fMarca").value = p.marca || "";
+  $("fModelo").value = p.modelo || ""; $("fDetalhes").value = p.detalhes || ""; desenharArmazenamento();
+  $("fCond").value = p.condicao === "Novo" || p.condicao === "Lacrado" ? "Novo" : "Seminovo";
+  atualizarCamposSemi();
+  $("fBateria").value = p.bateria || ""; $("fObs").value = p.observacao || "";
+  const bo = p.boleto || {};
+  $("fEntrada").value = bo.entrada ? String(bo.entrada).replace(".", ",") : "";
+  $("fParcN").value = bo.parcelas ? String(bo.parcelas) : "15";
+  $("fParcVal").value = bo.parcela ? String(bo.parcela).replace(".", ",") : "";
+  atualizarBoleto();
+  $("fPreco").value = p.preco != null ? String(p.preco).replace(".", ",") : "";
+  atualizarCartao();
+  $("fCores").value = (p.cores || []).join(", ");
+  aplicarRegraCor();
+  $("fParcelado").value = p.parcelado ? String(p.parcelado).replace(".", ",") : "";
+  $("fDisp").checked = p.disponivel !== false;
+  S.fotosForm = [...(p.fotos || [])]; S.novasForm = [...(p.novas || [])];
+  $("tFormulario").textContent = "Editando aparelho";
+  $("btnAdicionar").textContent = "Salvar alterações";
+  desenharMiniaturas();
+  $("tFormulario").scrollIntoView({behavior: "smooth"});
+}
+
+/* ============ LISTA ============ */
+function desenharLista(){
+  $("qtd").textContent = S.itens.length;
+  const box = $("lista"); box.replaceChildren();
+  if (!S.itens.length){
+    const p = document.createElement("p"); p.className = "vazio"; p.textContent = "Nenhum aparelho ainda."; box.append(p);
+  }
+  S.itens.forEach((p, i) => {
+    const d = document.createElement("div"); d.className = "item" + (p.disponivel === false ? " off" : "");
+    const t = document.createElement("b"); t.textContent = p.modelo + (p.detalhes ? " · " + p.detalhes : "");
+    const l2 = document.createElement("div"); l2.className = "preco"; l2.textContent = brl(p.preco);
+    const l3 = document.createElement("small");
+    const nf = (p.fotos || []).length + (p.novas || []).length;
+    l3.textContent = [platDe(p) === "Apple" ? "Apple" : (p.marca || "Android"), p.condicao, p.bateria ? "bateria " + p.bateria + "%" : "", p.observacao ? "com observação" : "",
+                      calcCartao(p.preco).length ? "cartão " + calcCartao(p.preco).join(" / ") : "",
+                      p.boleto ? `boleto ${p.boleto.entrada > 0 ? brl(p.boleto.entrada) + " + " : ""}${p.boleto.parcelas}x ${brl(p.boleto.parcela)}` : "sem boleto", nf ? nf + (nf === 1 ? " foto" : " fotos") : "foto automática", (p.novas || []).length ? (p.novas.length + " para enviar") : "",
+                      p.disponivel === false ? "indisponível" : ""].filter(Boolean).join(" · ");
+    const bt = document.createElement("div"); bt.className = "linha-btn";
+    const be = document.createElement("button"); be.type = "button"; be.className = "sec mini"; be.textContent = "Editar"; be.onclick = () => editar(i);
+    const bc = document.createElement("button"); bc.type = "button"; bc.className = "sec mini"; bc.textContent = "Duplicar";
+    bc.onclick = () => {
+      editar(i); S.editando = -1; S.novasForm = [];
+      $("tFormulario").textContent = "Novo aparelho (cópia)"; $("btnAdicionar").textContent = "Adicionar aparelho";
+      desenharMiniaturas(); const c1 = $("chipsArm").querySelector("button"); if (c1) c1.focus();
+    };
+    const bd = document.createElement("button"); bd.type = "button"; bd.className = "sec mini";
+    bd.textContent = p.disponivel === false ? "Marcar disponível" : "Marcar indisponível";
+    bd.onclick = () => { p.disponivel = p.disponivel === false; desenharLista(); };
+    const br = document.createElement("button"); br.type = "button"; br.className = "sec mini"; br.textContent = "Remover";
+    br.onclick = () => {
+      if (!confirm(`Remover ${p.modelo} da lista?`)) return;
+      S.itens.splice(i, 1);
+      if (S.editando === i) limparForm(); else if (S.editando > i) S.editando--;
+      desenharLista();
+    };
+    bt.append(be, bc, bd, br);
+    d.append(t, l2, l3, bt); box.append(d);
+  });
+  $("previa").textContent = JSON.stringify(serializar(), null, 2);
+}
+function serializar(){
+  const o = {};
+  if (Object.keys(S.taxas).length) o.cartao = {...S.taxas};
+  o.produtos = S.itens.map(({novas, cartao, ...resto}) => resto);
+  return o;
+}
+
+/* ============ ENVIO ============ */
+async function enviar(){
+  const c = cfgCompleta(); if (!c) return;
+  if (formTemConteudo() && !adicionar()) return;
+  if (!S.itens.length){ aviso("erro", "A lista está vazia. Adicione ao menos um aparelho."); return; }
+  if (!S.carregada &&
+      !confirm("A lista atual do GitHub não foi carregada. Enviar agora vai substituir tudo que está lá. Continuar?")) return;
+  if (!confirm(`Enviar ${S.itens.length} aparelho(s) para o GitHub?`)) return;
+
+  ocupar(true);
+  try {
+    const total = S.itens.reduce((n, p) => n + (p.novas || []).length, 0);
+    let feitas = 0;
+    for (const p of S.itens){
+      const novas = p.novas || [];
+      while (novas.length){
+        const arq = novas[0];
+        aviso("info", `Enviando foto ${++feitas} de ${total}...`);
+        const nome = `${slug(p.modelo)}-${Date.now().toString(36)}-${feitas}.jpg`;
+        const caminho = c.pasta ? `${c.pasta}/${nome}` : nome;
+        await gh(c, "PUT", caminho, {message: `Foto: ${p.modelo}`, content: await fotoParaBase64(arq), branch: c.branch});
+        p.fotos = [...(p.fotos || []), nome];
+        novas.shift();
+      }
+      p.novas = novas;
+    }
+
+    aviso("info", "Enviando a lista...");
+    let sha;
+    try { sha = (await gh(c, "GET", c.path)).sha; } catch (e) { if (e.status !== 404) throw e; }
+    const corpo = {message: "Atualiza lista de aparelhos", content: utf8ParaB64(JSON.stringify(serializar(), null, 2) + "\n"), branch: c.branch};
+    if (sha) corpo.sha = sha;
+    await gh(c, "PUT", c.path, corpo);
+
+    S.carregada = true; desenharLista();
+    aviso("ok", `Lista enviada com ${S.itens.length} aparelho(s). A vitrine atualiza em alguns minutos.`);
+  } catch (e) {
+    desenharLista();
+    aviso("erro", "Não foi possível enviar: " + traduz(e));
+  } finally { ocupar(false); }
+}
+
+/* ============ EVENTOS ============ */
+$("btnAdicionar").onclick = adicionar;
+$("btnEnviar").onclick = enviar;
+$("salvarCfg").onclick = async () => { guardarCfg(); atualizarUrl(); await carregarLista(); if (S.carregada) $("painelGit").open = false; };
+$("copiarUrl").onclick = async () => {
+  const v = $("gUrl").value; if (!v) return;
+  try { await navigator.clipboard.writeText(v); aviso("ok", "Endereço copiado."); }
+  catch (e) { $("gUrl").select(); aviso("info", "Selecione e copie o endereço."); }
+};
+["gOwner","gRepo","gBranch","gPath"].forEach(id => $(id).addEventListener("input", atualizarUrl));
+["gOwner","gRepo","gBranch","gPasta"].forEach(id => $(id).addEventListener("change", atualizarFotoAuto));
+let tFoto; $("fModelo").addEventListener("input", () => { clearTimeout(tFoto); tFoto = setTimeout(atualizarFotoAuto, 400); });
+$("fModelo").addEventListener("change", atualizarFotoAuto);
+$("fCond").addEventListener("change", aplicarRegraCor);
+$("fCond").addEventListener("change", atualizarCamposSemi);
+["fEntrada","fParcN","fParcVal"].forEach(id => $(id).addEventListener("input", atualizarBoleto));
+$("fPreco").addEventListener("input", atualizarCartao);
+["fTaxa10","fTaxa18"].forEach(id => $(id).addEventListener("input", () => { lerTaxas(); atualizarCartao(); desenharLista(); }));
+window.addEventListener("beforeunload", e => {
+  if (S.itens.some(p => (p.novas || []).length)) { e.preventDefault(); e.returnValue = ""; }
+});
+
+/* ============ INÍCIO ============ */
+(function(){
+  $("modelosIphone").replaceChildren(...MODELOS.map(m => { const o = document.createElement("option"); o.value = m; return o; }));
+  $("marcasAndroid").replaceChildren(...MARCAS_ANDROID.map(m => { const o = document.createElement("option"); o.value = m; return o; }));
+  definirPlat("Apple");
+  const tinha = restaurarCfg();
+  atualizarUrl(); desenharLista(); desenharMiniaturas();
+  const c = lerCfg();
+  if (tinha && c.owner && c.repo && c.token) { $("painelGit").open = false; carregarLista(); }
+  else $("painelGit").open = true;
+})();
+</script>
+</body>
+</html>

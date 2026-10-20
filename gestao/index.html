@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gestor Loja</title>
+  <link rel="stylesheet" href="assets/fonts.css">
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+  <div id="app"><div class="login"><p style="color:#fff">Carregando…</p></div></div>
+  <noscript>Ative o JavaScript para usar o sistema.</noscript>
+
+  <!-- núcleo -->
+  <script src="js/core/db.js"></script>
+  <script src="js/core/ui.js"></script>
+  <script src="assets/vendor/lucide.min.js"></script>
+  <script src="js/core/fx.js"></script>
+  <script src="js/core/crud.js"></script>
+  <script src="js/core/app.js"></script>
+  <!-- regras de negócio compartilhadas -->
+  <script src="js/core/negocio.js"></script>
+  <!-- cadastros e dados iniciais -->
+  <script src="js/data/schemas.js"></script>
+  <script src="js/data/seed.js"></script>
+  <!-- módulos -->
+  <script src="js/mod/inicio.js"></script>
+  <script src="js/mod/vendas.js"></script>
+  <script src="js/mod/upgrade.js"></script>
+  <script src="js/mod/estoque.js"></script>
+  <script src="js/mod/os.js"></script>
+  <script src="js/mod/financeiro.js"></script>
+  <script src="js/mod/fiscal.js"></script>
+  <script src="js/mod/relatorios.js"></script>
+  <script src="js/mod/drecaixa.js"></script>
+  <script src="js/mod/recibos.js"></script>
+  <script src="js/mod/ferramentas.js"></script>
+  <script src="js/mod/config.js"></script>
+  <script>App.start();</script>
+</body>
+</html>

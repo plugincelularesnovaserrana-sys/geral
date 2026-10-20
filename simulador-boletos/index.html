@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMULADOR DE BOLETO | Plugin Celulares</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #0B0C10; /* Fundo escuro premium idêntico ao index e parcelas */
+            color: #FFFFFF;
+            padding: 40px 20px;
+            display: block; /* Adequado ao fluxo do topo */
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 950px;
+            background-color: #11141a; /* Container escuro levemente contrastante */
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            margin: 0 auto;
+        }
+
+        /* Estrutura de Cabeçalho Superior padrão */
+        .logo-back-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .logo-back-container img {
+            max-width: 250px;
+            height: auto;
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #1f4068, #162447);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(135deg, #0056b3, #1f4068);
+            border-color: #45F3FF;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+            color: #FFFFFF;
+            margin-bottom: 30px;
+            font-size: 22px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #45F3FF;
+            padding-bottom: 15px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .container {
+                padding: 1.5rem;
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #b0b3b8;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #162447;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #FFFFFF;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #45F3FF;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+        }
+
+        .radio-tile-group {
+            display: flex;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .radio-tile {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background-color: #162447;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: #b0b3b8;
+            transition: all 0.2s;
+        }
+
+        .radio-tile input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .radio-tile.active {
+            border-color: #45F3FF;
+            background-color: rgba(69, 243, 255, 0.05);
+            color: #45F3FF;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.1);
+        }
+
+        /* Estilo compacto para o seletor de estado do aparelho */
+        .radio-tile-sm-group {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .radio-tile-sm {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 11px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: #162447;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #b0b3b8;
+            transition: all 0.2s;
+        }
+
+        .radio-tile-sm input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .radio-tile-sm.active {
+            border-color: #45F3FF;
+            background-color: rgba(69, 243, 255, 0.05);
+            color: #45F3FF;
+        }
+
+        /* AJUSTADO: Removido o space-between para evitar o buraco vertical sob o aviso */
+        .results-box {
+            background-color: #162447;
+            border-radius: 8px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.85rem 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            font-size: 1rem;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item span:first-child {
+            color: #b0b3b8;
+        }
+
+        .summary-item span:last-child {
+            font-weight: 700;
+            color: #FFFFFF;
+        }
+
+        .alert-message {
+            background-color: rgba(217, 119, 6, 0.15);
+            border: 1px solid #d97706;
+            color: #fbbf24;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        /* AJUSTADO: Definido margem superior fixa e altura controlada */
+        .table-wrapper {
+            margin-top: 1.5rem;
+            max-height: 380px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            background: #11141a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #162447;
+            color: #45F3FF;
+            padding: 0.9rem 1.2rem;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: rgba(69, 243, 255, 0.02);
+        }
+
+        tr td strong {
+            color: #45F3FF;
+        }
+
+        .best-option {
+            color: #27ae60;
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-left: 5px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Seção do Gerador de Mensagem */
+        .msg-section {
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1.5rem;
+        }
+
+        .btn-generate {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #00b4db, #0083b0);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 180, 219, 0.2);
+        }
+
+        .btn-generate:hover {
+            background: linear-gradient(135deg, #45F3FF, #00b4db);
+            box-shadow: 0 0 15px rgba(69, 243, 255, 0.4);
+        }
+
+        /* Estilização da barra de rolagem interna da tabela */
+        .table-wrapper::-webkit-scrollbar {
+            width: 6px;
+        }
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #11141a;
+        }
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #162447;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-back-container">
+        <img src="assets/LOGO.png" alt="Plugin Celulares & Acessórios">
+        <a href="../index.html" class="btn-back">⬅ Voltar ao Painel</a>
+    </div>
+
+    <h2>Simulador de Boleto</h2>
+
+    <div class="grid">
+        <div>
+            <label>Tipo de Aparelho</label>
+            <div class="radio-tile-group">
+                <div class="radio-tile active" id="tile-android" onclick="setDevice('android')">
+                    <input type="radio" name="device_type" value="android" checked> Android
+                </div>
+                <div class="radio-tile" id="tile-iphone" onclick="setDevice('iphone')">
+                    <input type="radio" name="device_type" value="iphone"> iPhone
+                </div>
+            </div>
+
+            <div class="form-group" id="perfil-android-group">
+                <label for="perfil_android">Análise de Risco / Entrada Mínima (Android)</label>
+                <select id="perfil_android" onchange="calculate()">
+                    <option value="baixo">Risco Baixo (25% Entrada Mínima)</option>
+                    <option value="moderado">Risco Moderado (50% Entrada Mínima)</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="perfil-iphone-group" style="display: none;">
+                <label for="perfil_iphone">Análise de Risco / Entrada Mínima (iPhone)</label>
+                <select id="perfil_iphone" onchange="calculate()">
+                    <option value="baixo">Risco Baixo (30% Entrada Mínima)</option>
+                    <option value="moderado">Risco Moderado (50% Entrada Mínima)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="valor_venda">Valor de Venda do Aparelho (R$)</label>
+                <input type="number" id="valor_venda" value="1000.00" step="0.01" oninput="calculate()">
+            </div>
+
+            <div class="form-group">
+                <label for="valor_entrada">Valor de Entrada Informado (R$)</label>
+                <input type="number" id="valor_entrada" value="250.00" step="0.01" oninput="calculate()">
+            </div>
+
+            <div class="msg-section">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="device_model">Modelo do Aparelho</label>
+                        <input type="text" id="device_model" placeholder="Ex: Galaxy S24 / iPhone 15 Pro">
+                    </div>
+                    <div class="form-group">
+                        <label>Estado do Aparelho</label>
+                        <div class="radio-tile-sm-group">
+                            <div class="radio-tile-sm active" id="tile-lacrado" onclick="setCondition('LACRADO')">
+                                <input type="radio" name="device_condition" value="LACRADO" checked> Lacrado
+                            </div>
+                            <div class="radio-tile-sm" id="tile-seminovo" onclick="setCondition('SEMINOVO')">
+                                <input type="radio" name="device_condition" value="SEMINOVO"> Seminovo
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="device_storage">Armazenamento (GB)</label>
+                        <input type="number" id="device_storage" placeholder="Ex: 128">
+                    </div>
+                    <div class="form-group" id="ram-field-group">
+                        <label id="dynamic-label" for="device_ram">Memória RAM (GB)</label>
+                        <input type="number" id="device_ram" placeholder="Ex: 8">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="device_obs">Observações (Opcional)</label>
+                    <textarea id="device_obs" placeholder="Ex: Tela trocada, riscos na traseira..."></textarea>
+                </div>
+
+                <button class="btn-generate" onclick="copyModelMessage()">📋 GERAR PROPOSTA</button>
+            </div>
+        </div>
+
+        <div class="results-box">
+            <div>
+                <h3 style="font-size: 1.15rem; margin-bottom: 1.2rem; font-weight: 700; color: #45F3FF; text-transform: uppercase; letter-spacing: 0.5px;">Resumo do Cálculo</h3>
+                <div class="summary-item">
+                    <span>Entrada Mínima Recomendada:</span>
+                    <span id="res_entrada_minima">R$ 0,00</span>
+                </div>
+                <div class="summary-item">
+                    <span>Saldo Líquido a Parcelar:</span>
+                    <span id="res_saldo_liquido">R$ 0,00</span>
+                </div>
+                <div id="alert_container"></div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parcelas</th>
+                            <th>Valor da Parcela</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table_parcelas">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let computedInstallments = {};
+    let currentDevice = 'android';
+    let currentCondition = 'LACRADO';
+
+    function formatCurrency(value) {
+        return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function setDevice(type) {
+        currentDevice = type;
+        document.getElementById('tile-android').classList.toggle('active', type === 'android');
+        document.getElementById('tile-iphone').classList.toggle('active', type === 'iphone');
+        
+        const androidGroup = document.getElementById('perfil-android-group');
+        const iphoneGroup = document.getElementById('perfil-iphone-group');
+        const dynamicLabel = document.getElementById('dynamic-label');
+        const ramInput = document.getElementById('device_ram');
+
+        if (type === 'iphone') {
+            androidGroup.style.display = 'none';
+            iphoneGroup.style.display = 'block';
+            dynamicLabel.innerText = "Saúde da Bateria (%)";
+            ramInput.placeholder = "Ex: 92";
+        } else {
+            androidGroup.style.display = 'block';
+            iphoneGroup.style.display = 'none';
+            dynamicLabel.innerText = "Memória RAM (GB)";
+            ramInput.placeholder = "Ex: 8";
+        }
+        
+        updateMinInput();
+        calculate();
+    }
+
+    function setCondition(condition) {
+        currentCondition = condition;
+        document.getElementById('tile-lacrado').classList.toggle('active', condition === 'LACRADO');
+        document.getElementById('tile-seminovo').classList.toggle('active', condition === 'SEMINOVO');
+    }
+
+    function updateMinInput() {
+        const venda = parseFloat(document.getElementById('valor_venda').value) || 0;
+        let minEntrada = 0;
+
+        if (currentDevice === 'android') {
+            const perfil = document.getElementById('perfil_android').value;
+            minEntrada = perfil === 'baixo' ? venda * 0.25 : venda * 0.50;
+        } else {
+            const perfil = document.getElementById('perfil_iphone').value;
+            minEntrada = perfil === 'baixo' ? venda * 0.30 : venda * 0.50;
+        }
+
+        document.getElementById('valor_entrada').value = minEntrada.toFixed(2);
+    }
+
+    document.getElementById('valor_venda').addEventListener('input', updateMinInput);
+
+    function calculate() {
+        const venda = parseFloat(document.getElementById('valor_venda').value) || 0;
+        let entrada = parseFloat(document.getElementById('valor_entrada').value) || 0;
+        
+        let pctMin = 0;
+        if (currentDevice === 'android') {
+            const perfil = document.getElementById('perfil_android').value;
+            pctMin = (perfil === 'baixo') ? 0.25 : 0.50;
+        } else {
+            const perfil = document.getElementById('perfil_iphone').value;
+            pctMin = (perfil === 'baixo') ? 0.30 : 0.50;
+        }
+
+        const entradaMinima = venda * pctMin;
+        document.getElementById('res_entrada_minima').innerText = formatCurrency(entradaMinima);
+
+        if (entrada < entradaMinima - 0.01) {
+            document.getElementById('alert_container').innerHTML = `
+                <div class="alert-message">
+                    Aviso: O valor de entrada está abaixo do recomendado (${pctMin * 100}%).
+                </div>
+            `;
+        } else {
+            document.getElementById('alert_container').innerHTML = '';
+        }
+
+        const saldoLiquido = Math.max(0, venda - entrada);
+        document.getElementById('res_saldo_liquido').innerText = formatCurrency(saldoLiquido);
+
+        let htmlTable = '';
+        computedInstallments = {};
+
+        if (currentDevice === 'android') {
+            const parcelasAndroid = [3, 4, 5, 6, 7, 8, 9, 10, 11];
+            
+            parcelasAndroid.forEach(n => {
+                let multiplicador = 2.0;
+                let taxaFixaParcela = 1.0;
+                let custoFixoTotal = 60.0;
+
+                if (n === 3) multiplicador = 1.7;
+                else if (n === 4) multiplicador = 1.8;
+                else if (n === 5) multiplicador = 1.9;
+                else if (n === 10 || n === 11) {
+                    multiplicador = 2.2;
+                    taxaFixaParcela = 2.24;
+                }
+
+                const valorParcela = ((saldoLiquido * multiplicador) + (taxaFixaParcela * n) + custoFixoTotal) / n;
+                computedInstallments[n] = formatCurrency(valorParcela);
+
+                let labelExtra = '';
+                if (n === 9) {
+                    labelExtra = ' <span class="best-option">(MELHOR OPÇÃO PARA O CLIENTE)</span>';
+                }
+
+                htmlTable += `
+                    <tr>
+                        <td><strong>${n}X</strong>${labelExtra}</td>
+                        <td>${computedInstallments[n]}</td>
+                    </tr>
+                `;
+            });
+
+        } else {
+            const parcelasIphone = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+
+            parcelasIphone.forEach(n => {
+                let multiplicador = 2.0;
+                let custoFixoTotal = 70.0;
+
+                if (n === 3) multiplicador = 1.7;
+                else if (n === 4) multiplicador = 1.8;
+                else if (n === 5) multiplicador = 1.9;
+                else if (n === 7) multiplicador = 2.1;
+                else if (n === 8) multiplicador = 2.16;
+                else if (n === 9) multiplicador = 2.17;
+                else if (n === 10) multiplicador = 2.19;
+                else if (n === 11) multiplicador = 2.2;
+                else if (n >= 12) {
+                    custoFixoTotal = 140.0;
+                    if (n === 12) multiplicador = 2.22;
+                    else if (n === 13) multiplicador = 2.24;
+                    else if (n === 14) multiplicador = 2.26;
+                    else if (n === 15) multiplicador = 2.28;
+                }
+
+                const valorParcela = ((saldoLiquido * multiplicador) + (2.0 * n) + custoFixoTotal) / n;
+                computedInstallments[n] = formatCurrency(valorParcela);
+
+                htmlTable += `
+                    <tr>
+                        <td><strong>${n}X</strong></td>
+                        <td>${computedInstallments[n]}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        document.getElementById('table_parcelas').innerHTML = htmlTable;
+    }
+
+    function copyModelMessage() {
+        const modelo = document.getElementById('device_model').value.toUpperCase() || '{{MODELO}}';
+        const armazenamento = document.getElementById('device_storage').value || '{{ARMAZENAMENTO}}';
+        const dynamicValue = document.getElementById('device_ram').value || '{{VALOR}}';
+        const observacao = document.getElementById('device_obs').value.trim();
+        
+        const valorVenda = formatCurrency(parseFloat(document.getElementById('valor_venda').value) || 0);
+        const valorEntrada = formatCurrency(parseFloat(document.getElementById('valor_entrada').value) || 0);
+
+        let linhasMensagem = [];
+
+        if (currentDevice === 'android') {
+            const p9 = computedInstallments[9] || "R$ 0,00";
+            const p11 = computedInstallments[11] || "R$ 0,00";
+
+            linhasMensagem = [
+                "📱✨ *ANDROID NO BOLETO* ✨📱",
+                `*${modelo}* | *${armazenamento}GB* | *${dynamicValue}GB RAM*`,
+                `Estado: *${currentCondition}*`,
+                `Valor: *${valorVenda} à vista*`,
+                "",
+                "✨ *CONDIÇÃO ESPECIAL* ✨",
+                `🔹 *Entrada:* ${valorEntrada}`,
+                `🔹 *Parcelas:* 9x de *${p9}*`,
+                `🔹 *Parcelas:* 11x de *${p11}*`
+            ];
+        } else {
+            const p12 = computedInstallments[12] || "R$ 0,00";
+            const p15 = computedInstallments[15] || "R$ 0,00";
+
+            linhasMensagem = [
+                "📱✨ *IPHONE NO BOLETO* ✨📱",
+                `*${modelo}* | *${armazenamento}GB* | *Bateria: ${dynamicValue}%*`,
+                `Estado: *${currentCondition}*`,
+                `Valor: *${valorVenda} à vista*`,
+                "",
+                "✨ *CONDIÇÃO ESPECIAL* ✨",
+                `🔹 *Entrada:* ${valorEntrada}`,
+                `🔹 *Parcelas:* 12x de *${p12}*`,
+                `🔹 *Parcelas:* 15x de *${p15}*`
+            ];
+        }
+
+        if (observacao !== "") {
+            linhasMensagem.push("");
+            linhasMensagem.push(`⚠️ *Observação:* ${observacao}`);
+        }
+
+        const mensagemPronta = linhasMensagem.join("\n");
+
+        navigator.clipboard.writeText(mensagemPronta).then(() => {
+            alert("Mensagem copiada com sucesso!");
+        }).catch(err => {
+            alert("Erro ao copiar mensagem automaticamente. Tente novamente.");
+        });
+    }
+
+    updateMinInput();
+    calculate();
+</script>
+
+<!-- ===== INÍCIO: BOTÃO CALENDÁRIO DE VENCIMENTOS (cole antes de </body>) =====
+     Autônomo: usa Shadow DOM, então não herda nem altera nenhum CSS/JS da página.
+     Posição padrão: botão flutuante no canto inferior direito.
+     Para colocar o botão em outro lugar, crie <div id="venc-calendario-slot"></div> onde quiser. -->
+<script>
+(function () {
+  function init() {
+    if (document.getElementById('pg-venc-cal')) return;
+
+    /* ===== REGRA (edite aqui se mudar) ===== */
+    var PERMITE_VENCER_HOJE = false; // true = boleto pode vencer no próprio dia
+    var MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+    var SEM = ['D','S','T','Q','Q','S','S'];
+    /* dia 20 do mês M -> liberado no dia 10 do mês M-1 | dia 10 do mês M -> liberado no dia 20 do mês M-2 */
+    function liberacao(v) { return v.getDate() === 20 ? new Date(v.getFullYear(), v.getMonth() - 1, 10) : new Date(v.getFullYear(), v.getMonth() - 2, 20); }
+    function zero(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+    function fmt(d) { return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear(); }
+    function dias(a, b) { return Math.round((zero(b) - zero(a)) / 864e5); }
+    function mesmo(a, b) { return a.getTime() === b.getTime(); }
+    function quando(n) { return n === 0 ? 'hoje' : n === 1 ? 'amanhã' : 'em ' + n + ' dias'; }
+    function estado(v, hoje) {
+      if (v < hoje || (!PERMITE_VENCER_HOJE && mesmo(v, hoje))) return 'passou';
+      return liberacao(v) <= hoje ? 'liberado' : 'breve';
+    }
+
+    var slot = document.getElementById('venc-calendario-slot');
+    var host = document.createElement('div');
+    host.id = 'pg-venc-cal';
+    host.style.cssText = slot ? 'display:inline-block' : 'position:fixed;right:20px;bottom:20px;z-index:2147483000';
+    (slot || document.body).appendChild(host);
+    var root = host.attachShadow({ mode: 'open' });
+
+    root.innerHTML =
+      '<style>' +
+      ':host{all:initial;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Arial,sans-serif}' +
+      '*{box-sizing:border-box;margin:0;padding:0;font-family:inherit}' +
+      '.fab{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border:1px solid rgba(69,243,255,.5);border-radius:6px;background:linear-gradient(135deg,#1f4068,#162447);color:#fff;font:700 12px/1 "Inter",system-ui,sans-serif;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,.45);transition:all .25s}' +
+      '.fab:hover{background:linear-gradient(135deg,#0056b3,#1f4068);border-color:#45F3FF;box-shadow:0 0 12px rgba(69,243,255,.35)}' +
+      '.ov{position:fixed;inset:0;z-index:2147483001;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0);visibility:hidden;transition:background .25s,visibility 0s .3s}' +
+      '.ov.open{background:rgba(0,0,0,.6);visibility:visible;transition:background .25s}' +
+      '.sheet{width:100%;max-width:380px;max-height:92vh;overflow:auto;background:#11141a;color:#fff;border:1px solid rgba(255,255,255,.1);border-bottom:none;border-radius:12px 12px 0 0;padding:18px 18px 22px;box-shadow:0 -10px 30px rgba(0,0,0,.5);transform:translateY(100%);transition:transform .3s ease}' +
+      '.ov.open .sheet{transform:translateY(0)}' +
+      '@media(min-width:600px){.ov{align-items:center}.sheet{border-bottom:1px solid rgba(255,255,255,.1);border-radius:10px;transform:translateY(40px);opacity:0;transition:transform .3s ease,opacity .3s}.ov.open .sheet{transform:none;opacity:1}}' +
+      '@media(prefers-reduced-motion:reduce){.sheet,.ov{transition:none}}' +
+      '.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}' +
+      '.top h2{font-size:15px;color:#45F3FF;text-transform:uppercase;letter-spacing:.6px}' +
+      '.x{background:none;border:1px solid rgba(255,255,255,.15);color:#b0b3b8;width:30px;height:30px;border-radius:4px;font-size:16px;cursor:pointer}' +
+      '.x:hover{color:#fff;border-color:#45F3FF}' +
+      '.hoje{font-size:12px;color:#b0b3b8;margin-bottom:12px}' +
+      '.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}' +
+      '.chip{background:#162447;border:1px solid #45F3FF;color:#fff;border-radius:4px;padding:7px 11px;font-size:13px;font-weight:700;cursor:pointer;line-height:1.2}' +
+      '.chip small{display:block;font-size:10.5px;font-weight:400;color:#b0b3b8}' +
+      '.chip:hover{background:#45F3FF;color:#0B0C10}.chip:hover small{color:#0B0C10}' +
+      '.nav{display:flex;align-items:center;justify-content:space-between;margin:12px 0 6px}' +
+      '.nav b{font-size:14px}' +
+      '.nav button{background:#162447;border:1px solid rgba(255,255,255,.12);color:#fff;width:30px;height:28px;border-radius:4px;cursor:pointer}' +
+      '.nav button:disabled{opacity:.3;cursor:default}' +
+      '.g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}' +
+      '.s{text-align:center;font-size:10.5px;color:#64748b;padding-bottom:2px}' +
+      '.d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:12px;color:#475569;border-radius:4px;border:1px solid transparent;background:none}' +
+      '.d.h{color:#fff;border-color:rgba(255,255,255,.4)}' +
+      '.d.v{font-weight:700}' +
+      '.d.liberado{background:#45F3FF;color:#0B0C10;cursor:pointer;border-color:#45F3FF}' +
+      '.d.liberado:hover{box-shadow:0 0 0 2px #fff}' +
+      '.d.breve{color:#94a3b8;border:1px dashed #64748b}' +
+      '.d.passou{color:#64748b;text-decoration:line-through}' +
+      '.st{min-height:18px;margin-top:10px;font-size:12px;color:#45F3FF;font-weight:600}' +
+      '.px{font-size:12px;color:#b0b3b8;line-height:1.5}.px b{color:#45F3FF}' +
+      '.lg{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:10.5px;color:#94a3b8}' +
+      '.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}' +
+      'button:focus-visible{outline:2px solid #fff;outline-offset:2px}' +
+      '</style>' +
+      '<button class="fab" type="button" id="fab" aria-haspopup="dialog">📅 Vencimentos</button>' +
+      '<div class="ov" id="ov"><div class="sheet" role="dialog" aria-modal="true" aria-label="Calendário de vencimentos do boleto">' +
+      '<div class="top"><h2>Vencimentos do boleto</h2><button class="x" type="button" id="x" aria-label="Fechar">✕</button></div>' +
+      '<p class="hoje" id="hoje"></p><div class="chips" id="chips"></div>' +
+      '<div class="nav"><button type="button" id="prev" aria-label="Mês anterior">‹</button><b id="mes"></b><button type="button" id="next" aria-label="Próximo mês">›</button></div>' +
+      '<div class="g" id="g"></div><p class="st" id="st" aria-live="polite"></p><p class="px" id="px"></p>' +
+      '<div class="lg"><span><i style="background:#45F3FF"></i>Liberado</span><span><i style="border:1px dashed #64748b"></i>Ainda não liberado</span><span><i style="border:1px solid rgba(255,255,255,.4)"></i>Hoje</span></div>' +
+      '</div></div>';
+
+    var $ = function (id) { return root.getElementById(id); };
+    var off = 0;
+
+    function copiar(v) {
+      var t = fmt(v);
+      var ok = function () { $('st').textContent = t + ' copiado'; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, function () { $('st').textContent = 'Vencimento: ' + t; });
+      else { var x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); try { document.execCommand('copy'); ok(); } catch (e) { $('st').textContent = 'Vencimento: ' + t; } x.remove(); }
+    }
+
+    function render() {
+      var hoje = zero(new Date());
+      var SEMANA = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+      $('hoje').textContent = 'Hoje: ' + SEMANA[hoje.getDay()] + ', ' + hoje.getDate() + ' de ' + MESES[hoje.getMonth()] + ' de ' + hoje.getFullYear();
+
+      var cand = [];
+      for (var m = 0; m < 6; m++) [10, 20].forEach(function (d) { cand.push(new Date(hoje.getFullYear(), hoje.getMonth() + m, d)); });
+
+      $('chips').innerHTML = '';
+      cand.filter(function (v) { return estado(v, hoje) === 'liberado'; }).forEach(function (v) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'chip';
+        b.innerHTML = fmt(v) + '<small>' + quando(dias(hoje, v)) + '</small>';
+        b.onclick = function () { copiar(v); };
+        $('chips').appendChild(b);
+      });
+
+      var prox = cand.filter(function (v) { return v > hoje && liberacao(v) > hoje; }).sort(function (a, b) { return liberacao(a) - liberacao(b); })[0];
+      $('px').innerHTML = prox ? 'Próxima liberação: <b>' + fmt(liberacao(prox)) + '</b> (' + quando(dias(hoje, liberacao(prox))) + ') libera <b>' + fmt(prox) + '</b>.' : '';
+
+      var ini = new Date(hoje.getFullYear(), hoje.getMonth() + off, 1);
+      var ult = new Date(ini.getFullYear(), ini.getMonth() + 1, 0).getDate();
+      $('mes').textContent = MESES[ini.getMonth()][0].toUpperCase() + MESES[ini.getMonth()].slice(1) + ' de ' + ini.getFullYear();
+      $('prev').disabled = off === 0; $('next').disabled = off === 2;
+
+      var g = $('g'); g.innerHTML = '';
+      SEM.forEach(function (s) { var e = document.createElement('div'); e.className = 's'; e.textContent = s; g.appendChild(e); });
+      for (var i = 0; i < ini.getDay(); i++) g.appendChild(document.createElement('div'));
+      for (var d = 1; d <= ult; d++) {
+        var dt = new Date(ini.getFullYear(), ini.getMonth(), d), el, cls = 'd' + (mesmo(dt, hoje) ? ' h' : '');
+        if (d === 10 || d === 20) {
+          var st = estado(dt, hoje); cls += ' v ' + st;
+          if (st === 'liberado') { el = document.createElement('button'); el.type = 'button'; (function (v) { el.onclick = function () { copiar(v); }; })(dt); el.title = 'Toque para copiar'; }
+          else { el = document.createElement('div'); el.title = st === 'breve' ? 'Libera em ' + fmt(liberacao(dt)) : 'Data já passou'; }
+        } else el = document.createElement('div');
+        el.className = cls; el.textContent = d; g.appendChild(el);
+      }
+    }
+
+    var lastFocus = null;
+    function abrir() { off = 0; $('st').textContent = ''; render(); lastFocus = $('fab'); $('ov').classList.add('open'); $('x').focus(); }
+    function fechar() { $('ov').classList.remove('open'); if (lastFocus) lastFocus.focus(); }
+    $('fab').onclick = abrir; $('x').onclick = fechar;
+    $('ov').addEventListener('click', function (e) { if (e.target === $('ov')) fechar(); });
+    $('prev').onclick = function () { if (off > 0) { off--; render(); } };
+    $('next').onclick = function () { if (off < 2) { off++; render(); } };
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('ov').classList.contains('open')) fechar(); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+<!-- ===== FIM: BOTÃO CALENDÁRIO DE VENCIMENTOS ===== -->
+
+</body>
+</html>

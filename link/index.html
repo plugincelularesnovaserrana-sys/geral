@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Link WhatsApp - Plugin Financeiro</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0B0C10; /* Fundo escuro premium idêntico ao index */
+            color: #FFFFFF;
+            display: block;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            background-color: #11141a; /* Container escuro levemente contrastante */
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        /* Estrutura de Cabeçalho Superior idêntica aos outros simuladores */
+        .logo-back-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .logo-back-container img {
+            max-width: 250px;
+            height: auto;
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #1f4068, #162447);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(135deg, #0056b3, #1f4068);
+            border-color: #45F3FF;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+            color: #FFFFFF;
+            margin-bottom: 30px;
+            font-size: 22px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #45F3FF;
+            padding-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #b0b3b8;
+            letter-spacing: 0.5px;
+        }
+
+        .hint {
+            display: block;
+            margin-top: 6px;
+            font-size: 12px;
+            color: #6b7280;
+            letter-spacing: 0.3px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #162447;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #FFFFFF;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            resize: vertical;
+        }
+
+        textarea {
+            min-height: 130px;
+            line-height: 1.5;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #45F3FF;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+        }
+
+        /* Botão Principal no padrão do index */
+        button.btn-principal {
+            width: 100%;
+            padding: 18px;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #1f4068, #162447);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-top: 15px;
+        }
+
+        button.btn-principal:hover {
+            background: linear-gradient(135deg, #0056b3, #1f4068);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(69, 243, 255, 0.2);
+            border-color: #45F3FF;
+        }
+
+        .resultado {
+            margin-top: 35px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 25px;
+        }
+
+        .resultado h3 {
+            color: #45F3FF;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .link-box {
+            padding: 14px;
+            background-color: #162447;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            color: #e2e8f0;
+            word-break: break-all;
+            line-height: 1.5;
+            transition: border-color 0.3s;
+        }
+
+        .link-box:hover {
+            border-color: rgba(69, 243, 255, 0.3);
+        }
+
+        .acoes {
+            display: flex;
+            gap: 12px;
+        }
+
+        .acoes button, .acoes a {
+            flex: 1;
+            text-align: center;
+            padding: 12px 15px;
+            background: #0f172a;
+            color: #FFFFFF;
+            border: 1px solid #45F3FF;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .acoes button:hover, .acoes a:hover {
+            background: #45F3FF;
+            color: #0B0C10;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.4);
+        }
+
+        .acoes .abrir {
+            background: linear-gradient(135deg, #1f4068, #162447);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .acoes .abrir:hover {
+            background: linear-gradient(135deg, #0056b3, #1f4068);
+            border-color: #45F3FF;
+            color: #FFFFFF;
+        }
+
+        .btn-copiar.copiado {
+            background-color: #27ae60 !important;
+            border-color: #27ae60 !important;
+            color: white !important;
+            box-shadow: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Bloco superior com a Logo e botão Voltar adicionados no mesmo layout padrão -->
+    <div class="logo-back-container">
+        <img src="../assets/LOGO.png" alt="Plugin Celulares & Acessórios">
+        <a href="../index.html" class="btn-back">⬅ Voltar ao Painel</a>
+    </div>
+
+    <h2>Gerador de Link WhatsApp</h2>
+
+    <div class="form-group">
+        <label for="numero">Número do WhatsApp:</label>
+        <input type="text" id="numero" value="5537991385331">
+        <span class="hint">Formato: DDI + DDD + Número (apenas números, sem espaços ou símbolos)</span>
+    </div>
+
+    <div class="form-group">
+        <label for="mensagem">Mensagem:</label>
+        <textarea id="mensagem" placeholder="Digite a mensagem que será enviada..."></textarea>
+    </div>
+
+    <button class="btn-principal" onclick="gerarLink()">Gerar Link</button>
+
+    <div class="resultado" id="resultado-box" style="display:none;">
+        <h3>Link Gerado:</h3>
+        <div class="link-box" id="link-gerado"></div>
+        <div class="acoes">
+            <button class="btn-copiar" id="btn-copiar" onclick="copiarLink(this)">Copiar Link</button>
+            <a class="abrir" id="btn-abrir" href="#" target="_blank" rel="noopener">Abrir no WhatsApp</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function gerarLink() {
+    let numero = document.getElementById('numero').value.replace(/\D/g, "");
+    const mensagem = document.getElementById('mensagem').value;
+
+    if (!numero) {
+        alert("Por favor, informe um número de WhatsApp válido.");
+        return;
+    }
+
+    const mensagemCodificada = encodeURIComponent(mensagem);
+    const link = `https://wa.me/${numero}${mensagemCodificada ? "?text=" + mensagemCodificada : ""}`;
+
+    document.getElementById('link-gerado').innerText = link;
+    document.getElementById('btn-abrir').href = link;
+    document.getElementById('resultado-box').style.display = "block";
+}
+
+function copiarLink(botao) {
+    const link = document.getElementById('link-gerado').innerText;
+    navigator.clipboard.writeText(link).then(() => {
+        const textoOriginal = botao.innerText;
+        botao.innerText = "Copiado! ✓";
+        botao.classList.add("copiado");
+
+        setTimeout(() => {
+            botao.innerText = textoOriginal;
+            botao.classList.remove("copiado");
+        }, 1500);
+    });
+}
+</script>
+
+</body>
+</html>

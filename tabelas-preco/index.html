@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TABELAS DE PREÇOS | Plugin Celulares</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #0B0C10;
+            color: #FFFFFF;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background-color: #11141a;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            padding: 40px;
+            margin: 0 auto;
+        }
+
+        .logo-back-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .logo-back-container img {
+            max-width: 220px;
+            height: auto;
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #1f4068, #162447);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(135deg, #0056b3, #1f4068);
+            border-color: #45F3FF;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+            color: #FFFFFF;
+            margin-bottom: 25px;
+            font-size: 22px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #45F3FF;
+            padding-bottom: 15px;
+        }
+
+        .main-tabs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            background-color: #162447;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            color: #b0b3b8;
+            padding: 14px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            border-color: rgba(69, 243, 255, 0.5);
+            color: #FFFFFF;
+        }
+
+        .tab-btn.active {
+            border-color: #45F3FF;
+            background-color: rgba(69, 243, 255, 0.08);
+            color: #45F3FF;
+            box-shadow: 0 0 12px rgba(69, 243, 255, 0.15);
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 14px 18px;
+            background-color: #162447;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #FFFFFF;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #45F3FF;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+        }
+
+        .sub-categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .sub-btn {
+            background: #162447;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #a0a5b1;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sub-btn:hover, .sub-btn.active {
+            background: #45F3FF;
+            color: #0B0C10;
+            border-color: #45F3FF;
+        }
+
+        .table-wrapper {
+            max-height: 520px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            background: #11141a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #162447;
+            color: #45F3FF;
+            padding: 1rem 1.2rem;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 0.9rem 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+        }
+
+        tr:hover {
+            background-color: rgba(69, 243, 255, 0.03);
+        }
+
+        .price-tag {
+            color: #45F3FF;
+            font-weight: 700;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.05rem;
+        }
+
+        .color-badge {
+            display: inline-block;
+            background-color: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-right: 4px;
+            margin-top: 2px;
+            color: #d1d5db;
+        }
+
+        .last-update {
+            text-align: center;
+            color: #6b7280;
+            font-size: 11px;
+            margin-top: -15px;
+            margin-bottom: 20px;
+            letter-spacing: 0.3px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: #8a8d93;
+            font-style: italic;
+        }
+
+        .table-wrapper::-webkit-scrollbar { width: 6px; }
+        .table-wrapper::-webkit-scrollbar-track { background: #11141a; }
+        .table-wrapper::-webkit-scrollbar-thumb { background: #162447; border-radius: 3px; }
+
+        @media (max-width: 768px) {
+            .container { padding: 20px; }
+            .main-tabs { grid-template-columns: 1fr 1fr; }
+            th, td { padding: 0.75rem; font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-back-container">
+        <img src="../assets/LOGO.png" alt="Plugin Celulares & Acessórios" onerror="this.style.display='none'">
+        <a href="../index.html" class="btn-back">⬅ Voltar ao Simulador</a>
+    </div>
+
+    <h2>Tabela de Produtos & Preços</h2>
+    <div class="last-update" id="lastUpdate"></div>
+
+    <div class="main-tabs">
+        <button class="tab-btn active" onclick="switchList('android')"> Android Novos</button>
+        <button class="tab-btn" onclick="switchList('acessorios')"> Acessórios</button>
+        <button class="tab-btn" onclick="switchList('apple_novos')"> Apple Novos</button>
+        <button class="tab-btn" onclick="switchList('apple_grade_a')"> Apple Grade A</button>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="🔍 Digite para buscar um modelo, marca ou acessório..." oninput="filterData()">
+    </div>
+
+    <div class="sub-categories" id="subCategoriesContainer"></div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Modelo / Item</th>
+                    <th>Categoria</th>
+                    <th>Cores / Detalhes</th>
+                    <th>Preço à Vista</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let rawData = {};
+    let currentTab = 'android';
+    let currentSubCategory = 'ALL';
+
+    // Carregamento inteligente testando múltiplos nomes de ficheiro possíveis
+    async function loadData() {
+        const filesToTry = [
+            'tabelas_atualizadas.json',
+            './tabelas_atualizadas.json'
+        ];
+
+        let loaded = false;
+
+        for (const fileName of filesToTry) {
+            try {
+                const response = await fetch(`${fileName}?v=${new Date().getTime()}`);
+                if (response.ok) {
+                    rawData = await response.json();
+                    loaded = true;
+                    console.log("Sucesso ao carregar ficheiro:", fileName);
+                    break;
+                }
+            } catch (e) {
+                // Continua tentando
+            }
+        }
+
+        if (loaded) {
+            renderLastUpdate();
+            renderSubCategories();
+            renderTable();
+        } else {
+            document.getElementById('tableBody').innerHTML = `
+                <tr>
+                    <td colspan="4" class="no-results">
+                        <strong>Erro ao carregar os dados.</strong><br>
+                        Verifique se o arquivo JSON está na pasta <code>tabelas-preço</code>.
+                    </td>
+                </tr>`;
+        }
+    }
+
+    function renderLastUpdate() {
+        const el = document.getElementById('lastUpdate');
+        if (!rawData.ultima_atualizacao) {
+            el.innerText = '';
+            return;
+        }
+        const data = new Date(rawData.ultima_atualizacao);
+        const formatado = data.toLocaleString('pt-BR', {
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        });
+        el.innerText = `Última atualização: ${formatado}`;
+    }
+
+    // Mapeamento correto de TODAS as variações de nomes de chaves
+    function getListData(tab) {
+        if (!rawData) return [];
+
+        if (tab === 'android') {
+            return rawData.tabela_android_acessorios_diversos?.categorias || [];
+        } else if (tab === 'acessorios') {
+            return rawData.tabela_acessorios?.categorias || [];
+        } else if (tab === 'apple_novos') {
+            // Mapeia tanto lacrados quanto novos
+            return rawData.tabela_apple_lacrados?.categorias || rawData.tabela_apple_novos?.categorias || [];
+        } else if (tab === 'apple_grade_a') {
+            // Mapeia tabela_apple_seminovos, tabela_apple_seminovos_grade_a e tabela_apple_grade_a
+            return rawData.tabela_apple_seminovos?.categorias || 
+                   rawData.tabela_apple_seminovos_grade_a?.categorias || 
+                   rawData.tabela_apple_grade_a?.categorias || [];
+        }
+        return [];
+    }
+
+    function switchList(tab) {
+        currentTab = tab;
+        currentSubCategory = 'ALL';
+        
+        document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+            btn.classList.toggle('active', ['android', 'acessorios', 'apple_novos', 'apple_grade_a'][idx] === tab);
+        });
+
+        document.getElementById('searchInput').value = '';
+        renderSubCategories();
+        renderTable();
+    }
+
+    function renderSubCategories() {
+        const categories = getListData(currentTab);
+        const container = document.getElementById('subCategoriesContainer');
+        container.innerHTML = '';
+
+        if (categories.length === 0) return;
+
+        const allBtn = document.createElement('button');
+        allBtn.className = `sub-btn ${currentSubCategory === 'ALL' ? 'active' : ''}`;
+        allBtn.innerText = 'Todos';
+        allBtn.onclick = () => filterSubCategory('ALL');
+        container.appendChild(allBtn);
+
+        categories.forEach(cat => {
+            const btn = document.createElement('button');
+            btn.className = `sub-btn ${currentSubCategory === cat.nome ? 'active' : ''}`;
+            btn.innerText = cat.nome;
+            btn.onclick = () => filterSubCategory(cat.nome);
+            container.appendChild(btn);
+        });
+    }
+
+    function filterSubCategory(catName) {
+        currentSubCategory = catName;
+        renderSubCategories();
+        renderTable();
+    }
+
+    function filterData() {
+        renderTable();
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+
+        const categories = getListData(currentTab);
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+
+        let totalItems = 0;
+
+        categories.forEach(cat => {
+            if (currentSubCategory !== 'ALL' && currentSubCategory !== cat.nome) return;
+
+            cat.itens.forEach(item => {
+                const modeloMatch = item.modelo?.toLowerCase().includes(searchTerm);
+                const catMatch = cat.nome?.toLowerCase().includes(searchTerm);
+                const precoMatch = item.preco?.toLowerCase().includes(searchTerm);
+
+                if (modeloMatch || catMatch || precoMatch) {
+                    totalItems++;
+                    const tr = document.createElement('tr');
+
+                    let coresHTML = '-';
+                    if (item.cores && item.cores.length > 0) {
+                        coresHTML = item.cores.map(c => `<span class="color-badge">${c}</span>`).join(' ');
+                    }
+
+                    tr.innerHTML = `
+                        <td><strong>${item.modelo}</strong></td>
+                        <td><span style="color:#b0b3b8; font-size: 12px; font-weight: 600;">${cat.nome}</span></td>
+                        <td>${coresHTML}</td>
+                        <td class="price-tag">${item.preco || 'Sob Consulta'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                }
+            });
+        });
+
+        if (totalItems === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="no-results">Nenhum produto encontrado nesta categoria.</td></tr>`;
+        }
+    }
+
+    window.onload = loadData;
+</script>
+
+</body>
+</html>

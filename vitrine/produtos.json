@@ -1,0 +1,204 @@
+{
+  "produtos": [
+    {
+      "plataforma": "Apple",
+      "modelo": "iPhone 15",
+      "detalhes": "256GB",
+      "condicao": "Seminovo",
+      "preco": 3599,
+      "fotos": [
+        "iphone-15-mv066d66-2.jpg"
+      ],
+      "cores": [
+        "Preto"
+      ],
+      "bateria": 89,
+      "boleto": {
+        "entrada": 1099.9,
+        "parcelas": 15,
+        "parcela": 399.9
+      },
+      "disponivel": true
+    },
+    {
+      "plataforma": "Apple",
+      "modelo": "iPhone 15",
+      "detalhes": "256GB",
+      "condicao": "Seminovo",
+      "preco": 3599,
+      "fotos": [
+        "iphone-15-mv06nze2-1.jpg"
+      ],
+      "cores": [
+        "Rosa"
+      ],
+      "bateria": 82,
+      "boleto": {
+        "entrada": 1099.9,
+        "parcelas": 15,
+        "parcela": 399.9
+      },
+      "disponivel": true
+    },
+    {
+      "plataforma": "Apple",
+      "modelo": "iPhone 14",
+      "detalhes": "256GB",
+      "condicao": "Seminovo",
+      "preco": 2899,
+      "fotos": [
+        "iphone-14-mv06o120-2.jpg"
+      ],
+      "cores": [
+        "Vermelho"
+      ],
+      "bateria": 82,
+      "boleto": {
+        "entrada": 869.9,
+        "parcelas": 15,
+        "parcela": 319.9
+      },
+      "disponivel": true
+    },
+    {
+      "plataforma": "Apple",
+      "modelo": "iPhone 14",
+      "detalhes": "256GB",
+      "condicao": "Seminovo",
+      "preco": 2899,
+      "fotos": [
+        "iphone-14-mv06szwf-1.jpg"
+      ],
+      "cores": [
+        "Lilás"
+      ],
+      "bateria": 83,
+      "boleto": {
+        "entrada": 869.9,
+        "parcelas": 15,
+        "parcela": 319.9
+      },
+      "disponivel": true
+    },
+    {
+      "plataforma": "Apple",
+      "modelo": "iPhone 14",
+      "detalhes": "128GB",
+      "condicao": "Seminovo",
+      "preco": 2690,
+      "fotos": [
+        "iphone-14-mv06t1e9-2.jpg"
+      ],
+      "cores": [
+        "Preto"
+      ],
+      "bateria": 88,
+      "boleto": {
+        "entrada": 799.9,
+        "parcelas": 15,
+        "parcela": 299.9
+      },
+      "disponivel": true
+    },
+    {
+      "plataforma": "Apple",
+      "modelo": "iPhone 14",
+      "detalhes": "128GB",
+      "condicao": "Seminovo",
+      "preco": 2690,
+      "fotos": [
+        "iphone-14-mv06yw26-1.jpg"
+      ],
+      "cores": [
+        "Azul-claro"
+      ],
+      "bateria": 83,
+      "boleto": {
+        "entrada": 799.9,
+        "parcelas": 15,
+        "parcela": 299.9
+      },
+      "disponivel": true
+    },
+    {
+      "plataforma": "Apple",
+      "modelo": "iPhone 13",
+      "detalhes": "256GB",
+      "condicao": "Seminovo",
+      "preco": 2590,
+      "fotos": [
+        "iphone-13-mv077eb7-1.jpg"
+      ],
+      "cores": [
+        "Preto"
+      ],
+      "bateria": 85,
+      "boleto": {
+        "entrada": 779.9,
+        "parcelas": 15,
+        "parcela": 289.9
+      },
+      "disponivel": true
+    },
+    {
+      "plataforma": "Apple",
+      "modelo": "iPhone 13",
+      "detalhes": "128GB",
+      "condicao": "Seminovo",
+      "preco": 2390,
+      "fotos": [
+        "iphone-13-mv077fui-2.jpg"
+      ],
+      "cores": [
+        "Vermelho"
+      ],
+      "bateria": 82,
+      "boleto": {
+        "entrada": 719.9,
+        "parcelas": 15,
+        "parcela": 269.9
+      },
+      "disponivel": true
+    },
+    {
+      "plataforma": "Apple",
+      "modelo": "iPhone 12",
+      "detalhes": "128GB",
+      "condicao": "Seminovo",
+      "preco": 2049,
+      "fotos": [
+        "iphone-12-mv07cqs1-2.jpg"
+      ],
+      "cores": [
+        "Vermelho"
+      ],
+      "bateria": 82,
+      "boleto": {
+        "entrada": 619.9,
+        "parcelas": 15,
+        "parcela": 229.9
+      },
+      "disponivel": false
+    },
+    {
+      "plataforma": "Android",
+      "modelo": "Note 60x",
+      "detalhes": "128GB · 4GB RAM",
+      "condicao": "Novo",
+      "preco": 989,
+      "fotos": [
+        "note-60x-mv07qdb3-2.jpg"
+      ],
+      "cores": [
+        "Verde"
+      ],
+      "boleto": {
+        "entrada": 249.9,
+        "parcelas": 11,
+        "parcela": 159.9
+      },
+      "disponivel": false,
+      "marca": "Realme"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catálogo Virtual - Plugin Celulares</title>
+<meta name="description" content="Confira nossas promoções!">
+
+<!-- Prévia de link (WhatsApp, Facebook, Instagram, Telegram...) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Plugin Celulares">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Catálogo Virtual - Plugin Celulares">
+<meta property="og:description" content="Confira nossas promoções!">
+<meta property="og:url" content="https://plugincelularesnovaserrana-sys.github.io/Vitrine/">
+<meta property="og:image" content="https://plugincelularesnovaserrana-sys.github.io/Vitrine/assets/og-catalogo.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="iPhone 18 Pro Max - Catálogo Virtual Plugin Celulares">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Catálogo Virtual - Plugin Celulares">
+<meta name="twitter:description" content="Confira nossas promoções!">
+<meta name="twitter:image" content="https://plugincelularesnovaserrana-sys.github.io/Vitrine/assets/og-catalogo.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="catalogo.css?v=6">
+</head>
+<body data-modo="completo">
+<!-- Vitrine: o modo ("completo") escolhe quais preços aparecem. Configuração e textos ficam em catalogo.js -->
+
+<header class="loja">
+  <div class="logo" id="logo"></div>
+  <div>
+    <h1 id="nomeLoja">Plugin Celulares</h1>
+    <p id="slogan"></p>
+    <p id="contato"></p>
+  </div>
+</header>
+<div class="selos" id="selos"></div>
+
+<div class="barra">
+  <div class="barra-in">
+    <input class="busca" id="busca" type="search" placeholder="Digite um modelo..." aria-label="Buscar modelo">
+    <nav class="abas" id="abas" aria-label="Filtrar por categoria"></nav>
+    <nav class="abas faixas" id="faixas" aria-label="Filtrar por valor da parcela" hidden></nav>
+  </div>
+</div>
+
+<div class="aviso" id="aviso" hidden></div>
+<main class="grade" id="grade" aria-live="polite"></main>
+
+<section class="sistema" id="sistemaBox" hidden>
+  <h2 id="sistemaTitulo">Nosso sistema</h2>
+  <iframe id="sistemaFrame" title="Sistema da loja" loading="lazy"></iframe>
+</section>
+
+<a class="flutuante" id="zapFlutuante" target="_blank" rel="noopener" aria-label="Falar no WhatsApp"></a>
+<footer class="rodape" id="rodape"></footer>
+
+<script src="catalogo.js?v=6"></script>
+</body>
+</html>

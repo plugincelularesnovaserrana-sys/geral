@@ -1,0 +1,142 @@
+<!-- ===== INÍCIO: BOTÃO CALENDÁRIO DE VENCIMENTOS (cole antes de </body>) =====
+     Autônomo: usa Shadow DOM, então não herda nem altera nenhum CSS/JS da página.
+     Posição padrão: botão flutuante no canto inferior direito.
+     Para colocar o botão em outro lugar, crie <div id="venc-calendario-slot"></div> onde quiser. -->
+<script>
+(function () {
+  function init() {
+    if (document.getElementById('pg-venc-cal')) return;
+
+    /* ===== REGRA (edite aqui se mudar) ===== */
+    var PERMITE_VENCER_HOJE = false; // true = boleto pode vencer no próprio dia
+    var MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+    var SEM = ['D','S','T','Q','Q','S','S'];
+    /* dia 20 do mês M -> liberado no dia 10 do mês M-1 | dia 10 do mês M -> liberado no dia 20 do mês M-2 */
+    function liberacao(v) { return v.getDate() === 20 ? new Date(v.getFullYear(), v.getMonth() - 1, 10) : new Date(v.getFullYear(), v.getMonth() - 2, 20); }
+    function zero(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+    function fmt(d) { return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear(); }
+    function dias(a, b) { return Math.round((zero(b) - zero(a)) / 864e5); }
+    function mesmo(a, b) { return a.getTime() === b.getTime(); }
+    function quando(n) { return n === 0 ? 'hoje' : n === 1 ? 'amanhã' : 'em ' + n + ' dias'; }
+    function estado(v, hoje) {
+      if (v < hoje || (!PERMITE_VENCER_HOJE && mesmo(v, hoje))) return 'passou';
+      return liberacao(v) <= hoje ? 'liberado' : 'breve';
+    }
+
+    var slot = document.getElementById('venc-calendario-slot');
+    var host = document.createElement('div');
+    host.id = 'pg-venc-cal';
+    host.style.cssText = slot ? 'display:inline-block' : 'position:fixed;right:20px;bottom:20px;z-index:2147483000';
+    (slot || document.body).appendChild(host);
+    var root = host.attachShadow({ mode: 'open' });
+
+    root.innerHTML =
+      '<style>' +
+      ':host{all:initial;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Arial,sans-serif}' +
+      '*{box-sizing:border-box;margin:0;padding:0;font-family:inherit}' +
+      '.fab{display:inline-flex;align-items:center;gap:8px;padding:12px 18px;border:1px solid rgba(69,243,255,.5);border-radius:6px;background:linear-gradient(135deg,#1f4068,#162447);color:#fff;font:700 12px/1 "Inter",system-ui,sans-serif;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,.45);transition:all .25s}' +
+      '.fab:hover{background:linear-gradient(135deg,#0056b3,#1f4068);border-color:#45F3FF;box-shadow:0 0 12px rgba(69,243,255,.35)}' +
+      '.ov{position:fixed;inset:0;z-index:2147483001;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,0);visibility:hidden;transition:background .25s,visibility 0s .3s}' +
+      '.ov.open{background:rgba(0,0,0,.6);visibility:visible;transition:background .25s}' +
+      '.sheet{width:100%;max-width:380px;max-height:92vh;overflow:auto;background:#11141a;color:#fff;border:1px solid rgba(255,255,255,.1);border-bottom:none;border-radius:12px 12px 0 0;padding:18px 18px 22px;box-shadow:0 -10px 30px rgba(0,0,0,.5);transform:translateY(100%);transition:transform .3s ease}' +
+      '.ov.open .sheet{transform:translateY(0)}' +
+      '@media(min-width:600px){.ov{align-items:center}.sheet{border-bottom:1px solid rgba(255,255,255,.1);border-radius:10px;transform:translateY(40px);opacity:0;transition:transform .3s ease,opacity .3s}.ov.open .sheet{transform:none;opacity:1}}' +
+      '@media(prefers-reduced-motion:reduce){.sheet,.ov{transition:none}}' +
+      '.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}' +
+      '.top h2{font-size:15px;color:#45F3FF;text-transform:uppercase;letter-spacing:.6px}' +
+      '.x{background:none;border:1px solid rgba(255,255,255,.15);color:#b0b3b8;width:30px;height:30px;border-radius:4px;font-size:16px;cursor:pointer}' +
+      '.x:hover{color:#fff;border-color:#45F3FF}' +
+      '.hoje{font-size:12px;color:#b0b3b8;margin-bottom:12px}' +
+      '.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}' +
+      '.chip{background:#162447;border:1px solid #45F3FF;color:#fff;border-radius:4px;padding:7px 11px;font-size:13px;font-weight:700;cursor:pointer;line-height:1.2}' +
+      '.chip small{display:block;font-size:10.5px;font-weight:400;color:#b0b3b8}' +
+      '.chip:hover{background:#45F3FF;color:#0B0C10}.chip:hover small{color:#0B0C10}' +
+      '.nav{display:flex;align-items:center;justify-content:space-between;margin:12px 0 6px}' +
+      '.nav b{font-size:14px}' +
+      '.nav button{background:#162447;border:1px solid rgba(255,255,255,.12);color:#fff;width:30px;height:28px;border-radius:4px;cursor:pointer}' +
+      '.nav button:disabled{opacity:.3;cursor:default}' +
+      '.g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}' +
+      '.s{text-align:center;font-size:10.5px;color:#64748b;padding-bottom:2px}' +
+      '.d{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:12px;color:#475569;border-radius:4px;border:1px solid transparent;background:none}' +
+      '.d.h{color:#fff;border-color:rgba(255,255,255,.4)}' +
+      '.d.v{font-weight:700}' +
+      '.d.liberado{background:#45F3FF;color:#0B0C10;cursor:pointer;border-color:#45F3FF}' +
+      '.d.liberado:hover{box-shadow:0 0 0 2px #fff}' +
+      '.d.breve{color:#94a3b8;border:1px dashed #64748b}' +
+      '.d.passou{color:#64748b;text-decoration:line-through}' +
+      '.st{min-height:18px;margin-top:10px;font-size:12px;color:#45F3FF;font-weight:600}' +
+      '.px{font-size:12px;color:#b0b3b8;line-height:1.5}.px b{color:#45F3FF}' +
+      '.lg{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:10.5px;color:#94a3b8}' +
+      '.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}' +
+      'button:focus-visible{outline:2px solid #fff;outline-offset:2px}' +
+      '</style>' +
+      '<button class="fab" type="button" id="fab" aria-haspopup="dialog">📅 Vencimentos</button>' +
+      '<div class="ov" id="ov"><div class="sheet" role="dialog" aria-modal="true" aria-label="Calendário de vencimentos do boleto">' +
+      '<div class="top"><h2>Vencimentos do boleto</h2><button class="x" type="button" id="x" aria-label="Fechar">✕</button></div>' +
+      '<p class="hoje" id="hoje"></p><div class="chips" id="chips"></div>' +
+      '<div class="nav"><button type="button" id="prev" aria-label="Mês anterior">‹</button><b id="mes"></b><button type="button" id="next" aria-label="Próximo mês">›</button></div>' +
+      '<div class="g" id="g"></div><p class="st" id="st" aria-live="polite"></p><p class="px" id="px"></p>' +
+      '<div class="lg"><span><i style="background:#45F3FF"></i>Liberado</span><span><i style="border:1px dashed #64748b"></i>Ainda não liberado</span><span><i style="border:1px solid rgba(255,255,255,.4)"></i>Hoje</span></div>' +
+      '</div></div>';
+
+    var $ = function (id) { return root.getElementById(id); };
+    var off = 0;
+
+    function copiar(v) {
+      var t = fmt(v);
+      var ok = function () { $('st').textContent = t + ' copiado'; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, function () { $('st').textContent = 'Vencimento: ' + t; });
+      else { var x = document.createElement('textarea'); x.value = t; document.body.appendChild(x); x.select(); try { document.execCommand('copy'); ok(); } catch (e) { $('st').textContent = 'Vencimento: ' + t; } x.remove(); }
+    }
+
+    function render() {
+      var hoje = zero(new Date());
+      var SEMANA = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+      $('hoje').textContent = 'Hoje: ' + SEMANA[hoje.getDay()] + ', ' + hoje.getDate() + ' de ' + MESES[hoje.getMonth()] + ' de ' + hoje.getFullYear();
+
+      var cand = [];
+      for (var m = 0; m < 6; m++) [10, 20].forEach(function (d) { cand.push(new Date(hoje.getFullYear(), hoje.getMonth() + m, d)); });
+
+      $('chips').innerHTML = '';
+      cand.filter(function (v) { return estado(v, hoje) === 'liberado'; }).forEach(function (v) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'chip';
+        b.innerHTML = fmt(v) + '<small>' + quando(dias(hoje, v)) + '</small>';
+        b.onclick = function () { copiar(v); };
+        $('chips').appendChild(b);
+      });
+
+      var prox = cand.filter(function (v) { return v > hoje && liberacao(v) > hoje; }).sort(function (a, b) { return liberacao(a) - liberacao(b); })[0];
+      $('px').innerHTML = prox ? 'Próxima liberação: <b>' + fmt(liberacao(prox)) + '</b> (' + quando(dias(hoje, liberacao(prox))) + ') libera <b>' + fmt(prox) + '</b>.' : '';
+
+      var ini = new Date(hoje.getFullYear(), hoje.getMonth() + off, 1);
+      var ult = new Date(ini.getFullYear(), ini.getMonth() + 1, 0).getDate();
+      $('mes').textContent = MESES[ini.getMonth()][0].toUpperCase() + MESES[ini.getMonth()].slice(1) + ' de ' + ini.getFullYear();
+      $('prev').disabled = off === 0; $('next').disabled = off === 2;
+
+      var g = $('g'); g.innerHTML = '';
+      SEM.forEach(function (s) { var e = document.createElement('div'); e.className = 's'; e.textContent = s; g.appendChild(e); });
+      for (var i = 0; i < ini.getDay(); i++) g.appendChild(document.createElement('div'));
+      for (var d = 1; d <= ult; d++) {
+        var dt = new Date(ini.getFullYear(), ini.getMonth(), d), el, cls = 'd' + (mesmo(dt, hoje) ? ' h' : '');
+        if (d === 10 || d === 20) {
+          var st = estado(dt, hoje); cls += ' v ' + st;
+          if (st === 'liberado') { el = document.createElement('button'); el.type = 'button'; (function (v) { el.onclick = function () { copiar(v); }; })(dt); el.title = 'Toque para copiar'; }
+          else { el = document.createElement('div'); el.title = st === 'breve' ? 'Libera em ' + fmt(liberacao(dt)) : 'Data já passou'; }
+        } else el = document.createElement('div');
+        el.className = cls; el.textContent = d; g.appendChild(el);
+      }
+    }
+
+    var lastFocus = null;
+    function abrir() { off = 0; $('st').textContent = ''; render(); lastFocus = $('fab'); $('ov').classList.add('open'); $('x').focus(); }
+    function fechar() { $('ov').classList.remove('open'); if (lastFocus) lastFocus.focus(); }
+    $('fab').onclick = abrir; $('x').onclick = fechar;
+    $('ov').addEventListener('click', function (e) { if (e.target === $('ov')) fechar(); });
+    $('prev').onclick = function () { if (off > 0) { off--; render(); } };
+    $('next').onclick = function () { if (off < 2) { off++; render(); } };
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('ov').classList.contains('open')) fechar(); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+})();
+</script>
+<!-- ===== FIM: BOTÃO CALENDÁRIO DE VENCIMENTOS ===== -->

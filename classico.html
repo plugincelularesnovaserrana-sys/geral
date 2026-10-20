@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plugin Celulares</title>
+
+    <link rel="apple-touch-icon" sizes="512x512" href="assets/ICO.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/ICO.png">
+    <link rel="shortcut icon" sizes="512x512" href="assets/ICO.png">
+
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/FAVICON.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root{
+            --bg: #0B0C10;
+            --cyan: #45F3FF;
+            --cyan-dim: rgba(69, 243, 255, 0.2);
+            --panel-a: #1f4068;
+            --panel-b: #162447;
+            --border: rgba(255, 255, 255, 0.1);
+            --ease: cubic-bezier(.4,0,.2,1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background:
+                radial-gradient(900px 500px at 50% -10%, rgba(69, 243, 255, 0.06), transparent 60%),
+                var(--bg);
+            color: #FFFFFF;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 56px 20px;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 760px;
+            width: 100%;
+        }
+
+        .logo-container {
+            margin-bottom: 44px;
+        }
+
+        .logo-container img {
+            max-width: 380px;
+            width: 100%;
+            height: auto;
+        }
+
+        .unit-label{
+            margin-top: 16px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--cyan);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: .9;
+        }
+
+        .modules-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            text-align: left;
+        }
+
+        .module-item {
+            background: linear-gradient(135deg, var(--panel-a), var(--panel-b));
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+            transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease);
+        }
+
+        details summary {
+            padding: 22px 28px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1.3px;
+            text-transform: uppercase;
+            color: var(--cyan);
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            user-select: none;
+            transition: background 0.2s var(--ease);
+        }
+
+        details summary::-webkit-details-marker{ display: none; }
+
+        details summary::after {
+            content: '';
+            flex: none;
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid var(--cyan);
+            border-bottom: 2px solid var(--cyan);
+            transform: rotate(-45deg);
+            transition: transform 0.25s var(--ease);
+        }
+
+        details[open] > summary::after {
+            transform: rotate(45deg);
+        }
+
+        details summary:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        details summary:focus-visible {
+            outline: 2px solid var(--cyan);
+            outline-offset: -2px;
+        }
+
+        .module-item > details[open] {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 1px var(--cyan-dim), 0 12px 30px rgba(0, 0, 0, 0.55);
+        }
+
+        .menu-content {
+            padding: 22px 28px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-top: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.18);
+            animation: fadeIn 0.25s var(--ease);
+        }
+
+        /* Submenus internos */
+        .submenu-item {
+            background: rgba(15, 23, 42, 0.35);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: border-color 0.2s var(--ease);
+        }
+
+        .submenu-item summary {
+            padding: 16px 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--cyan);
+            letter-spacing: 0.8px;
+            border: 1px solid var(--border);
+            background: linear-gradient(135deg, var(--panel-a), var(--panel-b));
+            border-radius: 8px;
+        }
+
+        .submenu-item summary::after {
+            border-right: 2px solid var(--cyan);
+            border-bottom: 2px solid var(--cyan);
+        }
+
+        .submenu-item details[open] > summary {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .submenu-content {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            animation: fadeIn 0.2s var(--ease);
+        }
+
+        /* Terceiro nível (dentro de Contratos): leve recuo para reforçar hierarquia */
+        .submenu-item .submenu-item summary {
+            padding: 13px 18px;
+            font-size: 11px;
+            letter-spacing: 0.6px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Botões de ação unificados */
+        .btn {
+            width: 100%;
+            padding: 17px 22px;
+            color: var(--cyan);
+            background: linear-gradient(135deg, var(--panel-a), var(--panel-b));
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            transition: transform 0.2s var(--ease), background 0.2s var(--ease), border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), color 0.2s var(--ease);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            min-height: 54px;
+            line-height: 1.3;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #0056b3, var(--panel-a));
+            border-color: var(--cyan);
+            box-shadow: 0 6px 18px rgba(69, 243, 255, 0.18);
+            color: #FFFFFF;
+            transform: translateY(-1px);
+        }
+
+        .btn:active{
+            transform: translateY(0);
+        }
+
+        .btn:focus-visible{
+            outline: 2px solid var(--cyan);
+            outline-offset: 2px;
+        }
+
+        /* Botões internos dos submenus */
+        .btn-submenu {
+            background: rgba(11, 12, 16, 0.6);
+            color: #cbd5e1;
+            min-height: 46px;
+            padding: 12px 18px;
+            font-size: 11px;
+            letter-spacing: 0.6px;
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .btn-submenu:hover {
+            background: #162447;
+            border-color: var(--cyan);
+            color: var(--cyan);
+            box-shadow: 0 4px 14px rgba(69, 243, 255, 0.12);
+        }
+
+        @media (max-width: 480px){
+            body{ padding: 36px 14px; }
+            .logo-container{ margin-bottom: 32px; }
+            details summary{ padding: 18px 20px; font-size: 12.5px; }
+            .menu-content{ padding: 18px 20px 22px; }
+            .btn{ padding: 15px 18px; font-size: 11px; }
+        }
+
+        @media (prefers-reduced-motion: reduce){
+            *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+        }
+
+        /* Ícone discreto de acesso administrativo */
+        .admin-gear {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: rgba(69, 243, 255, 0.35);
+            text-decoration: none;
+            transition: all 0.25s var(--ease);
+            z-index: 999;
+        }
+
+        .admin-gear svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .admin-gear:hover {
+            color: var(--cyan);
+            border-color: var(--cyan-dim);
+            background: rgba(69, 243, 255, 0.08);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo-container">
+            <img src="assets/LOGO.png" alt="Plugin Celulares & Acessórios">
+            <p class="unit-label">Unidade Nova Serrana/MG</p>
+        </div>
+
+        <div class="modules-wrapper">
+     
+            <!-- SEÇÃO: OPERACIONAL -->
+            <div class="module-item">
+                <details>
+                    <summary>Módulo de Vendas</summary>
+                    <div class="menu-content">                        
+                        <a href="https://app.mercadophone.tech/index.php?class=LoginForm&previous_class=meudashboard" target="_blank" class="btn">
+                            Mercado Phone
+                        </a>
+                        
+                        <a href="https://pluginnovaserrana5.kommo.com/leads/pipeline/11444559/?skip_filter=Y" target="_blank" class="btn">
+                            Kommo CRM
+                        </a>
+                        
+                        <a href="tabelas-preco/index.html" class="btn">
+                            Tabelas de Preço
+                        </a>
+                        
+                        <a href="tabelas-preco/tabela_precos.html" class="btn">
+                            Tabelas de Serviços
+                        </a>
+
+                        <a href="simulador-boletos/index.html" class="btn">
+                            Simulador de Boletos
+                        </a>
+                        
+                        <a href="https://sistema.consultcenter.com.br/users/login" target="_blank" class="btn">
+                            Consult Center
+                        </a>
+                        
+                        <a href="link/index.html" class="btn">
+                            Gerador de Link Whatsapp
+                        </a>
+                        
+                        <a href="gerador-extenso/index.html" class="btn">
+                            Gerador de Parcelas
+                        </a>
+
+                        <!-- SUBMENU: CONTRATOS OPERACIONAL -->
+                        <div class="submenu-item">
+                            <details>
+                                <summary>Contratos</summary>
+
+                                <div class="submenu-content">
+
+                                    <!-- SUBMENU: CONTRATOS CLICKSIGN -->
+                                    <div class="submenu-item">
+                                        <details>
+                                            <summary>Contratos Clicksign</summary>
+
+                                            <div class="submenu-content">
+                                                <a href="https://app.clicksign.com/fluxia/e7f7261f-7a37-4f71-8af4-94f02c9551fd"
+                                                   target="_blank"
+                                                   class="btn btn-submenu">
+                                                    Contrato de Locação com Fiador
+                                                </a>
+
+                                                <a href="https://app.clicksign.com/fluxia/65f3eaee-bfad-4a68-adfd-0ad14badc264"
+                                                   target="_blank"
+                                                   class="btn btn-submenu">
+                                                    Contrato de Locação sem Fiador
+                                                </a>
+                                            </div>
+                                        </details>
+                                    </div>
+
+                                    <!-- SUBMENU: CONTRATOS MANUAIS -->
+                                    <div class="submenu-item">
+                                        <details>
+                                            <summary>Contratos Manuais</summary>
+
+                                            <div class="submenu-content">
+                                                <a href="contratos-manuais/locacao-com-fiador.html"
+                                                   class="btn btn-submenu">
+                                                    Contrato de Locação com Fiador
+                                                </a>
+
+                                                <a href="contratos-manuais/locacao-sem-fiador.html"
+                                                   class="btn btn-submenu">
+                                                    Contrato de Locação sem Fiador
+                                                </a>
+                                            </div>
+                                        </details>
+                                    </div>
+
+                                </div>
+                            </details>
+                        </div>
+                        
+                        <!-- SUBMENU: UTILITARIOS -->
+                        <div class="submenu-item">
+                            <details>
+                                <summary>Utilitários</summary>
+                                <div class="submenu-content">
+                                    <a href="http://201.222.31.101:8081/webfactoring/" target="_blank" class="btn btn-submenu">
+                                        Web Factoring
+                                    </a>
+                                    <a href="https://www.paymobi.com.br/views/modules/login_page.php" target="_blank" class="btn btn-submenu">
+                                        Paymobi
+                                    </a>
+                                    <a href="simulador-promissorias/index.html" class="btn btn-submenu">
+                                        Simulador Nota Promissória
+                                    </a>                                                             
+                                    <a href="gerador-capa/index.html" class="btn btn-submenu">
+                                        Gerador Capa de Carnê
+                                    </a>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </details>
+            </div>   
+            
+            <!-- SEÇÃO: FINANCEIRO -->
+            <div class="module-item">
+                <details>
+                    <summary>Módulo Financeiro</summary>
+                    <div class="menu-content">             
+                        <a href="https://app.mercadophone.tech/index.php?class=LoginForm&previous_class=meudashboard" target="_blank" class="btn">
+                            Mercado Phone
+                        </a>
+                        
+                        <a href="gerador1/index.html" class="btn">
+                            Simulador Renegociação Total/Parcial
+                        </a>
+                        
+                        <a href="gerador2/index.html" class="btn">
+                            Simulador Renegociação Remanejamento
+                        </a>
+
+                        <a href="gerador-extenso/index.html" class="btn">
+                            Gerador de Parcelas
+                        </a>
+
+                        <a href="https://sistema.consultcenter.com.br/users/login" target="_blank" class="btn">
+                            Consult Center
+                        </a>  
+
+                        <!-- SUBMENU: CONTRATOS FINANCEIRO -->
+                        <div class="submenu-item">
+                            <details>
+                                <summary>Contratos de Renegociação</summary>
+
+                                <div class="submenu-content">
+
+                                    <!-- SUBMENU: CONTRATOS CLICKSIGN -->
+                                    <div class="submenu-item">
+                                        <details>
+                                            <summary>Contratos Clicksign</summary>
+
+                                            <div class="submenu-content">
+                                                <a href="https://app.clicksign.com/fluxia/861114f2-7170-4c10-87e4-470235102e00"
+                                                   target="_blank"
+                                                   class="btn btn-submenu">
+                                                    Renegociação Novo sem Fiador
+                                                </a>
+
+                                                <a href="https://app.clicksign.com/fluxia/0ddb95f5-a964-4c33-b538-5222970c529f"
+                                                   target="_blank"
+                                                   class="btn btn-submenu">
+                                                    Renegociação Novo com Fiador
+                                                </a>
+
+                                                <a href="https://app.clicksign.com/fluxia/d6802929-7de2-45df-8d70-b12d52021afa"
+                                                   target="_blank"
+                                                   class="btn btn-submenu">
+                                                    Renegociação Antigo sem Fiador
+                                                </a>
+
+                                                <a href="https://app.clicksign.com/fluxia/788dc296-7301-48c5-bd1d-23bba499c572"
+                                                   target="_blank"
+                                                   class="btn btn-submenu">
+                                                    Renegociação Antigo com Fiador
+                                                </a>
+                                            </div>
+                                        </details>
+                                    </div>
+
+                                    <!-- SUBMENU: CONTRATOS MANUAIS -->
+                                    <div class="submenu-item">
+                                        <details>
+                                            <summary>Contratos Manuais</summary>
+
+                                            <div class="submenu-content">
+                                                <a href="contratos-manuais/renegociacao-financiamento-com-fiador.html"
+                                                   class="btn btn-submenu">
+                                                    Renegociação Financiamento com Fiador
+                                                </a>
+
+                                                <a href="contratos-manuais/renegociacao-financiamento-sem-fiador.html"
+                                                   class="btn btn-submenu">
+                                                    Renegociação Financiamento sem Fiador
+                                                </a>
+
+                                                <a href="contratos-manuais/renegociacao-locacao-com-fiador.html"
+                                                   class="btn btn-submenu">
+                                                    Renegociação Locação com Fiador
+                                                </a>
+
+                                                <a href="contratos-manuais/renegociacao-locacao-sem-fiador.html"
+                                                   class="btn btn-submenu">
+                                                    Renegociação Locação sem Fiador
+                                                </a>
+                                                
+                                                <a href="contratos-manuais/contrato-devolucao.html"
+                                                   class="btn btn-submenu">
+                                                    Termo de devolução + checklist
+                                                </a>
+                                            </div>
+                                        </details>
+                                    </div>
+
+                                </div>
+                            </details>
+                        </div>
+                        
+                        <!-- SUBMENU: UTILITARIOS -->
+                        <div class="submenu-item">
+                            <details>
+                                <summary>Utilitários</summary>
+                                <div class="submenu-content">
+                                    <a href="http://201.222.31.101:8081/webfactoring/" target="_blank" class="btn btn-submenu">
+                                        Web Factoring
+                                    </a>
+                                    <a href="https://www.paymobi.com.br/views/modules/login_page.php" target="_blank" class="btn btn-submenu">
+                                        Paymobi
+                                    </a>
+                                     <a href="simulador-promissorias/index.html" class="btn btn-submenu">
+                                        Simulador Nota Promissória
+                                    </a>                                                         
+                                    <a href="gerador-capa/index.html" class="btn btn-submenu">
+                                        Gerador Capa de Carnê
+                                    </a>
+                                </div>
+                            </details>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Acesso administrativo discreto -->
+    <a href="admin/index.html" class="admin-gear" title="Administrativo" aria-label="Administrativo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+    </a>
+
+</body>
+</html>

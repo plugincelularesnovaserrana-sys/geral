@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#0B0C10">
+<title>Plugin Celulares — Plataforma</title>
+<script>
+  /* Ferramentas antigas têm o botão "voltar" apontando para esta página.
+     Se ela abrir DENTRO da plataforma (num quadro), avisa a plataforma e não carrega nada. */
+  (function () {
+    try {
+      if (window.self !== window.top && window.parent.PLATAFORMA) {
+        window.parent.PLATAFORMA.voltarDe(window);
+        document.documentElement.innerHTML = '';
+        window.stop && window.stop();
+      }
+    } catch (e) { /* outra origem: segue normal */ }
+  })();
+</script>
+<link rel="apple-touch-icon" sizes="512x512" href="assets/ICO.png">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/ICO.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/FAVICON.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="plataforma/plataforma.css?v=1">
+</head>
+<body>
+<div class="app" id="app">
+  <aside class="lateral" id="lateral" aria-label="Menu">
+    <div class="lateral-topo">
+      <a class="marca" href="#/" title="Início">
+        <img src="assets/LOGO.png" alt="Plugin Celulares &amp; Acessórios">
+      </a>
+      <button class="icone-btn so-mobile" id="fecharMenu" aria-label="Fechar menu"><i data-lucide="x"></i></button>
+    </div>
+    <p class="unidade" id="unidade"></p>
+    <nav class="menu" id="menu"></nav>
+    <div class="lateral-rodape">
+      <button class="icone-btn" id="recolher" title="Recolher menu" aria-label="Recolher menu"><i data-lucide="panel-left-close"></i></button>
+    </div>
+  </aside>
+  <div class="veu" id="veu"></div>
+
+  <div class="principal">
+    <header class="topo">
+      <button class="icone-btn so-mobile" id="abrirMenu" aria-label="Abrir menu"><i data-lucide="menu"></i></button>
+      <button class="busca-gatilho" id="buscaGatilho" aria-label="Buscar ferramentas e telas">
+        <i data-lucide="search"></i><span>Buscar ferramenta, tela ou atalho…</span><kbd>Ctrl K</kbd>
+      </button>
+      <div class="abas" id="abas" role="tablist" aria-label="Ferramentas abertas"></div>
+    </header>
+
+    <div class="barra-ferramenta" id="barraFerramenta" hidden>
+      <div class="trilha" id="trilha"></div>
+      <div class="acoes">
+        <button class="icone-btn" id="btFav" title="Favoritar"><i data-lucide="star"></i></button>
+        <button class="icone-btn" id="btRecarregar" title="Recarregar"><i data-lucide="rotate-cw"></i></button>
+        <button class="icone-btn" id="btNovaAba" title="Abrir em nova aba do navegador"><i data-lucide="external-link"></i></button>
+        <button class="icone-btn" id="btTela" title="Tela cheia (Esc para sair)"><i data-lucide="maximize-2"></i></button>
+      </div>
+    </div>
+
+    <main class="area" id="area">
+      <section class="inicio" id="inicio"></section>
+      <div class="quadros" id="quadros"></div>
+    </main>
+  </div>
+</div>
+
+<div class="paleta" id="paleta" hidden>
+  <div class="paleta-caixa" role="dialog" aria-modal="true" aria-label="Busca">
+    <div class="paleta-campo"><i data-lucide="search"></i><input id="paletaInput" type="search" placeholder="Digite: boleto, inadimplência, nova venda, contrato…" autocomplete="off"><kbd>Esc</kbd></div>
+    <div class="paleta-lista" id="paletaLista" role="listbox"></div>
+  </div>
+</div>
+<div class="aviso-flutuante" id="avisoFlutuante" hidden></div>
+
+<script src="gestao/assets/vendor/lucide.min.js"></script>
+<script src="plataforma/gestao-menu.js?v=1"></script>
+<script src="plataforma/registro.js?v=1"></script>
+<script src="plataforma/plataforma.js?v=1"></script>
+</body>
+</html>
