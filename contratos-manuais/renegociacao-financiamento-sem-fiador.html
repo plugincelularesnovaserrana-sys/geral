@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Contrato de Renegociação de Financiamento (Sem Fiador) - Central de Ferramentas</title>
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+        background-color: #0B0C10;
+        color: #FFFFFF;
+        min-height: 100vh;
+        padding: 40px 20px;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #162447, #0f172a);
+        padding: 30px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .logo-back-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 20px;
+    }
+
+    .logo-back-container img {
+        max-width: 250px;
+        height: auto;
+    }
+
+    .btn-back {
+        padding: 10px 20px;
+        color: #FFFFFF;
+        background: linear-gradient(135deg, #1f4068, #162447);
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 11px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-back:hover {
+        background: linear-gradient(135deg, #0056b3, #1f4068);
+        border-color: #45F3FF;
+        box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    header h1 {
+        margin: 0;
+        color: #45F3FF;
+        font-size: 24px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    header .subtitle {
+        margin: 6px 0 0 0;
+        color: #94a3b8;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    /* ===== BARRA DE PROGRESSO (fluxo estilo Clicksign) ===== */
+    .progress-wrap {
+        margin-bottom: 25px;
+    }
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    .progress-step {
+        flex: 1 1 0;
+        text-align: center;
+        font-size: 10px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: #64748b;
+        font-weight: 600;
+        padding-bottom: 6px;
+        border-bottom: 3px solid rgba(255,255,255,0.08);
+        transition: all 0.3s ease;
+    }
+    .progress-step.ativo {
+        color: #45F3FF;
+        border-bottom-color: #45F3FF;
+    }
+    .progress-step.concluido {
+        color: #16a34a;
+        border-bottom-color: #16a34a;
+    }
+
+    .step-panel {
+        display: none;
+        background: rgba(15, 23, 42, 0.4);
+        padding: 25px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .step-panel.ativo { display: block; }
+
+    .step-titulo {
+        color: #45F3FF;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+        font-weight: bold;
+    }
+    .step-desc {
+        color: #94a3b8;
+        font-size: 12.5px;
+        margin-bottom: 20px;
+        line-height: 1.4;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .form-group.full { grid-column: 1 / -1; }
+
+    .form-group label {
+        margin-bottom: 8px;
+        font-weight: 600;
+        font-size: 12px;
+        color: #cbd5e1;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .form-group label .opcional {
+        color: #64748b;
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    .form-group input, .form-group select {
+        padding: 12px;
+        background-color: #0B0C10;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        font-size: 14px;
+        color: #FFFFFF;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+        outline: none;
+        border-color: #45F3FF;
+        box-shadow: 0 0 8px rgba(69, 243, 255, 0.2);
+    }
+
+    .cpf-valido { border: 1px solid #16a34a !important; box-shadow: 0 0 8px rgba(22, 163, 74, 0.3); }
+    .cpf-invalido { border: 1px solid #dc2626 !important; box-shadow: 0 0 8px rgba(220, 38, 38, 0.3); }
+    .campo-obrigatorio-erro { border: 1px solid #dc2626 !important; background-color: rgba(220, 38, 38, 0.05); }
+
+    .doc-hint {
+        margin-top: 4px;
+        font-size: 10.5px;
+        color: #94a3b8;
+    }
+    .doc-hint.ok { color: #16a34a; }
+    .doc-hint.erro { color: #dc2626; }
+
+    .nav-botoes {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    button {
+        cursor: pointer;
+        border: none;
+        font-family: inherit;
+    }
+
+    .btn-primario, .btn-print {
+        background: linear-gradient(135deg, #1f4068, #162447);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 14px 22px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+    .btn-primario:hover, .btn-print:hover {
+        background: linear-gradient(135deg, #0056b3, #1f4068);
+        border-color: #45F3FF;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(69, 243, 255, 0.2);
+    }
+
+    .btn-secundario {
+        background: transparent;
+        color: #94a3b8;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 14px 22px;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .btn-secundario:hover { border-color: #94a3b8; color: #fff; }
+    .btn-secundario:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-print {
+        width: 100%;
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 25px;
+    }
+
+    .resumo-box {
+        background: rgba(69, 243, 255, 0.05);
+        border: 1px solid rgba(69, 243, 255, 0.15);
+        border-radius: 6px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        line-height: 1.9;
+    }
+    .resumo-box strong { color: #45F3FF; }
+    .resumo-box .linha { border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 4px; margin-bottom: 4px; }
+
+    .results-section {
+        margin-top: 30px;
+        display: none;
+    }
+    .results-section h2 {
+        color: #45F3FF;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* ===== DOCUMENTO / CONTRATO — medidas extraídas do XML do .docx original =====
+       Fonte: Times New Roman 12pt (w:sz 24) | Página: A4 | Margens: 1440 twips = 1in = 25,4mm
+       Título: 12pt negrito, entrelinha 1.5 | Corpo: justificado */
+    #docContrato {
+        background: #fff;
+        color: #000;
+        width: 210mm;
+        max-width: 210mm;
+        margin: 0 auto;
+        padding: 25.4mm;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 12pt;
+        line-height: 1.15;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 6px 16px rgba(0,0,0,0.25);
+    }
+    #docContrato p { margin: 0 0 12pt 0; text-align: justify; }
+    #docContrato .titulo-principal {
+        text-align: center;
+        font-weight: bold;
+        font-size: 12pt;
+        line-height: 1.5;
+        margin-bottom: 6pt;
+        text-transform: uppercase;
+    }
+    #docContrato .subtitulo {
+        text-align: center;
+        font-size: 12pt;
+        line-height: 1.5;
+        margin-bottom: 0;
+    }
+    #docContrato .espaco { margin-bottom: 12pt; }
+    #docContrato .clausula {
+        font-weight: bold;
+        font-size: 12pt;
+        margin-top: 12pt;
+        margin-bottom: 12pt;
+    }
+    #docContrato ul.bullets {
+        list-style: none;
+        margin: 0 0 12pt 0;
+        padding: 0;
+    }
+    #docContrato ul.bullets li {
+        position: relative;
+        margin: 0 0 12pt 54pt;
+        text-align: justify;
+    }
+    #docContrato ul.bullets li::before {
+        content: "·";
+        position: absolute;
+        left: -18pt;
+    }
+    #docContrato .parcela-linha {
+        font-weight: bold;
+        font-size: 12pt;
+        margin: 0 0 0 0;
+        text-align: left;
+    }
+    #docContrato .parcela-vencida-linha {
+        font-weight: normal;
+        font-style: italic;
+        font-size: 12pt;
+        margin: 0 0 0 0;
+        text-align: left;
+    }
+    #docContrato .data-local {
+        text-align: center;
+        margin: 24pt 0 30pt 0;
+    }
+    #docContrato .assinatura {
+        margin: 30pt 0 4pt 0;
+        border-top: 1px solid #000;
+        text-align: center;
+        padding-top: 4pt;
+        font-weight: bold;
+    }
+    #docContrato .dado-testemunha {
+        font-weight: normal;
+        font-size: 11pt;
+        margin-top: 8pt;
+    }
+    #docContrato .bloco-assinaturas {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    /* ===== IMPRESSÃO ===== */
+    @media print {
+        @page {
+            size: A4;
+            margin: 25.4mm;
+        }
+        html, body {
+            background-color: #fff;
+            padding: 0;
+            color: #111827;
+        }
+        .container {
+            box-shadow: none;
+            padding: 0;
+            max-width: 100%;
+            background: #fff;
+            border: none;
+        }
+        header, #wizardForm, .btn-print, .btn-secundario, .results-section h2, .logo-back-container, .progress-wrap {
+            display: none !important;
+        }
+        .results-section {
+            display: block !important;
+            margin-top: 0;
+        }
+        #docContrato {
+            box-shadow: none;
+            max-width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-back-container">
+        <img src="../assets/LOGO.png" alt="Plugin Celulares & Acessórios" onerror="this.style.display='none'">
+        <a href="../index.html" class="btn-back">⬅ Voltar ao Painel</a>
+    </div>
+
+    <header>
+        <h1>Gerador de Contrato de Renegociação de Financiamento (Sem Fiador)</h1>
+        <p class="subtitle">Preencha os dados em etapas e gere o contrato completo, pronto para impressão, na mesma formatação do modelo original</p>
+    </header>
+
+    <form id="wizardForm" onsubmit="return false;">
+
+        <div class="progress-wrap">
+            <div class="progress-steps" id="progressSteps">
+                <div class="progress-step" data-step="1">1. Devedor</div>
+                <div class="progress-step" data-step="2">2. Endereço</div>
+                <div class="progress-step" data-step="3">3. Débito Original</div>
+                <div class="progress-step" data-step="4">4. Parcelas Vencidas</div>
+                <div class="progress-step" data-step="5">5. Parcelas a Vencer</div>
+                <div class="progress-step" data-step="6">6. Assinatura</div>
+                <div class="progress-step" data-step="7">7. Revisão</div>
+            </div>
+        </div>
+
+        <!-- ETAPA 1 -->
+        <div class="step-panel ativo" data-step="1">
+            <div class="step-titulo">Dados do Devedor(a)</div>
+            <div class="step-desc">Informações pessoais de quem está renegociando a dívida.</div>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="f_nome">Nome completo</label>
+                    <input type="text" id="f_nome" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_cpf">CPF</label>
+                    <input type="text" id="f_cpf" inputmode="numeric" required oninput="mascaraCPF(this)">
+                    <span class="doc-hint" id="hintCpf"></span>
+                </div>
+                <div class="form-group">
+                    <label for="f_rg">RG</label>
+                    <input type="text" id="f_rg" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 2 -->
+        <div class="step-panel" data-step="2">
+            <div class="step-titulo">Endereço do Devedor(a)</div>
+            <div class="step-desc">Endereço completo de residência e domicílio.</div>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="f_rua">Rua</label>
+                    <input type="text" id="f_rua" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_numero">Número</label>
+                    <input type="text" id="f_numero" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_bairro">Bairro</label>
+                    <input type="text" id="f_bairro" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_complemento">Complemento <span class="opcional">(opcional)</span></label>
+                    <input type="text" id="f_complemento">
+                </div>
+                <div class="form-group">
+                    <label for="f_cidade">Cidade</label>
+                    <input type="text" id="f_cidade" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_cep">CEP</label>
+                    <input type="text" id="f_cep" inputmode="numeric" maxlength="9" required oninput="mascaraCEP(this)">
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 3 -->
+        <div class="step-panel" data-step="3">
+            <div class="step-titulo">Dados do Débito Original</div>
+            <div class="step-desc">Informações do aparelho e da dívida que deu origem à renegociação.</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="f_marca">Marca do aparelho</label>
+                    <input type="text" id="f_marca" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_modelo">Modelo do aparelho</label>
+                    <input type="text" id="f_modelo" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_imei">IMEI</label>
+                    <input type="text" id="f_imei" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_dataCompra">Data da compra original</label>
+                    <input type="date" id="f_dataCompra" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_valorOriginal">Valor original da dívida (R$)</label>
+                    <input type="number" id="f_valorOriginal" step="0.01" min="0.01" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 4 -->
+        <div class="step-panel" data-step="4">
+            <div class="step-titulo">Parcelas Já Vencidas (Não Pagas)</div>
+            <div class="step-desc">Informe o valor de cada parcela vencida, a quantidade e a data do 1º vencimento em atraso. O sistema gera automaticamente o demonstrativo das parcelas vencidas e o total em atraso.</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="f_valorParcelaVencida">Valor de cada parcela vencida (R$)</label>
+                    <input type="number" id="f_valorParcelaVencida" step="0.01" min="0.01" required oninput="atualizarPreviewVencidas()">
+                </div>
+                <div class="form-group">
+                    <label for="f_qtdParcelasVencidas">Quantidade de parcelas vencidas</label>
+                    <input type="number" id="f_qtdParcelasVencidas" min="1" max="36" value="1" required oninput="atualizarPreviewVencidas()">
+                </div>
+                <div class="form-group">
+                    <label for="f_primeiroVencimentoVencida">Vencimento da 1ª parcela em atraso</label>
+                    <input type="date" id="f_primeiroVencimentoVencida" required oninput="atualizarPreviewVencidas()">
+                </div>
+                <div class="form-group full">
+                    <label for="f_valorAtualizado">Valor atualizado do débito, com juros e encargos (R$)</label>
+                    <input type="number" id="f_valorAtualizado" step="0.01" min="0.01" required>
+                    <span class="doc-hint" id="hintValorAtualizado"></span>
+                </div>
+            </div>
+            <div class="resumo-box" id="previewVencidas" style="margin-top:20px; display:none;"></div>
+        </div>
+
+        <!-- ETAPA 5 -->
+        <div class="step-panel" data-step="5">
+            <div class="step-titulo">Parcelas a Vencer (Renegociadas)</div>
+            <div class="step-desc">Informe o valor de entrada (se houver), o valor de cada nova parcela, a quantidade (até 15) e o vencimento da 1ª. O sistema gera automaticamente o novo parcelamento, com o valor por extenso, pronto para o contrato.</div>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="f_valorEntrada">Valor de entrada <span class="opcional">(opcional — pago no ato da assinatura)</span></label>
+                    <input type="number" id="f_valorEntrada" step="0.01" min="0" value="0" oninput="atualizarPreviewNovas()">
+                </div>
+                <div class="form-group">
+                    <label for="f_valorParcelaNova">Valor de cada parcela renegociada (R$)</label>
+                    <input type="number" id="f_valorParcelaNova" step="0.01" min="0.01" required oninput="atualizarPreviewNovas()">
+                </div>
+                <div class="form-group">
+                    <label for="f_qtdParcelasNovas">Quantidade de parcelas</label>
+                    <input type="number" id="f_qtdParcelasNovas" min="1" max="15" value="1" required oninput="atualizarPreviewNovas()">
+                </div>
+                <div class="form-group">
+                    <label for="f_primeiroVencimentoNova">Vencimento da 1ª parcela renegociada</label>
+                    <input type="date" id="f_primeiroVencimentoNova" required oninput="atualizarPreviewNovas()">
+                </div>
+                <div class="form-group full">
+                    <label for="f_valorRenegociado">Valor total renegociado (R$)</label>
+                    <input type="number" id="f_valorRenegociado" step="0.01" min="0.01" required>
+                    <span class="doc-hint" id="hintValorRenegociado">Sugestão automática: entrada + (valor da parcela × quantidade). Ajuste se necessário.</span>
+                </div>
+            </div>
+            <div class="resumo-box" id="previewNovas" style="margin-top:20px; display:none;"></div>
+        </div>
+
+        <!-- ETAPA 6 -->
+        <div class="step-panel" data-step="6">
+            <div class="step-titulo">Data da Assinatura</div>
+            <div class="step-desc">Data em que o instrumento de renegociação será firmado.</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="f_dataVenda">Data da assinatura</label>
+                    <input type="date" id="f_dataVenda" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 7 -->
+        <div class="step-panel" data-step="7">
+            <div class="step-titulo">Revisão</div>
+            <div class="step-desc">Confira os dados antes de gerar o contrato para impressão.</div>
+            <div class="resumo-box" id="resumoBox"></div>
+            <button type="button" class="btn-primario" style="width:100%" onclick="gerarContrato()">Gerar Contrato para Impressão</button>
+        </div>
+
+        <div class="nav-botoes">
+            <button type="button" class="btn-secundario" id="btnVoltar" onclick="mudarEtapa(-1)" disabled>Voltar</button>
+            <button type="button" class="btn-primario" id="btnAvancar" onclick="mudarEtapa(1)">Avançar</button>
+        </div>
+    </form>
+
+    <div id="resultsSection" class="results-section">
+        <h2>Contrato Gerado</h2>
+        <button class="btn-print" onclick="window.print()">🖨️ Imprimir Contrato</button>
+        <div id="docContrato">
+
+<p class="titulo-principal">INSTRUMENTO PARTICULAR DE TRANSAÇÃO E RENEGOCIAÇÃO DE DÍVIDA</p>
+
+<p>Pelo presente instrumento, de um lado:</p>
+
+<p><strong>CREDORA:</strong> PLUGIN CELULARES ACESSÓRIOS E INFORMÁTICA LTDA, pessoa jurídica de direito privado, inscrita no CNPJ nº 59.032.702/0001-08, com sede à RUA CORONEL MARTINHO FERREIRA DO AMARAL N° 264, CENTRO, NOVA SERRANA-MG, CEP 35.520-122, doravante denominada <strong>CREDORA</strong>;</p>
+
+<p>E, de outro lado:</p>
+
+<p><strong>DEVEDOR(A):</strong> <span data-f="nome"></span>, CPF nº <span data-f="cpf"></span>, RG nº <span data-f="rg"></span>, residente e domiciliado(a) à <span data-f="rua"></span>, <span data-f="numero"></span>, <span data-f="bairro"></span>, <span data-f="complemento"></span>, <span data-f="cidade"></span> - MG, <span data-f="cep"></span>;</p>
+
+<p>As partes, que declaram possuir plena capacidade civil, ter compreendido integralmente o conteúdo deste instrumento, cujas cláusulas foram previamente disponibilizadas, lidas e aceitas de forma consciente, firmam o presente contrato em caráter <strong>irrevogável e irretratável</strong>, nos termos abaixo.</p>
+
+<p class="clausula">CLÁUSULA 1 – DO OBJETO</p>
+<p>1.1 - O(A) DEVEDOR(A) reconhece e confessa de forma inequívoca ser devedor(a) à CREDORA da quantia original de R$ <span data-f="valorOriginalFormatado"></span> (<span data-f="valorOriginalExtenso"></span>), decorrente da aquisição do aparelho celular marca <span data-f="marca"></span>, modelo <span data-f="modelo"></span>, identificado pelo IMEI sob o nº <span data-f="imei"></span>, realizada em <span data-f="dataCompraBR"></span>, cujas parcelas encontram-se vencidas e não pagas, conforme demonstrativo abaixo:</p>
+<div id="listaParcelasVencidas"></div>
+<p class="espaco">Perfazendo o débito vencido o montante de R$ <span data-f="totalVencidoFormatado"></span> (<span data-f="totalVencidoExtenso"></span>).</p>
+<p>1.2 - O valor atualizado do débito, acrescido de juros e encargos moratórios até a presente data, totaliza a quantia de R$ <span data-f="valorAtualizadoFormatado"></span> (<span data-f="valorAtualizadoExtenso"></span>).</p>
+
+<p class="clausula">CLÁUSULA 2 - DA RENEGOCIAÇÃO E DO PAGAMENTO</p>
+<p>2.1 - Por mera liberalidade, as partes transacionam o valor total do débito, que nesta data fica ajustado em R$ <span data-f="valorRenegociadoFormatado"></span> (<span data-f="valorRenegociadoExtenso"></span>) para pagamento de forma parcelada, nos termos que seguem.</p>
+<p class="espaco" id="paragrafoEntrada" style="display:none;">2.1.1 - Do valor renegociado, R$ <span data-f="valorEntradaFormatado"></span> (<span data-f="valorEntradaExtenso"></span>) será pago a título de <strong>ENTRADA</strong>, no ato da assinatura deste instrumento, sendo o saldo remanescente de R$ <span data-f="saldoParceladoFormatado"></span> (<span data-f="saldoParceladoExtenso"></span>) pago de forma parcelada, conforme abaixo.</p>
+<p>2.2 - O pagamento será realizado da seguinte forma:</p>
+<div id="listaParcelasNovas"></div>
+<p class="espaco">por meio de <strong>boleto bancário.</strong></p>
+
+<p class="clausula">CLÁUSULA 3 - DA QUITAÇÃO</p>
+<p>3.1 - Com o efetivo pagamento integral do valor renegociado nos termos da Cláusula Segunda, a CREDORA dará ao(à) DEVEDOR(A) plena, geral e irrevogável quitação do débito original descrito na Cláusula Primeira, para nada mais reclamar a qualquer título.</p>
+<p>3.2 - Caso o nome do(a) DEVEDOR(A) tenha sido inscrito em cadastros de inadimplentes (SPC, Serasa, etc.) por conta do débito objeto deste acordo, a CREDORA se compromete a solicitar a baixa da inscrição no prazo de 5 (cinco) dias úteis após a quitação da 1ª parcela do presente instrumento.</p>
+
+<p class="clausula">CLÁUSULA 4 – DA INADIMPLÊNCIA</p>
+<p>4.1 - O não pagamento de qualquer parcela na data acordada implicará no vencimento antecipado de toda a dívida confessada neste instrumento, sobre a qual incidirá multa de 10% (dez por cento) sobre o saldo devedor, além de juros de mora de 1% (um por cento) ao mês e correção monetária.</p>
+<p>4.2 – Ocorrendo a inadimplência, a CREDORA poderá promover o bloqueio remoto do aparelho, nos termos previamente ajustados, como medida de garantia do cumprimento contratual.</p>
+<p>4.3 - Ocorrendo a inadimplência, a CREDORA poderá tomar as medidas judiciais e extrajudiciais cabíveis para a cobrança do valor integral remanescente, independentemente de qualquer aviso ou notificação.</p>
+
+<p class="clausula">CLÁUSULA 5 – DA LEGISLAÇÃO APLICÁVEL</p>
+<p>5.1. O presente acordo é celebrado com fundamento nos princípios da autonomia da vontade, da boa-fé objetiva e da função social do contrato, previstos no Código Civil, bem como nas normas de proteção ao consumidor, que incentivam a repactuação de dívidas, conforme a Lei nº 8.078/90 (Código de Defesa do Consumidor), especialmente em seus artigos que tratam da prevenção e tratamento do superendividamento.</p>
+
+<p class="clausula">CLÁUSULA 6 - TÍTULO EXECUTIVO EXTRAJUDICIAL</p>
+<p>6.1 - O presente contrato constitui <strong>título executivo extrajudicial</strong>, nos termos do art. 784, inciso III, do Código de Processo Civil.</p>
+
+<div class="bloco-assinaturas">
+<p class="clausula">CLÁUSULA 7 – DO FORO</p>
+<p>7.1. Fica eleito o foro da Comarca de NOVA SERRANA-MG para dirimir quaisquer conflitos oriundos deste instrumento, com renúncia expressa de qualquer outro, por mais privilegiado que possa ser.</p>
+<p>E por estarem justas e contratadas, assinam o presente instrumento em 02 (duas) vias de igual teor.</p>
+
+<p class="data-local">NOVA SERRANA-MG, <span data-f="dataVendaBR"></span>.</p>
+
+<div class="assinatura">DEVEDOR(A)</div>
+<div class="assinatura">PLUGIN CELULARES ACESSÓRIOS E INFORMÁTICA LTDA</div>
+<div class="assinatura">TESTEMUNHA
+<div class="dado-testemunha">Nome: _________________________________________________</div>
+<div class="dado-testemunha">CPF: _________________________________________________</div>
+</div>
+<div class="assinatura">TESTEMUNHA
+<div class="dado-testemunha">Nome: _________________________________________________</div>
+<div class="dado-testemunha">CPF: _________________________________________________</div>
+</div>
+</div>
+
+        </div>
+        <button class="btn-secundario" style="width:100%; margin-top:15px;" onclick="location.reload()">Preencher Novo Contrato</button>
+    </div>
+</div>
+
+<script>
+    /* ===================== NAVEGAÇÃO DO FLUXO ===================== */
+    let etapaAtual = 1;
+    const TOTAL_ETAPAS = 7;
+    let parcelasVencidasGeradas = []; // preenchido por calcularParcelasVencidas()
+    let parcelasNovasGeradas = [];    // preenchido por calcularParcelasNovas()
+
+    function validarEtapaAtual() {
+        const painel = document.querySelector('.step-panel[data-step="' + etapaAtual + '"]');
+        const campos = painel.querySelectorAll('input[required]');
+        let ok = true;
+        let primeiro = null;
+        campos.forEach(function (c) {
+            c.classList.remove('campo-obrigatorio-erro');
+            if (!c.value.trim()) {
+                c.classList.add('campo-obrigatorio-erro');
+                ok = false;
+                if (!primeiro) primeiro = c;
+            }
+        });
+        if (etapaAtual === 1) {
+            const cpf = document.getElementById('f_cpf');
+            const nums = cpf.value.replace(/\D/g, "");
+            if (nums.length === 11 && !validarCPF(nums)) {
+                cpf.classList.add('campo-obrigatorio-erro');
+                ok = false;
+                if (!primeiro) primeiro = cpf;
+            }
+        }
+        if (etapaAtual === 4 && parcelasVencidasGeradas.length === 0) {
+            ok = false;
+        }
+        if (etapaAtual === 5 && parcelasNovasGeradas.length === 0) {
+            ok = false;
+        }
+        if (!ok) {
+            alert('Preencha corretamente todos os campos obrigatórios desta etapa antes de avançar.');
+            if (primeiro) primeiro.focus();
+        }
+        return ok;
+    }
+
+    function mudarEtapa(direcao) {
+        if (direcao > 0 && !validarEtapaAtual()) return;
+
+        if (etapaAtual === 6 && direcao > 0) montarResumo();
+
+        const novaEtapa = etapaAtual + direcao;
+        if (novaEtapa < 1 || novaEtapa > TOTAL_ETAPAS) return;
+
+        document.querySelector('.step-panel[data-step="' + etapaAtual + '"]').classList.remove('ativo');
+        etapaAtual = novaEtapa;
+        document.querySelector('.step-panel[data-step="' + etapaAtual + '"]').classList.add('ativo');
+
+        document.querySelectorAll('.progress-step').forEach(function (el) {
+            const n = parseInt(el.getAttribute('data-step'), 10);
+            el.classList.remove('ativo', 'concluido');
+            if (n === etapaAtual) el.classList.add('ativo');
+            else if (n < etapaAtual) el.classList.add('concluido');
+        });
+
+        document.getElementById('btnVoltar').disabled = (etapaAtual === 1);
+        document.getElementById('btnAvancar').style.display = (etapaAtual === TOTAL_ETAPAS) ? 'none' : 'inline-block';
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function montarResumo() {
+        const v = coletarValores();
+        const box = document.getElementById('resumoBox');
+        box.innerHTML =
+            '<div class="linha"><strong>Devedor(a):</strong> ' + v.nome + ' — CPF ' + v.cpf + ' — RG ' + v.rg + '</div>' +
+            '<div class="linha"><strong>Endereço:</strong> ' + v.rua + ', ' + v.numero + ', ' + v.bairro + (v.complemento ? ', ' + v.complemento : '') + ', ' + v.cidade + ' - MG, ' + v.cep + '</div>' +
+            '<div class="linha"><strong>Aparelho:</strong> ' + v.marca + ' ' + v.modelo + ' — IMEI ' + v.imei + ' — Compra em ' + v.dataCompraBR + '</div>' +
+            '<div class="linha"><strong>Dívida original:</strong> R$ ' + v.valorOriginalFormatado + ' — Atualizada: R$ ' + v.valorAtualizadoFormatado + '</div>' +
+            '<div class="linha"><strong>Parcelas vencidas:</strong> ' + v.parcelasVencidas.length + ' — Total vencido: R$ ' + v.totalVencidoFormatado + '</div>' +
+            '<div class="linha"><strong>Renegociação:</strong> R$ ' + v.valorRenegociadoFormatado + ' (entrada: R$ ' + v.valorEntradaFormatado + ') em ' + v.parcelasNovas.length + ' parcela(s)</div>' +
+            '<div><strong>Assinatura:</strong> ' + v.dataVendaBR + '</div>';
+    }
+
+    /* ===================== MÁSCARAS ===================== */
+    function mascaraCPF(input) {
+        let v = input.value.replace(/\D/g, "").substring(0, 11);
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        input.value = v;
+
+        const hint = document.getElementById('hintCpf');
+        const nums = v.replace(/\D/g, "");
+        input.classList.remove('cpf-valido', 'cpf-invalido', 'campo-obrigatorio-erro');
+        if (nums.length === 11) {
+            const ok = validarCPF(nums);
+            input.classList.add(ok ? 'cpf-valido' : 'cpf-invalido');
+            hint.textContent = ok ? 'CPF válido' : 'CPF inválido (dígito verificador não confere)';
+            hint.className = 'doc-hint ' + (ok ? 'ok' : 'erro');
+        } else {
+            hint.textContent = '';
+        }
+    }
+
+    function mascaraCEP(input) {
+        let v = input.value.replace(/\D/g, "").substring(0, 8);
+        v = v.replace(/(\d{5})(\d)/, "$1-$2");
+        input.value = v;
+    }
+
+    function validarCPF(cpf) {
+        if (/^(\d)\1{10}$/.test(cpf)) return false;
+        let soma = 0;
+        for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
+        let resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.charAt(9))) return false;
+
+        soma = 0;
+        for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
+        resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.charAt(10))) return false;
+
+        return true;
+    }
+
+    function formatarDataBR(isoStr) {
+        if (!isoStr) return '';
+        const partes = isoStr.split('-');
+        return partes[2] + '/' + partes[1] + '/' + partes[0];
+    }
+
+    /* ===================== VALOR POR EXTENSO ===================== */
+    function escreverNumero(n) {
+        if (n === 0) return "";
+        if (n === 100) return "cem";
+
+        const unidades = ["", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove"];
+        const dezDezenove = ["dez", "onze", "doze", "treze", "quatorze", "quinze", "dezesseis", "dezessete", "dezoito", "dezenove"];
+        const dezenas = ["", "", "vinte", "trinta", "quarenta", "cinquenta", "sessenta", "setenta", "oitenta", "noventa"];
+        const centenas = ["", "cento", "duzentos", "trezentos", "quatrocentos", "quinhentos", "seiscentos", "setecentos", "oitocentos", "novecentos"];
+
+        let arr = [];
+
+        if (n >= 100) {
+            arr.push(centenas[Math.floor(n / 100)]);
+            n %= 100;
+        }
+
+        if (n >= 10 && n <= 19) {
+            arr.push(dezDezenove[n - 10]);
+        } else {
+            if (n >= 20) {
+                arr.push(dezenas[Math.floor(n / 10)]);
+                n %= 10;
+            }
+            if (n > 0) {
+                arr.push(unidades[n]);
+            }
+        }
+
+        return arr.filter(Boolean).join(" e ");
+    }
+
+    function escreverInteiroLongo(n) {
+        // Suporta valores até milhões (suficiente para dívidas/parcelamentos)
+        if (n === 0) return "zero";
+        let partes = [];
+        const milhao = Math.floor(n / 1000000);
+        n %= 1000000;
+        const milhar = Math.floor(n / 1000);
+        n %= 1000;
+        const resto = n;
+
+        if (milhao > 0) partes.push((milhao === 1 ? "um milhão" : escreverNumero(milhao) + " milhões"));
+        if (milhar > 0) partes.push((milhar === 1 ? "mil" : escreverNumero(milhar) + " mil"));
+        if (resto > 0) partes.push(escreverNumero(resto));
+
+        return partes.join(" e ");
+    }
+
+    function valorPorExtenso(valor) {
+        let inteiros = Math.floor(valor);
+        let centavos = Math.round((valor - inteiros) * 100);
+
+        let textoReais = escreverInteiroLongo(inteiros) + (inteiros === 1 ? " real" : " reais");
+        let textoCentavos = escreverNumero(centavos) + (centavos === 1 ? " centavo" : " centavos");
+
+        if (inteiros === 0 && centavos === 0) return "zero reais";
+        if (inteiros > 0 && centavos > 0) return textoReais + " e " + textoCentavos;
+        if (inteiros > 0) return textoReais;
+        if (centavos > 0) return textoCentavos;
+    }
+
+    function formatarMoeda(valor) {
+        return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    /* ===================== CÁLCULO — PARCELAS JÁ VENCIDAS ===================== */
+    function calcularParcelasVencidas() {
+        const valor = parseFloat(document.getElementById('f_valorParcelaVencida').value);
+        const qtd = parseInt(document.getElementById('f_qtdParcelasVencidas').value, 10);
+        const dataInput = document.getElementById('f_primeiroVencimentoVencida').value;
+
+        parcelasVencidasGeradas = [];
+        if (!valor || valor <= 0 || !qtd || qtd < 1 || !dataInput) return;
+
+        const partes = dataInput.split('-');
+        let dataAtual = new Date(parseInt(partes[0], 10), parseInt(partes[1], 10) - 1, parseInt(partes[2], 10));
+
+        const valorFormatado = formatarMoeda(valor);
+
+        for (let i = 1; i <= qtd; i++) {
+            const d = String(dataAtual.getDate()).padStart(2, '0');
+            const m = String(dataAtual.getMonth() + 1).padStart(2, '0');
+            const a = dataAtual.getFullYear();
+            const dataBR = d + '/' + m + '/' + a;
+
+            const linha = i + 'ª Parcela vencida – R$ ' + valorFormatado + ' – Vencimento ' + dataBR + ' (em atraso)';
+            parcelasVencidasGeradas.push({ dataBR: dataBR, linha: linha, valor: valor });
+
+            dataAtual.setMonth(dataAtual.getMonth() + 1);
+        }
+
+        // Sugere automaticamente o valor atualizado do débito (editável)
+        const campoAtualizado = document.getElementById('f_valorAtualizado');
+        const hintAtualizado = document.getElementById('hintValorAtualizado');
+        const totalNominal = valor * qtd;
+        if (campoAtualizado && !campoAtualizado.dataset.editadoManual) {
+            campoAtualizado.value = totalNominal.toFixed(2);
+        }
+        if (hintAtualizado) {
+            hintAtualizado.textContent = 'Total nominal das parcelas vencidas: R$ ' + formatarMoeda(totalNominal) + '. Ajuste incluindo juros e encargos, se necessário.';
+        }
+    }
+
+    function atualizarPreviewVencidas() {
+        calcularParcelasVencidas();
+        const box = document.getElementById('previewVencidas');
+        if (parcelasVencidasGeradas.length === 0) {
+            box.style.display = 'none';
+            box.innerHTML = '';
+            return;
+        }
+        const total = parcelasVencidasGeradas.reduce(function (acc, p) { return acc + p.valor; }, 0);
+        box.style.display = 'block';
+        box.innerHTML = '<strong>Pré-visualização (' + parcelasVencidasGeradas.length + ' parcela' + (parcelasVencidasGeradas.length > 1 ? 's' : '') + ' vencida' + (parcelasVencidasGeradas.length > 1 ? 's' : '') + '):</strong><br><br>' +
+            parcelasVencidasGeradas.map(function (p) { return p.linha; }).join('<br>') +
+            '<br><br><strong>Total nominal vencido: R$ ' + formatarMoeda(total) + '</strong>';
+    }
+
+    /* ===================== CÁLCULO — PARCELAS A VENCER (RENEGOCIADAS) ===================== */
+    function calcularParcelasNovas() {
+        const valor = parseFloat(document.getElementById('f_valorParcelaNova').value);
+        const qtd = parseInt(document.getElementById('f_qtdParcelasNovas').value, 10);
+        const dataInput = document.getElementById('f_primeiroVencimentoNova').value;
+
+        parcelasNovasGeradas = [];
+        if (!valor || valor <= 0 || !qtd || qtd < 1 || !dataInput) return;
+
+        const partes = dataInput.split('-');
+        let dataAtual = new Date(parseInt(partes[0], 10), parseInt(partes[1], 10) - 1, parseInt(partes[2], 10));
+
+        const valorFormatado = formatarMoeda(valor);
+        const textoExtenso = valorPorExtenso(valor);
+
+        for (let i = 1; i <= qtd; i++) {
+            const d = String(dataAtual.getDate()).padStart(2, '0');
+            const m = String(dataAtual.getMonth() + 1).padStart(2, '0');
+            const a = dataAtual.getFullYear();
+            const dataBR = d + '/' + m + '/' + a;
+
+            const linha = i + 'ª Parcela – R$ ' + valorFormatado + ' (' + textoExtenso + ') – Vencimento ' + dataBR;
+            parcelasNovasGeradas.push({ dataBR: dataBR, linha: linha, valor: valor });
+
+            dataAtual.setMonth(dataAtual.getMonth() + 1);
+        }
+
+        // Sugere automaticamente o valor total renegociado (editável) = entrada + soma das parcelas
+        const entrada = parseFloat(document.getElementById('f_valorEntrada').value) || 0;
+        const campoRenegociado = document.getElementById('f_valorRenegociado');
+        const hintRenegociado = document.getElementById('hintValorRenegociado');
+        const totalNovo = (valor * qtd) + entrada;
+        if (campoRenegociado && !campoRenegociado.dataset.editadoManual) {
+            campoRenegociado.value = totalNovo.toFixed(2);
+        }
+        if (hintRenegociado) {
+            hintRenegociado.textContent = 'Sugestão automática: R$ ' + formatarMoeda(entrada) + ' (entrada) + R$ ' + formatarMoeda(valor * qtd) + ' (parcelas) = R$ ' + formatarMoeda(totalNovo) + '. Ajuste se necessário.';
+        }
+    }
+
+    function atualizarPreviewNovas() {
+        calcularParcelasNovas();
+        const box = document.getElementById('previewNovas');
+        if (parcelasNovasGeradas.length === 0) {
+            box.style.display = 'none';
+            box.innerHTML = '';
+            return;
+        }
+        const entrada = parseFloat(document.getElementById('f_valorEntrada').value) || 0;
+        let html = '';
+        if (entrada > 0) {
+            html += '<strong>Entrada: R$ ' + formatarMoeda(entrada) + ' (paga no ato da assinatura)</strong><br><br>';
+        }
+        html += '<strong>Pré-visualização (' + parcelasNovasGeradas.length + ' parcela' + (parcelasNovasGeradas.length > 1 ? 's' : '') + ' renegociada' + (parcelasNovasGeradas.length > 1 ? 's' : '') + '):</strong><br><br>' +
+            parcelasNovasGeradas.map(function (p) { return p.linha; }).join('<br>');
+        box.style.display = 'block';
+        box.innerHTML = html;
+    }
+
+    /* Marca os campos de valor atualizado/renegociado como editados manualmente,
+       para não sobrescrever o que o usuário digitou */
+    document.addEventListener('DOMContentLoaded', function () {
+        const campoAtualizado = document.getElementById('f_valorAtualizado');
+        const campoRenegociado = document.getElementById('f_valorRenegociado');
+        if (campoAtualizado) {
+            campoAtualizado.addEventListener('input', function () { this.dataset.editadoManual = '1'; });
+        }
+        if (campoRenegociado) {
+            campoRenegociado.addEventListener('input', function () { this.dataset.editadoManual = '1'; });
+        }
+    });
+
+    /* ===================== COLETA DE DADOS ===================== */
+    function coletarValores() {
+        const g = function (id) { return document.getElementById(id).value.trim(); };
+
+        const valorOriginal = parseFloat(g('f_valorOriginal')) || 0;
+        const valorAtualizado = parseFloat(g('f_valorAtualizado')) || 0;
+        const valorRenegociado = parseFloat(g('f_valorRenegociado')) || 0;
+        const valorEntrada = parseFloat(g('f_valorEntrada')) || 0;
+        const saldoParcelado = parcelasNovasGeradas.reduce(function (acc, p) { return acc + p.valor; }, 0);
+        const totalVencido = parcelasVencidasGeradas.reduce(function (acc, p) { return acc + p.valor; }, 0);
+
+        return {
+            nome: g('f_nome'), cpf: g('f_cpf'), rg: g('f_rg'),
+            rua: g('f_rua'), numero: g('f_numero'), bairro: g('f_bairro'),
+            complemento: g('f_complemento'), cidade: g('f_cidade'), cep: g('f_cep'),
+            marca: g('f_marca'), modelo: g('f_modelo'), imei: g('f_imei'),
+            dataCompraBR: formatarDataBR(g('f_dataCompra')),
+            valorOriginalFormatado: formatarMoeda(valorOriginal),
+            valorOriginalExtenso: valorPorExtenso(valorOriginal),
+            valorAtualizadoFormatado: formatarMoeda(valorAtualizado),
+            valorAtualizadoExtenso: valorPorExtenso(valorAtualizado),
+            valorRenegociadoFormatado: formatarMoeda(valorRenegociado),
+            valorRenegociadoExtenso: valorPorExtenso(valorRenegociado),
+            valorEntradaFormatado: formatarMoeda(valorEntrada),
+            valorEntradaExtenso: valorPorExtenso(valorEntrada),
+            saldoParceladoFormatado: formatarMoeda(saldoParcelado),
+            saldoParceladoExtenso: valorPorExtenso(saldoParcelado),
+            totalVencidoFormatado: formatarMoeda(totalVencido),
+            totalVencidoExtenso: valorPorExtenso(totalVencido),
+            dataVendaBR: formatarDataBR(g('f_dataVenda')),
+            parcelasVencidas: parcelasVencidasGeradas.map(function (p) { return p.linha; }),
+            parcelasNovas: parcelasNovasGeradas.map(function (p) { return p.linha; })
+        };
+    }
+
+    /* ===================== GERAÇÃO DO CONTRATO ===================== */
+    function gerarContrato() {
+        const v = coletarValores();
+
+        document.querySelectorAll('[data-f]').forEach(function (el) {
+            const chave = el.getAttribute('data-f');
+            el.textContent = (v[chave] !== undefined) ? v[chave] : '';
+        });
+
+        const valorEntrada = parseFloat(document.getElementById('f_valorEntrada').value) || 0;
+        const paragrafoEntrada = document.getElementById('paragrafoEntrada');
+        if (paragrafoEntrada) {
+            paragrafoEntrada.style.display = (valorEntrada > 0) ? 'block' : 'none';
+        }
+
+        const vencidasContainer = document.getElementById('listaParcelasVencidas');
+        let htmlVencidas = '';
+        v.parcelasVencidas.forEach(function (p) {
+            htmlVencidas += '<p class="parcela-vencida-linha">' + p + '</p>';
+        });
+        vencidasContainer.innerHTML = htmlVencidas;
+
+        const novasContainer = document.getElementById('listaParcelasNovas');
+        let htmlNovas = '';
+        v.parcelasNovas.forEach(function (p) {
+            htmlNovas += '<p class="parcela-linha">' + p + '</p>';
+        });
+        novasContainer.innerHTML = htmlNovas;
+
+        document.getElementById('wizardForm').style.display = 'none';
+        const resultsSection = document.getElementById('resultsSection');
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

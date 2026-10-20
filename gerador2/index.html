@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Renegociação Flexível - Central de Ferramentas</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0B0C10; /* Fundo escuro premium idêntico ao INDEX */
+            color: #FFFFFF;
+            display: block;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #162447, #0f172a);
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo-back-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .logo-back-container img {
+            max-width: 250px;
+            height: auto;
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #1f4068, #162447);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(135deg, #0056b3, #1f4068);
+            border-color: #45F3FF;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #45F3FF; /* Cor de destaque azul neon */
+            font-size: 24px;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        /* Seção de Dados do Cliente */
+        .dados-cliente {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+            background: rgba(31, 64, 104, 0.2);
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px dashed rgba(69, 243, 255, 0.3);
+        }
+
+        /* Elementos exclusivos da impressão: ocultos na tela */
+        .cabecalho-impressao,
+        .resumo-impressao,
+        .nota-esclarecimento-impressao,
+        .assinatura-impressao {
+            display: none;
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            background: rgba(15, 23, 42, 0.4);
+            padding: 25px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            padding: 12px;
+            background-color: #0B0C10;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            font-size: 14px;
+            color: #FFFFFF;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #45F3FF;
+            box-shadow: 0 0 8px rgba(69, 243, 255, 0.2);
+        }
+
+        .destaque-input {
+            border: 1px solid #45F3FF;
+            background-color: rgba(69, 243, 255, 0.05);
+        }
+
+        .sugestao-input {
+            border: 1px solid #16a34a;
+            background-color: rgba(22, 163, 74, 0.05);
+        }
+
+        .cpf-valido {
+            border: 1px solid #16a34a !important;
+            box-shadow: 0 0 8px rgba(22, 163, 74, 0.3);
+        }
+
+        .cpf-invalido {
+            border: 1px solid #dc2626 !important;
+            box-shadow: 0 0 8px rgba(22, 163, 74, 0.3);
+        }
+
+        .obrigatorio {
+            color: #dc2626;
+        }
+
+        .campo-obrigatorio-erro {
+            border: 1px solid #dc2626 !important;
+            background-color: rgba(220, 38, 38, 0.05);
+        }
+
+        .input-ajuste {
+            width: 90px;
+            padding: 6px;
+            font-size: 12px;
+            border: 1px solid #dc2626;
+            background-color: #0B0C10;
+            color: #FFFFFF;
+            border-radius: 4px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .actions-container {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn-action {
+            flex: 1;
+            background: linear-gradient(135deg, #1f4068, #162447);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-action:hover {
+            background: linear-gradient(135deg, #0056b3, #1f4068);
+            border-color: #45F3FF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(69, 243, 255, 0.2);
+        }
+
+        .btn-print {
+            flex: 1;
+            background: linear-gradient(135deg, #162447, #0f172a);
+            color: white;
+            border: 1px solid #45F3FF;
+            padding: 15px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-print:hover {
+            background: linear-gradient(135deg, #1f4068, #162447);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(69, 243, 255, 0.3);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            background-color: rgba(15, 23, 42, 0.2);
+        }
+
+        th, td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: middle;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: #162447;
+            color: #45F3FF;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 11px;
+        }
+
+        tr:hover {
+            background-color: rgba(31, 64, 104, 0.15);
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-paga { background-color: rgba(22, 163, 74, 0.2); color: #4ade80; border: 1px solid #16a34a; }
+        .badge-vencida { background-color: rgba(220, 38, 38, 0.2); color: #f87171; border: 1px solid #dc2626; }
+        .badge-avencer { background-color: rgba(202, 138, 4, 0.2); color: #facc15; border: 1px solid #ca8a04; }
+        .badge-manobrada { background-color: rgba(37, 99, 235, 0.2); color: #60a5fa; border: 1px solid #2563eb; }
+        .badge-entrada { background-color: rgba(22, 163, 74, 0.2); color: #4ade80; border: 1px solid #16a34a; }
+
+        .text-muted { color: #64748b; text-decoration: line-through; }
+        .text-bold { font-weight: bold; color: #45F3FF; }
+        
+        .total-container {
+            margin-top: 25px;
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            color: #45F3FF;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+        }
+
+        /* ================= REGRA DE IMPRESSÃO DA PROPOSTA ================= */
+        @media print {
+            @page {
+                size: A4;
+                margin: 12mm 14mm;
+            }
+
+            html, body {
+                background-color: white;
+                color: #111827;
+                padding: 0;
+                font-size: 11px;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+                background: white;
+                border: none;
+            }
+
+            h1,
+            p.subtitle,
+            .grid-inputs,
+            .dados-cliente,
+            .actions-container,
+            .logo-back-container {
+                display: none !important;
+            }
+
+            .cabecalho-impressao {
+                display: block !important;
+                margin-bottom: 10px;
+            }
+
+            .cabecalho-topo {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+                border-bottom: 2px solid #162447;
+                padding-bottom: 6px;
+                margin-bottom: 8px;
+            }
+
+            .cabecalho-topo h2 {
+                margin: 0;
+                font-size: 15px;
+                color: #162447;
+                letter-spacing: 0.02em;
+            }
+
+            .cabecalho-data-emissao {
+                font-size: 10px;
+                color: #64748b;
+            }
+
+            .print-dados-box {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 12px;
+                background-color: #f8fafc;
+                border: 1px solid #e2e8f0;
+                border-radius: 4px;
+                padding: 6px 12px;
+                margin-bottom: 10px;
+            }
+
+            .print-dados-box > div {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .dado-label {
+                font-size: 8.5px;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                color: #64748b;
+                margin-bottom: 1px;
+            }
+
+            .resumo-impressao {
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+                background-color: #f1f5f9;
+                border: 1px solid #cbd5e1;
+                border-radius: 4px;
+                padding: 8px 12px;
+                margin-bottom: 10px;
+            }
+
+            .resumo-item {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .resumo-item span:last-child {
+                font-size: 11.5px;
+                font-weight: bold;
+                color: #1e293b;
+            }
+
+            .table-container {
+                border: 1px solid #cbd5e1;
+                border-radius: 4px;
+            }
+
+            table {
+                page-break-inside: auto;
+                font-size: 9.5px;
+                background-color: white;
+            }
+
+            th {
+                background-color: #f1f5f9;
+                color: #1e293b;
+                border-bottom: 2px solid #cbd5e1;
+            }
+
+            td {
+                color: #334155;
+                border-bottom: 1px solid #e2e8f0;
+            }
+
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+
+            tr:hover {
+                background-color: transparent;
+            }
+
+            th, td {
+                padding: 5px 8px;
+                line-height: 1.25;
+            }
+
+            .input-ajuste {
+                display: none !important;
+            }
+
+            .badge {
+                padding: 1px 5px;
+                font-size: 8.5px;
+                border: 1px solid #cbd5e1;
+                background: transparent;
+            }
+            
+            .badge-paga { color: #16a34a; border-color: #16a34a; }
+            .badge-vencida { color: #dc2626; border-color: #dc2626; }
+            .badge-avencer { color: #ca8a04; border-color: #ca8a04; }
+            .badge-manobrada { color: #2563eb; border-color: #2563eb; }
+            .badge-entrada { color: #16a34a; border-color: #16a34a; }
+
+            .text-muted { color: #94a3b8; text-decoration: line-through; }
+            .text-bold { font-weight: bold; color: #1e293b; }
+
+            .total-container {
+                margin-top: 10px;
+                padding-top: 6px;
+                border-top: 2px solid #162447;
+                font-size: 13px;
+                color: #111827;
+            }
+
+            .nota-esclarecimento-impressao {
+                display: block !important;
+                margin-top: 20px;
+                margin-bottom: 25px;
+                text-align: justify;
+                font-size: 9px;
+                line-height: 1.4;
+                color: #475569;
+                border: 1px solid #e2e8f0;
+                background-color: #f8fafc;
+                padding: 10px;
+                border-radius: 4px;
+                page-break-inside: avoid;
+            }
+
+            .assinatura-impressao {
+                display: block !important;
+                margin-top: 35px;
+                text-align: center;
+                page-break-inside: avoid;
+            }
+
+            .linha-assinatura {
+                border-top: 1px solid #111827;
+                width: 240px;
+                margin: 0 auto 4px auto;
+            }
+
+            .assinatura-impressao p {
+                margin: 0;
+                font-size: 9.5px;
+                color: #475569;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-back-container">
+        <img src="assets/LOGO.png" alt="Plugin Celulares & Acessórios">
+        <a href="../index.html" class="btn-back">⬅ Voltar ao Painel</a>
+    </div>
+
+    <h1>Simulador de Manobra de Parcelas</h1>
+    <p class="subtitle">Consolidação de atrasos com parcelamento customizado pós-contrato</p>
+
+    <div class="cabecalho-impressao">
+        <div class="cabecalho-topo">
+            <h2>Proposta de Renegociação de Contrato</h2>
+            <span class="cabecalho-data-emissao">Emitido em <span id="printData">--/--/----</span></span>
+        </div>
+        <div class="print-dados-box">
+            <div>
+                <span class="dado-label">Cliente</span>
+                <span id="printNome">Não informado</span>
+            </div>
+            <div>
+                <span class="dado-label">CPF</span>
+                <span id="printCPF">Não informado</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="dados-cliente">
+        <div class="form-group">
+            <label>Nome Completo do Cliente <span class="obrigatorio">*</span></label>
+            <input type="text" id="nomeCliente" placeholder="DIGITE O NOME DO CLIENTE" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase(); sincronizarDadosImpressao()">
+        </div>
+        <div class="form-group">
+            <label>CPF <span class="obrigatorio">*</span></label>
+            <input type="text" id="cpfCliente" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" oninput="formatarCPF(this); sincronizarDadosImpressao()">
+        </div>
+    </div>
+
+    <div class="grid-inputs">
+        <div class="form-group">
+            <label>Valor da Parcela Original (R$)</label>
+            <input type="number" id="valorOriginal" placeholder="Ex: 186.13" step="0.01" oninput="atualizarSugestaoEntrada()">
+        </div>
+        <div class="form-group">
+            <label>Total Parcelas do Contrato</label>
+            <input type="number" id="totalContrato" placeholder="Ex: 12" min="1">
+        </div>
+        <div class="form-group">
+            <label>Parcelas Pagas</label>
+            <input type="number" id="pagas" placeholder="Ex: 2" min="0">
+        </div>
+        <div class="form-group">
+            <label>Parcelas Vencidas</label>
+            <input type="number" id="vencidas" placeholder="Ex: 4" min="0" oninput="atualizarSugestaoEntrada()">
+        </div>
+        <div class="form-group">
+            <label>Vencimento de uma Parcela <span style="font-weight: 400; color: #64748b;">(opcional)</span></label>
+            <input type="date" id="dataReferenciaParcela">
+        </div>
+        <div class="form-group">
+            <label>Número dessa Parcela</label>
+            <input type="number" id="numeroParcelaReferencia" placeholder="Ex: 1" min="1">
+        </div>
+        <div class="form-group">
+            <label style="color: #4ade80;">Valor de Entrada (20% Sugerido - R$)</label>
+            <input type="number" id="valorEntrada" class="sugestao-input" placeholder="Sugestão: R$ 0,00" step="0.01">
+        </div>
+        <div class="form-group">
+            <label style="color: #45F3FF;">Dividir Manobra em Quantas Vezes? (Até 15x)</label>
+            <input type="number" id="qtdParcelamentoFinal" class="destaque-input" placeholder="Ex: 6" min="1" max="15">
+        </div>
+        <div class="form-group">
+            <label>Taxa de Juros Mensal (%)</label>
+            <input type="number" id="juros" value="5.0" step="0.1" min="3.5">
+        </div>
+        <div class="form-group">
+            <label>IOF (%)</label>
+            <input type="number" id="iof" value="0.38" step="0.01">
+        </div>
+        <div class="form-group">
+            <label>Tarifa por Novo Boleto (R$)</label>
+            <input type="number" id="tarifa" value="1.00" step="0.01">
+        </div>
+        
+        <div class="actions-container">
+            <button class="btn-action" onclick="iniciarGeracao()">Gerar Tabela e Zerar Ajustes</button>
+            <button class="btn-print" onclick="imprimirProposta()">🖨️ Imprimir Proposta para o Cliente</button>
+        </div>
+    </div>
+
+    <div class="resumo-impressao">
+        <div class="resumo-item">
+            <span class="dado-label">Saldo Renegociado (Vencidas)</span>
+            <span id="printQtdVencidas">-</span>
+        </div>
+        <div class="resumo-item">
+            <span class="dado-label">Entrada</span>
+            <span id="printResumoEntrada">R$ 0,00</span>
+        </div>
+        <div class="resumo-item">
+            <span class="dado-label">Novas Parcelas</span>
+            <span id="printResumoParcelas">-</span>
+        </div>
+        <div class="resumo-item">
+            <span class="dado-label">Taxas Aplicadas</span>
+            <span id="printResumoTaxas">-</span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table id="tabelaParcelas">
+            <thead>
+                <tr>
+                    <th>Parcela</th>
+                    <th>Vencimento</th>
+                    <th>Status</th>
+                    <th>Valor Original</th>
+                    <th>Juros / Multa Acumulados (R$)</th>
+                    <th>Nova Parcela Corrigida</th>
+                    <th>Regra Aplicada / Detalhes</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="total-container" id="totalGeral">
+        Valor Final da Renegociação: R$ 0,00
+    </div>
+
+    <div class="nota-esclarecimento-impressao">
+        <strong>NOTA DE ESCLARESCIMENTO:</strong> Certificamos que as condições comerciais e os valores descritos no campo "Valor Final da Renegociação" englobam unicamente o saldo das parcelas que se encontravam vencidas. As parcelas vincendas (com status "A VENCER") permanecem ativas sob as mesmas condições contratuais originais, sem sofrer nenhuma modificação ou impacto financeiro decorrente desta manobra. A listagem integral de todas as parcelas nesta proposta serve exclusivamente para garantir a máxima transparência, permitindo que o cliente visualize que as parcelas remanejadas foram alocadas de forma sequencial após o término da última parcela original do contrato.
+    </div>
+
+    <div class="assinatura-impressao">
+        <div class="linha-assinatura"></div>
+        <p>Assinatura do Cliente</p>
+    </div>
+</div>
+
+<script>
+    let ajustesVencidas = {};
+
+    function sincronizarDadosImpressao() {
+        const nome = document.getElementById('nomeCliente').value || "Não informado";
+        const cpf = document.getElementById('cpfCliente').value || "Não informado";
+        
+        document.getElementById('printNome').innerText = nome;
+        document.getElementById('printCPF').innerText = cpf;
+
+        const r = window.resumoRenegociacao;
+        if (r) {
+            document.getElementById('printQtdVencidas').innerText =
+                `${r.vencidas}x de R$ ${r.valorOriginal.toFixed(2)} (R$ ${r.somaDividaAtrasada.toFixed(2)})`;
+            document.getElementById('printResumoEntrada').innerText = `R$ ${r.valorEntrada.toFixed(2)}`;
+            document.getElementById('printResumoParcelas').innerText =
+                `${r.qtdParcelasFinais}x de R$ ${r.valorCadaParcelaNovaBase.toFixed(2)}`;
+            document.getElementById('printResumoTaxas').innerText =
+                `${(r.jurosMensal * 100).toFixed(1)}% a.m. + IOF ${(r.iof * 100).toFixed(2)}% + R$ ${r.tarifa.toFixed(2)}/parcela`;
+        }
+    }
+
+    function definirDataAtual() {
+        const hoje = new Date();
+        const dd = String(hoje.getDate()).padStart(2, '0');
+        const mm = String(hoje.getMonth() + 1).padStart(2, '0');
+        const yyyy = hoje.getFullYear();
+        document.getElementById('printData').innerText = `${dd}/${mm}/${yyyy}`;
+    }
+
+    function imprimirProposta() {
+        if (!validarCamposObrigatorios()) return;
+        definirDataAtual();
+        sincronizarDadosImpressao();
+        window.print();
+    }
+
+    function atualizarSugestaoEntrada() {
+        const valorOriginal = parseFloat(document.getElementById('valorOriginal').value) || 0;
+        const vencidas = parseInt(document.getElementById('vencidas').value) || 0;
+        
+        const dividaAtrasadaOriginal = valorOriginal * vencidas;
+        const sugestao = dividaAtrasadaOriginal * 0.20;
+        
+        document.getElementById('valorEntrada').placeholder = `Sugerido (20%): R$ ${sugestao.toFixed(2)}`;
+    }
+
+    function salvarAjusteVencida(id, valor) {
+        ajustesVencidas[id] = parseFloat(valor) || 0;
+        calcularManobra(false);
+    }
+
+    function formatarCPF(input) {
+        let valor = input.value.replace(/\D/g, '').slice(0, 11);
+
+        if (valor.length > 9) {
+            valor = valor.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+        } else if (valor.length > 6) {
+            valor = valor.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+        } else if (valor.length > 3) {
+            valor = valor.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+        }
+        input.value = valor;
+
+        const apenasNumeros = valor.replace(/\D/g, '');
+        input.classList.remove('cpf-valido', 'cpf-invalido');
+        if (apenasNumeros.length === 11) {
+            input.classList.add(validarCPF(apenasNumeros) ? 'cpf-valido' : 'cpf-invalido');
+        }
+    }
+
+    function validarCPF(cpf) {
+        if (/^(\d) {10}$/.test(cpf)) return false;
+
+        let soma = 0;
+        for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
+        let resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.charAt(9))) return false;
+
+        soma = 0;
+        for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
+        resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.charAt(10))) return false;
+
+        return true;
+    }
+
+    function adicionarMeses(dataBase, meses) {
+        const d = new Date(dataBase.getTime());
+        const dia = d.getDate();
+        d.setDate(1);
+        d.setMonth(d.getMonth() + meses);
+        const ultimoDiaDoMes = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+        d.setDate(Math.min(dia, ultimoDiaDoMes));
+        return d;
+    }
+
+    function formatarDataBR(d) {
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+    }
+
+    function obterDataReferencia() {
+        const dataStr = document.getElementById('dataReferenciaParcela').value;
+        const numeroRef = parseInt(document.getElementById('numeroParcelaReferencia').value);
+        if (!dataStr || isNaN(numeroRef)) return null;
+
+        const [ano, mes, dia] = dataStr.split('-').map(Number);
+        return { data: new Date(ano, mes - 1, dia), numero: numeroRef };
+    }
+
+    function validarCamposObrigatorios() {
+        const nomeInput = document.getElementById('nomeCliente');
+        const cpfInput = document.getElementById('cpfCliente');
+        const nome = nomeInput.value.trim();
+        const cpfNumeros = cpfInput.value.replace(/\D/g, '');
+
+        nomeInput.classList.remove('campo-obrigatorio-erro');
+        cpfInput.classList.remove('campo-obrigatorio-erro', 'cpf-invalido');
+
+        let mensagens = [];
+
+        if (!nome) {
+            nomeInput.classList.add('campo-obrigatorio-erro');
+            mensagens.push('o Nome Completo do Cliente');
+        }
+
+        if (cpfNumeros.length !== 11 || !validarCPF(cpfNumeros)) {
+            cpfInput.classList.add('campo-obrigatorio-erro');
+            mensagens.push('um CPF válido');
+        }
+
+        if (mensagens.length > 0) {
+            alert(`Preencha ${mensagens.join(' e ')} antes de gerar a proposta.`);
+            return false;
+        }
+
+        return true;
+    }
+
+    function iniciarGeracao() {
+        if (!validarCamposObrigatorios()) return;
+        calcularManobra(true);
+    }
+
+    function calcularManobra(resetaAjustes = false) {
+        if (resetaAjustes) {
+            ajustesVencidas = {};
+        }
+
+        const valorOriginal = parseFloat(document.getElementById('valorOriginal').value) || 0;
+        const totalContrato = parseInt(document.getElementById('totalContrato').value) || 0;
+        const pagas = parseInt(document.getElementById('pagas').value) || 0;
+        const vencidas = parseInt(document.getElementById('vencidas').value) || 0;
+        let qtdParcelasFinais = parseInt(document.getElementById('qtdParcelamentoFinal').value) || 1;
+        
+        if (qtdParcelasFinais > 15) {
+            qtdParcelasFinais = 15;
+            document.getElementById('qtdParcelamentoFinal').value = 15;
+        }
+
+        const jurosMensal = parseFloat(document.getElementById('juros').value) / 100;
+        const iof = parseFloat(document.getElementById('iof').value) / 100;
+        const tarifa = parseFloat(document.getElementById('tarifa').value) || 0;
+        
+        let valorEntrada = parseFloat(document.getElementById('valorEntrada').value);
+        if (isNaN(valorEntrada)) {
+            valorEntrada = (valorOriginal * vencidas) * 0.20;
+        }
+        
+        const referenciaData = obterDataReferencia();
+
+        const tbody = document.querySelector('#tabelaParcelas tbody');
+        let recriarTabela = (tbody.children.length === 0 || resetaAjustes);
+        let tabelaHTML = '';
+
+        let totalLinhasSimulacao = totalContrato + qtdParcelasFinais;
+        let listaVencidasOriginais = [];
+        
+        for (let i = 1; i <= totalContrato; i++) {
+            if (i > pagas && i <= (pagas + vencidas)) {
+                listaVencidasOriginais.push(i);
+            }
+        }
+
+        let somaDividaAtrasada = 0;
+        listaVencidasOriginais.forEach(numParcela => {
+            const key = `p-${numParcela}`;
+            const jurosManual = ajustesVencidas[key] || 0;
+            somaDividaAtrasada += (valorOriginal + jurosManual);
+        });
+
+        let saldoFinanciado = somaDividaAtrasada - valorEntrada;
+        if (saldoFinanciado < 0) saldoFinanciado = 0;
+
+        let valorCadaParcelaNovaBase = 0;
+        if (vencidas > 0 && qtdParcelasFinais > 0 && saldoFinanciado > 0) {
+            let dividaComIOF = saldoFinanciado * (1 + iof);
+
+            let mesesEspera = totalContrato - pagas - vencidas;
+            if (mesesEspera < 0) mesesEspera = 0;
+            let saldoNaPrimeiraParcelaNova = dividaComIOF * Math.pow(1 + jurosMensal, mesesEspera);
+
+            let parcelaPrice;
+            if (jurosMensal > 0) {
+                const fatorPotencia = Math.pow(1 + jurosMensal, qtdParcelasFinais);
+                parcelaPrice = saldoNaPrimeiraParcelaNova * (jurosMensal * fatorPotencia) / (fatorPotencia - 1);
+            } else {
+                parcelaPrice = saldoNaPrimeiraParcelaNova / qtdParcelasFinais;
+            }
+
+            valorCadaParcelaNovaBase = parcelaPrice + tarifa;
+        }
+
+        let somaTotalGeral = 0;
+
+        if (valorEntrada > 0) {
+            somaTotalGeral += valorEntrada;
+            if (recriarTabela) {
+                tabelaHTML += `
+                    <tr>
+                        <td><strong>-</strong></td>
+                        <td>${referenciaData ? formatarDataBR(new Date()) : '-'}</td>
+                        <td><span class="badge badge-entrada">ENTRADA</span></td>
+                        <td><span class="text-muted">R$ 0,00</span></td>
+                        <td><span class="text-muted">R$ 0,00</span></td>
+                        <td><span class="text-bold" style="color: #4ade80">R$ ${valorEntrada.toFixed(2)}</span></td>
+                        <td><small style="color: #94a3b8;">Entrada de 20% abatida do saldo devedor antes do remanejamento.</small></td>
+                    </tr>
+                `;
+            }
+        }
+
+        for (let i = 1; i <= totalLinhasSimulacao; i++) {
+            let status = "";
+            let valorOrigTabela = i <= totalContrato ? valorOriginal : 0;
+            let novaParcelaFinal = 0;
+            let badgeClass = "";
+            let observacao = "";
+            const key = `p-${i}`;
+
+            if (i <= totalContrato) {
+                if (i <= pagas) {
+                    status = "PAGA";
+                    badgeClass = "badge-paga";
+                    novaParcelaFinal = valorOriginal;
+                    observacao = "Paga no fluxo normal.";
+                } else if (listaVencidasOriginais.includes(i)) {
+                    status = "VENCIDA";
+                    badgeClass = "badge-vencida";
+                    novaParcelaFinal = 0; 
+                    const jurosManual = ajustesVencidas[key] || 0;
+                    observacao = `Remanejada para o final. R$ ${(valorOriginal + jurosManual).toFixed(2)} enviado para a conta final.`;
+                } else {
+                    status = "A VENCER";
+                    badgeClass = "badge-avencer";
+                    novaParcelaFinal = valorOriginal;
+                    observacao = "Futura. Mantida sem alterações.";
+                }
+            } else {
+                status = "REMANEJADA";
+                badgeClass = "badge-manobrada";
+                novaParcelaFinal = valorCadaParcelaNovaBase;
+                let numParcelaAtualReneg = i - totalContrato;
+                observacao = `Parcela ${numParcelaAtualReneg} de ${qtdParcelasFinais} adicionada ao final do contrato.`;
+            }
+
+            if (status === "REMANEJADA") {
+                somaTotalGeral += novaParcelaFinal;
+            }
+
+            if (recriarTabela) {
+                let tdValorOriginal = status === "REMANEJADA" ? `<span class="text-muted">R$ ${valorOrigTabela.toFixed(2)}</span>` : `R$ ${valorOrigTabela.toFixed(2)}`;
+                
+                let inputAjusteHTML = '';
+                if (status === "VENCIDA") {
+                    const ajusteAtual = ajustesVencidas[key] || 0;
+                    inputAjusteHTML = `
+                        <input type="number" class="input-ajuste" value="${ajusteAtual.toFixed(2)}" step="0.01" oninput="salvarAjusteVencida('${key}', this.value)">
+                        <span class="valor-ajuste-print text-bold" style="display:none;">R$ ${ajusteAtual.toFixed(2)}</span>
+                    `;
+                } else {
+                    inputAjusteHTML = `<span class="text-muted">R$ 0,00</span>`;
+                }
+
+                let tdNovaParcela = novaParcelaFinal > 0 ? `<span class="${status === 'REMANEJADA' ? 'text-bold' : ''}" id="val-${key}">R$ ${novaParcelaFinal.toFixed(2)}</span>` : `<span class="text-muted">R$ 0,00</span>`;
+
+                let tdVencimento = '-';
+                if (referenciaData) {
+                    const diffMeses = i - referenciaData.numero;
+                    tdVencimento = formatarDataBR(adicionarMeses(referenciaData.data, diffMeses));
+                }
+
+                tabelaHTML += `
+                    <tr>
+                        <td><strong>${i}</strong></td>
+                        <td>${tdVencimento}</td>
+                        <td><span class="badge ${badgeClass}">${status}</span></td>
+                        <td>${tdValorOriginal}</td>
+                        <td>${inputAjusteHTML}</td>
+                        <td>${tdNovaParcela}</td>
+                        <td><small style="color: #cbd5e1;" id="obs-${key}">${observacao}</small></td>
+                    </tr>
+                `;
+            } else {
+                if (status === "VENCIDA") {
+                    const jurosManual = ajustesVencidas[key] || 0;
+                    document.getElementById(`obs-${key}`).innerText = `Remanejada para o final. R$ ${(valorOriginal + jurosManual).toFixed(2)} enviado para a conta final.`;
+                    
+                    const spanPrint = document.querySelector(`#val-${key} + .valor-ajuste-print`);
+                    if (spanPrint) spanPrint.innerText = `R$ ${jurosManual.toFixed(2)}`;
+                }
+                if (status === "REMANEJADA") {
+                    const spanValor = document.getElementById(`val-${key}`);
+                    if (spanValor) {
+                        spanValor.innerText = `R$ ${novaParcelaFinal.toFixed(2)}`;
+                    }
+                }
+            }
+        }
+
+        if (recriarTabela) {
+            tbody.innerHTML = tabelaHTML;
+        }
+
+        document.getElementById('totalGeral').innerText = `Valor Final da Renegociação: R$ ${somaTotalGeral.toFixed(2)}`;
+
+        window.resumoRenegociacao = {
+            vencidas: vencidas,
+            valorOriginal: valorOriginal,
+            somaDividaAtrasada: somaDividaAtrasada,
+            valorEntrada: valorEntrada,
+            qtdParcelasFinais: qtdParcelasFinais,
+            valorCadaParcelaNovaBase: valorCadaParcelaNovaBase,
+            jurosMensal: jurosMensal,
+            iof: iof,
+            tarifa: tarifa
+        };
+    }
+
+    window.onload = function() {
+        atualizarSugestaoEntrada();
+        calcularManobra();
+        definirDataAtual();
+    };
+</script>
+
+</body>
+</html>

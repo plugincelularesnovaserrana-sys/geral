@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Contrato de Locação (Sem Fiador) - Central de Ferramentas</title>
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+        background-color: #0B0C10;
+        color: #FFFFFF;
+        min-height: 100vh;
+        padding: 40px 20px;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #162447, #0f172a);
+        padding: 30px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .logo-back-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 20px;
+    }
+
+    .logo-back-container img {
+        max-width: 250px;
+        height: auto;
+    }
+
+    .btn-back {
+        padding: 10px 20px;
+        color: #FFFFFF;
+        background: linear-gradient(135deg, #1f4068, #162447);
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 11px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-back:hover {
+        background: linear-gradient(135deg, #0056b3, #1f4068);
+        border-color: #45F3FF;
+        box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    header h1 {
+        margin: 0;
+        color: #45F3FF;
+        font-size: 24px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    header .subtitle {
+        margin: 6px 0 0 0;
+        color: #94a3b8;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    /* ===== BARRA DE PROGRESSO (fluxo estilo Clicksign) ===== */
+    .progress-wrap {
+        margin-bottom: 25px;
+    }
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    .progress-step {
+        flex: 1 1 0;
+        text-align: center;
+        font-size: 10px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: #64748b;
+        font-weight: 600;
+        padding-bottom: 6px;
+        border-bottom: 3px solid rgba(255,255,255,0.08);
+        transition: all 0.3s ease;
+    }
+    .progress-step.ativo {
+        color: #45F3FF;
+        border-bottom-color: #45F3FF;
+    }
+    .progress-step.concluido {
+        color: #16a34a;
+        border-bottom-color: #16a34a;
+    }
+
+    .step-panel {
+        display: none;
+        background: rgba(15, 23, 42, 0.4);
+        padding: 25px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .step-panel.ativo { display: block; }
+
+    .step-titulo {
+        color: #45F3FF;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+        font-weight: bold;
+    }
+    .step-desc {
+        color: #94a3b8;
+        font-size: 12.5px;
+        margin-bottom: 20px;
+        line-height: 1.4;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .form-group.full { grid-column: 1 / -1; }
+
+    .form-group label {
+        margin-bottom: 8px;
+        font-weight: 600;
+        font-size: 12px;
+        color: #cbd5e1;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .form-group label .opcional {
+        color: #64748b;
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    .form-group input, .form-group select {
+        padding: 12px;
+        background-color: #0B0C10;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        font-size: 14px;
+        color: #FFFFFF;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+        outline: none;
+        border-color: #45F3FF;
+        box-shadow: 0 0 8px rgba(69, 243, 255, 0.2);
+    }
+
+    .cpf-valido { border: 1px solid #16a34a !important; box-shadow: 0 0 8px rgba(22, 163, 74, 0.3); }
+    .cpf-invalido { border: 1px solid #dc2626 !important; box-shadow: 0 0 8px rgba(220, 38, 38, 0.3); }
+    .campo-obrigatorio-erro { border: 1px solid #dc2626 !important; background-color: rgba(220, 38, 38, 0.05); }
+
+    .doc-hint {
+        margin-top: 4px;
+        font-size: 10.5px;
+        color: #94a3b8;
+    }
+    .doc-hint.ok { color: #16a34a; }
+    .doc-hint.erro { color: #dc2626; }
+
+    .parcelas-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 14px;
+    }
+
+    .nav-botoes {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    button {
+        cursor: pointer;
+        border: none;
+        font-family: inherit;
+    }
+
+    .btn-primario, .btn-print {
+        background: linear-gradient(135deg, #1f4068, #162447);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 14px 22px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+    .btn-primario:hover, .btn-print:hover {
+        background: linear-gradient(135deg, #0056b3, #1f4068);
+        border-color: #45F3FF;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(69, 243, 255, 0.2);
+    }
+
+    .btn-secundario {
+        background: transparent;
+        color: #94a3b8;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 14px 22px;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .btn-secundario:hover { border-color: #94a3b8; color: #fff; }
+    .btn-secundario:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-print {
+        width: 100%;
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 25px;
+    }
+
+    .resumo-box {
+        background: rgba(69, 243, 255, 0.05);
+        border: 1px solid rgba(69, 243, 255, 0.15);
+        border-radius: 6px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        line-height: 1.9;
+    }
+    .resumo-box strong { color: #45F3FF; }
+    .resumo-box .linha { border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 4px; margin-bottom: 4px; }
+
+    .results-section {
+        margin-top: 30px;
+        display: none;
+    }
+    .results-section h2 {
+        color: #45F3FF;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* ===== DOCUMENTO / CONTRATO — medidas extraídas do XML do .docx original =====
+       Fonte: Times New Roman 12pt (w:sz 24) | Página: A4 | Margens: 1440 twips = 1in = 25,4mm
+       Título: 12pt negrito sublinhado, entrelinha 1.5 | Corpo: justificado
+       Marcadores: caractere "·" com recuo esquerdo 0,75in e recuo suspenso 0,25in (w:ind left=1080 hanging=360) */
+    #docContrato {
+        background: #fff;
+        color: #000;
+        width: 210mm;
+        max-width: 210mm;
+        margin: 0 auto;
+        padding: 25.4mm;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 12pt;
+        line-height: 1.15;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 6px 16px rgba(0,0,0,0.25);
+    }
+    #docContrato p { margin: 0 0 12pt 0; text-align: justify; }
+    #docContrato .titulo-principal {
+        text-align: center;
+        font-weight: bold;
+        text-decoration: underline;
+        font-size: 12pt;
+        line-height: 1.5;
+        margin-bottom: 6pt;
+    }
+    #docContrato .subtitulo {
+        text-align: center;
+        font-size: 12pt;
+        line-height: 1.5;
+        margin-bottom: 0;
+    }
+    #docContrato .espaco { margin-bottom: 12pt; }
+    #docContrato .clausula {
+        font-weight: bold;
+        font-size: 12pt;
+        margin-top: 12pt;
+        margin-bottom: 12pt;
+    }
+    #docContrato ul.bullets {
+        list-style: none;
+        margin: 0 0 12pt 0;
+        padding: 0;
+    }
+    #docContrato ul.bullets li {
+        position: relative;
+        margin: 0 0 12pt 54pt;
+        text-align: justify;
+    }
+    #docContrato ul.bullets li::before {
+        content: "·";
+        position: absolute;
+        left: -18pt;
+    }
+    #docContrato .parcela-linha {
+        font-weight: bold;
+        font-size: 12pt;
+        margin: 0 0 0 0;
+        text-align: left;
+    }
+    #docContrato .data-local {
+        text-align: center;
+        margin: 24pt 0 30pt 0;
+    }
+    #docContrato .assinatura {
+        margin: 30pt 0 4pt 0;
+        border-top: 1px solid #000;
+        text-align: center;
+        padding-top: 4pt;
+        font-weight: bold;
+    }
+    #docContrato .dado-testemunha {
+        font-weight: normal;
+        font-size: 11pt;
+        margin-top: 8pt;
+    }
+    #docContrato .bloco-assinaturas {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+    #docContrato .quebra-pagina {
+        page-break-before: always;
+        padding-top: 4pt;
+    }
+    #docContrato .termo-titulo {
+        text-align: center;
+        margin-bottom: 12pt;
+    }
+
+    /* ===== IMPRESSÃO ===== */
+    @media print {
+        @page {
+            size: A4;
+            margin: 25.4mm;
+        }
+        html, body {
+            background-color: #fff;
+            padding: 0;
+            color: #111827;
+        }
+        .container {
+            box-shadow: none;
+            padding: 0;
+            max-width: 100%;
+            background: #fff;
+            border: none;
+        }
+        header, #wizardForm, .btn-print, .btn-secundario, .results-section h2, .logo-back-container, .progress-wrap {
+            display: none !important;
+        }
+        .results-section {
+            display: block !important;
+            margin-top: 0;
+        }
+        #docContrato {
+            box-shadow: none;
+            max-width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-back-container">
+        <img src="../assets/LOGO.png" alt="Plugin Celulares & Acessórios" onerror="this.style.display='none'">
+        <a href="../index.html" class="btn-back">⬅ Voltar ao Painel</a>
+    </div>
+
+    <header>
+        <h1>Gerador de Contrato de Locação (Sem Fiador)</h1>
+        <p class="subtitle">Preencha os dados em etapas e gere o contrato completo, pronto para impressão, na mesma formatação do modelo original</p>
+    </header>
+
+    <form id="wizardForm" onsubmit="return false;">
+
+        <div class="progress-wrap">
+            <div class="progress-steps" id="progressSteps">
+                <div class="progress-step" data-step="1">1. Locatário</div>
+                <div class="progress-step" data-step="2">2. Endereço</div>
+                <div class="progress-step" data-step="3">3. Aparelho</div>
+                <div class="progress-step" data-step="4">4. Parcelas</div>
+                <div class="progress-step" data-step="5">5. Prazo e Datas</div>
+                <div class="progress-step" data-step="6">6. Revisão</div>
+            </div>
+        </div>
+
+        <!-- ETAPA 1 -->
+        <div class="step-panel ativo" data-step="1">
+            <div class="step-titulo">Dados do Locatário</div>
+            <div class="step-desc">Informações pessoais de quem está alugando o aparelho.</div>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="f_nome">Nome completo</label>
+                    <input type="text" id="f_nome" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_cpf">CPF</label>
+                    <input type="text" id="f_cpf" inputmode="numeric" required oninput="mascaraCPF(this)">
+                    <span class="doc-hint" id="hintCpf"></span>
+                </div>
+                <div class="form-group">
+                    <label for="f_rg">RG</label>
+                    <input type="text" id="f_rg" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 2 -->
+        <div class="step-panel" data-step="2">
+            <div class="step-titulo">Endereço do Locatário</div>
+            <div class="step-desc">Endereço completo de residência e domicílio.</div>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="f_rua">Rua</label>
+                    <input type="text" id="f_rua" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_numero">Número</label>
+                    <input type="text" id="f_numero" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_bairro">Bairro</label>
+                    <input type="text" id="f_bairro" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_complemento">Complemento <span class="opcional">(opcional)</span></label>
+                    <input type="text" id="f_complemento">
+                </div>
+                <div class="form-group">
+                    <label for="f_cidade">Cidade</label>
+                    <input type="text" id="f_cidade" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_cep">CEP</label>
+                    <input type="text" id="f_cep" inputmode="numeric" maxlength="9" required oninput="mascaraCEP(this)">
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 3 -->
+        <div class="step-panel" data-step="3">
+            <div class="step-titulo">Dados do Aparelho</div>
+            <div class="step-desc">Características do aparelho celular objeto da locação.</div>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="f_modelo">Modelo do celular</label>
+                    <input type="text" id="f_modelo" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_imei">IMEI</label>
+                    <input type="text" id="f_imei" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_serie">Número de série</label>
+                    <input type="text" id="f_serie" required>
+                </div>
+                <div class="form-group full">
+                    <label for="f_detalhes">Detalhes do aparelho</label>
+                    <input type="text" id="f_detalhes" placeholder="Ex: cor, capacidade de armazenamento, estado de conservação" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 4 -->
+        <div class="step-panel" data-step="4">
+            <div class="step-titulo">Parcelas da Locação</div>
+            <div class="step-desc">Informe o valor de cada parcela, a quantidade e o vencimento da 1ª. O sistema gera automaticamente todas as parcelas, com o valor por extenso, prontas para o contrato.</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="f_valorParcela">Valor de cada parcela (R$)</label>
+                    <input type="number" id="f_valorParcela" step="0.01" min="0.01" required oninput="atualizarPreviewParcelas()">
+                </div>
+                <div class="form-group">
+                    <label for="f_qtdParcelas">Quantidade de parcelas</label>
+                    <input type="number" id="f_qtdParcelas" min="1" max="15" value="1" required oninput="atualizarPreviewParcelas()">
+                </div>
+                <div class="form-group">
+                    <label for="f_primeiroVencimento">Vencimento da 1ª parcela</label>
+                    <input type="date" id="f_primeiroVencimento" required oninput="atualizarPreviewParcelas()">
+                </div>
+            </div>
+            <div class="resumo-box" id="previewParcelas" style="margin-top:20px; display:none;"></div>
+        </div>
+
+        <!-- ETAPA 5 -->
+        <div class="step-panel" data-step="5">
+            <div class="step-titulo">Prazo e Datas</div>
+            <div class="step-desc">Duração do contrato e data de assinatura. O prazo e a data da última parcela já vêm sugeridos a partir das parcelas informadas — confira e ajuste se precisar.</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="f_prazo">Prazo da locação (meses)</label>
+                    <input type="number" id="f_prazo" min="1" max="60" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_dataVenda">Data da venda / assinatura</label>
+                    <input type="date" id="f_dataVenda" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 6 -->
+        <div class="step-panel" data-step="6">
+            <div class="step-titulo">Revisão</div>
+            <div class="step-desc">Confira os dados antes de gerar o contrato para impressão.</div>
+            <div class="resumo-box" id="resumoBox"></div>
+            <button type="button" class="btn-primario" style="width:100%" onclick="gerarContrato()">Gerar Contrato para Impressão</button>
+        </div>
+
+        <div class="nav-botoes">
+            <button type="button" class="btn-secundario" id="btnVoltar" onclick="mudarEtapa(-1)" disabled>Voltar</button>
+            <button type="button" class="btn-primario" id="btnAvancar" onclick="mudarEtapa(1)">Avançar</button>
+        </div>
+    </form>
+
+    <div id="resultsSection" class="results-section">
+        <h2>Contrato Gerado</h2>
+        <button class="btn-print" onclick="window.print()">🖨️ Imprimir Contrato</button>
+        <div id="docContrato">
+
+<p class="titulo-principal">CONTRATO DE LOCAÇÃO OPERACIONAL DE APARELHO CELULAR</p>
+<p class="subtitulo">COM OPÇÃO CONDICIONADA DE AQUISIÇÃO AO FINAL</p>
+<p class="subtitulo espaco">POSSE PRECÁRIA, BLOQUEIO REMOTO E RECOLHIMENTO IMEDIATO</p>
+
+<p>Pelo presente instrumento, de um lado:</p>
+
+<p><strong>LOCADORA:</strong> PLUGIN CELULARES ACESSÓRIOS E INFORMÁTICA LTDA, pessoa jurídica de direito privado, inscrita no CNPJ nº 59.032.702/0001-08, com sede à RUA CORONEL MARTINHO FERREIRA DO AMARAL N° 264, CENTRO, NOVA SERRANA-MG, CEP 35.520-122, doravante denominada <strong>LOCADORA</strong>;</p>
+
+<p>E, de outro lado:</p>
+
+<p><strong>LOCATÁRIO(A):</strong> <span data-f="nome"></span>, CPF nº <span data-f="cpf"></span>, RG nº <span data-f="rg"></span>, residente e domiciliado(a) à <span data-f="rua"></span>, <span data-f="numero"></span>, <span data-f="bairro"></span>, <span data-f="complemento"></span>, <span data-f="cidade"></span> - MG, <span data-f="cep"></span> doravante denominado(a) <strong>LOCATÁRIO(A)</strong>;</p>
+
+<p>As partes, que declaram possuir plena capacidade civil, ter compreendido integralmente o conteúdo deste instrumento, cujas cláusulas foram previamente disponibilizadas, lidas e aceitas de forma consciente, firmam o presente contrato em caráter <strong>irrevogável e irretratável</strong>, nos termos abaixo.</p>
+
+<p class="clausula">CLÁUSULA 1 – DO OBJETO</p>
+<p>1.1- O presente contrato tem por objeto a <strong>locação de 01 (um) aparelho celular,</strong> de propriedade exclusiva da LOCADORA, com as seguintes características:</p>
+<ul class="bullets">
+<li>Modelo: <span data-f="modelo"></span></li>
+<li>IMEI: <span data-f="imei"></span></li>
+<li>Número de Série: <span data-f="serie"></span></li>
+<li>Detalhes do aparelho: <span data-f="detalhes"></span></li>
+</ul>
+<p>1.2 - O bem é, foi e permanecerá de propriedade exclusiva da LOCADORA, não se transmitindo ao LOCATÁRIO qualquer direito real, expectativa de domínio, promessa de venda ou aquisição automática.</p>
+<p>1.3 - A eventual transferência de propriedade somente ocorrerá ao final do contrato, de forma condicionada, nos termos da Cláusula 11.</p>
+
+<p class="clausula">CLÁUSULA 2 - DA NATUREZA JURÍDICA</p>
+<p>2.1 - O LOCATÁRIO declara, de forma expressa, inequívoca e irretratável, que:</p>
+<ul class="bullets">
+<li>este contrato <strong>não é compra e venda</strong>;</li>
+<li><strong>não é financiamento</strong>;</li>
+<li><strong>não é venda parcelada</strong>;</li>
+<li>trata-se exclusivamente de <strong>locação operacional de bem móvel</strong>, nos termos dos arts. 565 e seguintes do Código Civil.</li>
+</ul>
+<p>2.2 - O LOCATÁRIO reconhece que assume os riscos inerentes ao uso do bem, não havendo correlação direta entre os valores pagos e o valor de mercado residual do aparelho..</p>
+<p>2.3 - Qualquer alegação futura em sentido contrário será considerada <strong>violação à boa-fé objetiva.</strong></p>
+
+<p class="clausula">CLÁUSULA 3 - POSSE PRECÁRIA, RESOLÚVEL E CONDICIONADA</p>
+<p>3.1 - O LOCATÁRIO exerce posse direta, temporária, precária, resolúvel e subordinada, obrigando-se a devolver o bem sempre que solicitado, nas hipóteses contratuais.</p>
+<p>3.2. A posse não gera direito de retenção, indenização ou compensação.</p>
+
+<p class="clausula">CLÁUSULA 4 – DO PRAZO DA LOCAÇÃO</p>
+<p>4.1 - O prazo da locação é de <span data-f="prazo"></span> meses, iniciando-se em <span data-f="dataVendaBR"></span> e encerrando-se em <span data-f="dataUltimaBR"></span>.</p>
+
+<p class="clausula">CLÁUSULA 5 – DA ENTRADA CONTRATUAL OBRIGATÓRIA</p>
+<p>5.1 - Como condição essencial para a celebração do presente contrato, liberação do aparelho, ativação do sistema de gerenciamento remoto (MDM) e início da relação locatícia, o LOCATÁRIO pagará à LOCADORA, no ato da assinatura, ENTRADA CONTRATUAL correspondente a 25% (vinte e cinco por cento) do valor total do contrato, a título de TAXA DE ADESÃO E DISPONIBILIZAÇÃO DO BEM.</p>
+<p>5.2 - A entrada contratual possui natureza indenizatória, administrativa e operacional, destinando-se a cobrir, dentre outros:<br>a) custos de aquisição, logística, cadastro, análise de risco e crédito;<br>b) ativação, licenciamento e manutenção do sistema de gerenciamento remoto (MDM);<br>c) custos administrativos, tributários, operacionais e de estrutura;<br>d) indisponibilidade comercial do bem durante a vigência contratual.</p>
+<p>5.3 - A entrada contratual não constitui:<br>a) sinal de compra;<br>b) antecipação de preço;<br>c) parcela de aquisição;<br>d) valor de entrada para compra e venda;<br>e) promessa ou princípio de pagamento do aparelho.</p>
+<p>5.4 - A entrada contratual é irrevogável, irretratável e não reembolsável, possuindo natureza compensatório e indenizatória nos termos do Art. 413 do Código Civil, ainda que:<br>a) o contrato seja rescindido;<br>b) o LOCATÁRIO perca o direito de aquisição ao final;<br>c) haja inadimplência, bloqueio, recolhimento ou devolução do aparelho;<br>d) o contrato seja resolvido por qualquer motivo imputável ao LOCATÁRIO.</p>
+<p>5.5 - O pagamento da entrada contratual não gera qualquer direito real, expectativa de domínio ou aquisição futura, mantendo-se integralmente a natureza jurídica de locação operacional de bem móvel.</p>
+<p>5.6 - A eventual aquisição do aparelho ao final do contrato não guarda relação automática ou proporcional com o valor da entrada, permanecendo condicionada exclusivamente ao cumprimento integral das obrigações previstas na Cláusula 11.</p>
+
+<p class="clausula">CLÁUSULA 6 – DO VALOR DA LOCAÇÃO E FORMA DE PAGAMENTO</p>
+<p>6.1- Pela locação do aparelho, o LOCATÁRIO pagará à LOCADORA o valor mensal de:</p>
+<div id="listaParcelas"></div>
+<p class="espaco">por meio de <strong>boleto bancário.</strong></p>
+<p>6.2- O pagamento deverá ocorrer até a data de vencimento indicada no boleto.</p>
+<p>6.3- O atraso de <strong>qualquer parcela</strong>, ainda que por 01 (um) dia, autoriza:</p>
+<ul class="bullets">
+<li>multa moratória de <strong>2%</strong>;</li>
+<li>juros de <strong>1% ao mês</strong>, pro rata die;</li>
+<li>correção monetária;</li>
+<li><strong>vencimento antecipado das parcelas vincendas</strong>;</li>
+<li>bloqueio pelo gerenciamento remoto.</li>
+</ul>
+<p>6.4. O atraso superior a 30 (trinta dias) dias implica:</p>
+<ul class="bullets">
+<li>vencimento antecipado de todo o contrato;</li>
+<li>rescisão automática;</li>
+<li>exigibilidade imediata do débito total.</li>
+</ul>
+<p>6.5. As penalidades previstas serão aplicadas de forma proporcional, vedada a cumulação que resulte em enriquecimento sem causa.</p>
+
+<p class="clausula">CLÁUSULA 7 – DO GERENCIAMENTO REMOTO (MDM)</p>
+<p>7.1- O LOCATÁRIO declara ciência de que o aparelho está vinculado ao <strong>sistema de gerenciamento remoto (MDM)</strong>, pertencente exclusivamente à LOCADORA.</p>
+<p>7.2- É <strong>expressamente proibido</strong>, sob qualquer hipótese:<br>a) remover, tentar remover ou burlar o gerenciamento;<br>b) resetar, desbloquear, formatar ou alterar configurações de segurança;<br>c) desvincular o aparelho da conta da LOCADORA;<br>d) vender, emprestar, ceder ou transferir o aparelho a terceiros.</p>
+
+<p class="clausula">CLÁUSULA 8 – DA QUEBRA CONTRATUAL GRAVÍSSIMA</p>
+<p>8.1- Configura <strong>INFRAÇÃO CONTRATUAL GARVÍSSIMA, autorizando rescisão imediata</strong>:</p>
+<ul class="bullets">
+<li>inadimplência superior a 30 (trinta) dias;</li>
+<li>violação ou tentativa de violação do MDM;</li>
+<li>resistência a devolução;</li>
+<li>tentativa de alienação ou ocultação do aparelho.</li>
+</ul>
+<p>8.2- Nessas hipóteses, o contrato será <strong>rescindido de pleno direito</strong>, ficando o LOCATÁRIO obrigado a:<br><strong>a) pagar multa equivalente a 20% do valor total do contrato;<br>b) quitar imediatamente as parcelas vencidas e 50% (cinquenta por cento) das vincendas;<br>c) devolver o aparelho em até 24 (vinte e quatro) horas;<br>d) aceitar o bloqueio remoto imediato do aparelho.</strong></p>
+
+<p class="clausula">CLÁUSULA 9 – DO RECOLHIMENTO IMEDIATO E AUTORIZAÇÃO EXPRESSA</p>
+<p>9.1- O LOCATÁRIO autoriza expressamente, de forma irrevogável:</p>
+<ul class="bullets">
+<li>o recolhimento imediato do aparelho, por prepostos da LOCADORA;</li>
+<li>o bloqueio técnico total;</li>
+<li>a adoção de medidas extrajudiciais e judiciais.</li>
+</ul>
+<p>9.2 - A não devolução caracteriza apropriação indevida de bem móvel, nos termos do Código Penal, sem prejuízo da cobrança civil.</p>
+<p>9.3 - O recolhimento observará, sempre que necessário, os limites legais, sendo vedada qualquer conduta que implique violação de domicílio ou constrangimento ilegal.</p>
+
+<p class="clausula">CLÁUSULA 10 – DA RESPONSABILIDADE PELO APARELHO</p>
+<p>10.1- O LOCATÁRIO é responsável pela guarda, conservação e integridade do aparelho.</p>
+<p>10.2 - Em caso de perda, furto, roubo ou dano irreversível, o LOCATÁRIO deverá pagar o <strong>valor integral de mercado do aparelho</strong>, atualizado, apurado por referência média de mercado ou nota fiscal.</p>
+
+<p class="clausula">CLÁUSULA 11 – DA OPÇÃO DE AQUISIÇÃO AO FINAL</p>
+<p>11.1 - A eventual aquisição definitiva do aparelho pelo <strong>LOCATÁRIO</strong> não é automática, não é promessa de venda, não é financiamento e não decorre do simples pagamento das parcelas, constituindo-se mera opção condicional, subordinada ao cumprimento integral e irrestrito de todas as obrigações contratuais.</p>
+<p>11.2 - O aparelho somente será transferido à titularidade do <strong>LOCATÁRIO</strong> após o término do prazo contratual, desde que, cumulativamente:<br>a) todas as parcelas da locação tenham sido integralmente quitadas, sem atraso, mora ou renegociação;<br>b) não tenha ocorrido qualquer infração contratual, ainda que posteriormente sanada;<br>c) não tenha havido violação, tentativa de violação ou burla do sistema de gerenciamento remoto (MDM), bloqueio técnico ou IMEI;<br>d) inexistam multas, encargos, indenizações ou débitos pendentes, de qualquer natureza;<br>e) o contrato não tenha sido rescindido, resolvido ou antecipadamente vencido por culpa do LOCATÁRIO.</p>
+<p>11.3 - Cumpridas todas as condições acima, a LOCADORA realizará a transferência definitiva da propriedade do aparelho, mediante:<br>a) liberação técnica do gerenciamento e bloqueios;<br>b) emissão de termo de quitação final;<br>c) transferência gratuita ou cobrança de valor simbólico previamente estipulado, a título meramente formal, sem natureza de preço.</p>
+<p>11.4 - O LOCATÁRIO reconhece expressamente que qualquer inadimplemento, infração ou rescisão, ainda que parcial ou temporária, acarreta a perda automática e definitiva do direito de aquisição, sem direito a indenização, restituição ou compensação de valores pagos.</p>
+<p>11.5 - Até a efetiva formalização da aquisição final, o LOCATÁRIO renuncia expressamente a qualquer alegação de:<br>a) compra e venda;<br>b) venda a prazo;<br>c) financiamento disfarçado;<br>d) direito adquirido ou expectativa irretratável;<br>e) enriquecimento sem causa da LOCADORA.</p>
+<p>11.6 - A aquisição final do aparelho não descaracteriza a natureza jurídica de locação do contrato, permanecendo válidas todas as cláusulas de posse precária, bloqueio, recolhimento e execução, inclusive para fins judiciais.</p>
+
+<p class="clausula">CLÁUSULA 12 - DA PROTEÇÃO DE DADOS PESSOAIS</p>
+<p>12.1 - As Partes declaram estar cientes e de acordo com o tratamento de dados pessoais necessário à execução do presente contrato, nos termos da Lei nº 13.709/2018 – Lei Geral de Proteção de Dados (LGPD).</p>
+<p>12.2 - O LOCATÁRIO autoriza, de forma expressa, o tratamento de seus dados pessoais pela LOCADORA, incluindo, mas não se limitando a: nome, CPF, RG, endereço, contatos, dados financeiros, informações cadastrais, dados técnicos do aparelho, IMEI e registros de uso vinculados ao gerenciamento remoto, exclusivamente para fins de execução contratual, cobrança, prevenção à fraude, segurança patrimonial e cumprimento de obrigações legais.</p>
+<p>12.3 - Cada Parte atuará como controladora independente dos dados pessoais sob sua responsabilidade, respondendo individualmente por eventual violação à legislação aplicável.</p>
+<p>12.4 - A LOCADORA não se responsabiliza por vazamentos, acessos indevidos ou incidentes de segurança decorrentes de:<br>a) culpa exclusiva do LOCATÁRIO;<br>b) uso inadequado do aparelho;<br>c) falhas de segurança em redes de terceiros;<br>d) ataques cibernéticos externos fora de seu controle razoável;<br>e) caso fortuito ou força maior.</p>
+<p>12.5 - Encerrada a relação contratual, os dados pessoais serão armazenados pelo prazo legal ou regulatório aplicável, sendo posteriormente eliminados ou anonimizados, conforme a legislação vigente.</p>
+
+<p class="clausula">CLÁUSULA 13 - A LIMITAÇÃO DE RESPONSABILIDADE POR FALHAS TECNOLÓGICAS, INTERNET E TERCEIROS</p>
+<p>13.1 - A LOCADORA não será responsável, em nenhuma hipótese, por qualquer dano, prejuízo ou perda sofridos pelo LOCATÁRIO em razão de:<br>a) falhas na internet;<br>b) indisponibilidade, instabilidade ou mau funcionamento de redes de telecomunicação;<br>c) falhas em sistemas, aplicativos, servidores, plataformas digitais ou softwares utilizados pelo LOCATÁRIO;<br>d) condutas de terceiros;<br>e) caso fortuito ou força maior.</p>
+<p>13.2 - A LOCADORA não se responsabiliza por qualquer vírus, malware, spyware, ransomware, invasor ou código malicioso que venha a atingir o aparelho do LOCATÁRIO em decorrência:<br>a) do acesso, utilização ou navegação na internet;<br>b) da instalação de aplicativos;<br>c) da transferência ou download de dados, arquivos, imagens, textos, vídeos, áudios ou quaisquer conteúdos digitais.</p>
+<p>13.3 - O LOCATÁRIO declara estar ciente de que a segurança digital do aparelho depende também de suas condutas, assumindo integral responsabilidade por:<br>a) acessos realizados;<br>b) aplicativos instalados;<br>c) links acessados;<br>d) arquivos transferidos;<br>e) configurações de segurança adotadas.</p>
+<p>13.4 - Em nenhuma hipótese a LOCADORA será responsabilizada por lucros cessantes, danos indiretos, danos morais, perda de dados, perda de oportunidades ou interrupção de atividades, ainda que decorrentes do uso do aparelho objeto da locação.</p>
+
+<p class="clausula">CLÁUSÚLA 14 – DA FALHA</p>
+<p>14.1 - Em caso de falha, defeito ou mau funcionamento do aparelho durante a vigência do contrato, o LOCATÁRIO deverá comunicar imediatamente a LOCADORA, comprometendo-se a não realizar qualquer reparo, abertura, intervenção técnica ou tentativa de conserto por conta própria ou por terceiros não autorizados.</p>
+<p>14.2 - O aparelho será submetido à avaliação técnica exclusiva da LOCADORA, diretamente ou por meio de assistência técnica por ela indicada, com a finalidade de apurar a natureza da falha, sua origem e eventual responsabilidade.</p>
+<p>14.3 - A eventual substituição do aparelho é facultativo exclusivo da LOCADORA, condicionada à conclusão da avaliação técnica e à constatação de defeito não decorrente de mau uso, negligência, imprudência, imperícia, queda, impacto, umidade, oxidação, violação física ou lógica do aparelho, alteração de software ou qualquer conduta imputável ao LOCATÁRIO.</p>
+<p>14.4 - Durante todo o período de avaliação técnica, o LOCATÁRIO declara ciência e concorda que não fará jus a aparelho substituto, reserva, backup ou equivalente, não cabendo qualquer indenização, abatimento, suspensão ou compensação de valores.</p>
+<p>14.5 - Constatado que a falha decorre de mau uso ou conduta do LOCATÁRIO, este será responsável pelo custo integral do reparo ou, sendo inviável, pelo ressarcimento do valor integral de mercado do aparelho.</p>
+<p>14.6 - A continuidade da cobrança das parcelas durante o período de avaliação não será suspensa, permanecendo o LOCATÁRIO integralmente responsável pelo cumprimento das obrigações contratuais.</p>
+
+<p class="clausula">CLÁUSULA 15 – DO SEGURO INTEGRADO À LOCAÇÃO</p>
+<p>15.1. O LOCATÁRIO declara ciência de que o aparelho objeto deste contrato possui SEGURO OBRIGATÓRIO INTEGRADO À CONTRATAÇÃO, cujo custo já está embutido no valor da locação mensal, não havendo contratação autônoma ou apólice individual em seu nome.</p>
+<p>15.2. O seguro tem por finalidade exclusiva mitigar riscos patrimoniais da LOCADORA, proprietária do bem, não se caracterizando como benefício direto ao LOCATÁRIO nem como seguro pessoal ou patrimonial em seu favor.</p>
+<p>15.3. A existência do seguro não afasta, não limita e não substitui a responsabilidade integral do LOCATÁRIO pela guarda, conservação e restituição do aparelho, permanecendo este responsável por:<br>a) danos;<br>b) perdas;<br>c) furto;<br>d) roubo;<br>e) extravio;<br>f) mau uso;<br>g) qualquer sinistro, independentemente de cobertura securitária.</p>
+<p>15.4. Eventual indenização securitária, total ou parcial, pertencerá exclusivamente à LOCADORA, não gerando ao LOCATÁRIO:<br>a) direito de restituição;<br>b) abatimento de valores;<br>c) quitação de débitos;<br>d) compensação financeira;<br>e) manutenção automática da posse.</p>
+<p>15.5. A ocorrência de sinistro não suspende a exigibilidade das parcelas da locação, tampouco impede a aplicação de multas, rescisão contratual, bloqueio remoto ou recolhimento do aparelho, quando cabível.</p>
+<p>15.6. O LOCATÁRIO reconhece que o seguro não garante substituição imediata do aparelho, nem assegura continuidade da posse durante análise de sinistro, avaliação técnica ou procedimentos internos da LOCADORA.</p>
+<p>15.7. O seguro integrado não altera a natureza jurídica do contrato, não constitui venda, financiamento ou promessa de aquisição, permanecendo o presente instrumento caracterizado como locação operacional de bem móvel.</p>
+
+<p class="clausula">CLÁUSULA 16 - TÍTULO EXECUTIVO EXTRAJUDICIAL</p>
+<p>16.1. O presente contrato constitui <strong>título executivo extrajudicial</strong>, nos termos do art. 784, inciso III, do Código de Processo Civil.</p>
+
+<p class="clausula">CLÁUSULA 17 – DAS DISPOSIÇÕES GERAIS</p>
+<p>17.1. As Partes se comprometem a não ceder, total ou parcialmente, quaisquer das obrigações ora assumidas, sem a prévia e expressa anuência da outra Parte, sendo qualquer cessão ou transferência efetuada sem a devida autorização considerada nula e sem efeito.</p>
+<p>17.2. Qualquer tolerância ou concessão das partes não constituirá precedente invocável pelo favorecido e não terá virtude de alterar quaisquer obrigações estipuladas neste Contrato.</p>
+<p>17.3. No caso de qualquer disposição, ou parte de qualquer disposição deste Instrumento, ser nula ou não executável, tal disposição, ou sua parte, deverá ser ignorada, e o restante do Instrumento permanecerá em vigor como se ela não existisse.</p>
+<p>17.4. O presente contrato é firmado em caráter irrevogável e irretratável, obrigando os contratantes e seus eventuais sucessores legais.</p>
+<p>17.5. De comum acordo, as partes qualificadas neste instrumento afirmam e declaram que esse poderá ser assinado eletronicamente através de plataforma válida para assinaturas digitais, com fundamento no Artigo 10, parágrafo 2º da Medida Provisória 2200-2/2001, e do Artigo 6º do Decreto 10.278/2020, sendo as assinaturas consideradas válidas. Consigna-se no presente instrumento que a assinatura digital tem a mesma validade jurídica de um registro e autenticação feitos em cartório.</p>
+<p>Parágrafo Único: As Partes renunciam à possibilidade de exigir a troca, envio ou entrega das vias originais (não-eletrônicas) assinadas do instrumento, bem como renunciam ao direito de recusar ou contestar a validade das assinaturas eletrônicas, na medida máxima permitida pela legislação aplicável</p>
+<p>17.6. Os casos omissos neste acordo serão dirimidos à luz da legislação brasileira em vigor, da Teoria Geral dos Contratos, da Jurisprudência dos Tribunais Pátrios, e/ou dos usos e costumes, quando em direito admitidos.</p>
+
+<div class="bloco-assinaturas">
+<p class="clausula">CLÁUSULA 18 – DO FORO</p>
+<p>18.1. Fica eleito o foro da Comarca de NOVA SERRANA-MG para dirimir quaisquer conflitos oriundos deste instrumento, com renúncia expressa de qualquer outro, por mais privilegiado que possa ser.</p>
+<p>E por estarem justas e contratadas, assinam o presente instrumento em 02 (duas) vias de igual teor, na presença de 02 (duas) testemunhas. (condição indispensável para fazer valer a cláusula 16 do título executivo extrajudicial)</p>
+
+<p class="data-local">NOVA SERRANA-MG, <span data-f="dataVendaBR"></span>.</p>
+
+<div class="assinatura">LOCATÁRIO</div>
+<div class="assinatura">PLUGIN CELULARES ACESSÓRIOS E INFORMÁTICA LTDA</div>
+<div class="assinatura">TESTEMUNHA
+<div class="dado-testemunha">Nome: _________________________________________________</div>
+<div class="dado-testemunha">CPF: _________________________________________________</div>
+</div>
+<div class="assinatura">TESTEMUNHA
+<div class="dado-testemunha">Nome: _________________________________________________</div>
+<div class="dado-testemunha">CPF: _________________________________________________</div>
+</div>
+</div>
+
+<div class="quebra-pagina">
+<p class="termo-titulo">TERMO DE ENTREGA, CIÊNCIA E RESPONSABILIDADE</p>
+<p>Declaro que recebi o aparelho abaixo descrito em <strong>perfeito estado</strong>, ciente de que:</p>
+<ul class="bullets">
+<li><strong>não sou proprietário</strong>;</li>
+<li>o bem possui <strong>MDM e bloqueio remoto</strong>;</li>
+<li>a inadimplência gera <strong>bloqueio e recolhimento imediato</strong>;</li>
+<li>a não devolução pode gerar <strong>responsabilização civil e penal</strong>.</li>
+<li>Modelo: <span data-f="modelo"></span></li>
+<li>IMEI: <span data-f="imei"></span></li>
+<li>Número de Série: <span data-f="serie"></span></li>
+<li>Detalhes do aparelho: <span data-f="detalhes"></span></li>
+</ul>
+
+<p class="data-local">NOVA SERRANA-MG, <span data-f="dataVendaBR"></span>.</p>
+
+<div class="assinatura">LOCATÁRIO</div>
+</div>
+
+        </div>
+        <button class="btn-secundario" style="width:100%; margin-top:15px;" onclick="location.reload()">Preencher Novo Contrato</button>
+    </div>
+</div>
+
+<script>
+    /* ===================== NAVEGAÇÃO DO FLUXO ===================== */
+    let etapaAtual = 1;
+    const TOTAL_ETAPAS = 6;
+    let parcelasGeradas = []; // preenchido por calcularParcelas()
+
+    function validarEtapaAtual() {
+        const painel = document.querySelector('.step-panel[data-step="' + etapaAtual + '"]');
+        const campos = painel.querySelectorAll('input[required]');
+        let ok = true;
+        let primeiro = null;
+        campos.forEach(function (c) {
+            c.classList.remove('campo-obrigatorio-erro');
+            if (!c.value.trim()) {
+                c.classList.add('campo-obrigatorio-erro');
+                ok = false;
+                if (!primeiro) primeiro = c;
+            }
+        });
+        if (etapaAtual === 1) {
+            const cpf = document.getElementById('f_cpf');
+            const nums = cpf.value.replace(/\D/g, "");
+            if (nums.length === 11 && !validarCPF(nums)) {
+                cpf.classList.add('campo-obrigatorio-erro');
+                ok = false;
+                if (!primeiro) primeiro = cpf;
+            }
+        }
+        if (etapaAtual === 4 && parcelasGeradas.length === 0) {
+            ok = false;
+        }
+        if (!ok) {
+            alert('Preencha corretamente todos os campos obrigatórios desta etapa antes de avançar.');
+            if (primeiro) primeiro.focus();
+        }
+        return ok;
+    }
+
+    function mudarEtapa(direcao) {
+        if (direcao > 0 && !validarEtapaAtual()) return;
+
+        if (etapaAtual === 5 && direcao > 0) montarResumo();
+
+        const novaEtapa = etapaAtual + direcao;
+        if (novaEtapa < 1 || novaEtapa > TOTAL_ETAPAS) return;
+
+        document.querySelector('.step-panel[data-step="' + etapaAtual + '"]').classList.remove('ativo');
+        etapaAtual = novaEtapa;
+        document.querySelector('.step-panel[data-step="' + etapaAtual + '"]').classList.add('ativo');
+
+        document.querySelectorAll('.progress-step').forEach(function (el) {
+            const n = parseInt(el.getAttribute('data-step'), 10);
+            el.classList.remove('ativo', 'concluido');
+            if (n === etapaAtual) el.classList.add('ativo');
+            else if (n < etapaAtual) el.classList.add('concluido');
+        });
+
+        document.getElementById('btnVoltar').disabled = (etapaAtual === 1);
+        document.getElementById('btnAvancar').style.display = (etapaAtual === TOTAL_ETAPAS) ? 'none' : 'inline-block';
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function montarResumo() {
+        const v = coletarValores();
+        const box = document.getElementById('resumoBox');
+        box.innerHTML =
+            '<div class="linha"><strong>Locatário:</strong> ' + v.nome + ' — CPF ' + v.cpf + ' — RG ' + v.rg + '</div>' +
+            '<div class="linha"><strong>Endereço:</strong> ' + v.rua + ', ' + v.numero + ', ' + v.bairro + (v.complemento ? ', ' + v.complemento : '') + ', ' + v.cidade + ' - MG, ' + v.cep + '</div>' +
+            '<div class="linha"><strong>Aparelho:</strong> ' + v.modelo + ' — IMEI ' + v.imei + ' — Série ' + v.serie + '</div>' +
+            '<div class="linha"><strong>Detalhes:</strong> ' + v.detalhes + '</div>' +
+            '<div class="linha"><strong>Prazo:</strong> ' + v.prazo + ' meses — de ' + v.dataVendaBR + ' até ' + v.dataUltimaBR + '</div>' +
+            '<div><strong>Parcelas geradas:</strong> ' + v.parcelas.length + '</div>';
+    }
+
+    /* ===================== MÁSCARAS ===================== */
+    function mascaraCPF(input) {
+        let v = input.value.replace(/\D/g, "").substring(0, 11);
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        input.value = v;
+
+        const hint = document.getElementById('hintCpf');
+        const nums = v.replace(/\D/g, "");
+        input.classList.remove('cpf-valido', 'cpf-invalido', 'campo-obrigatorio-erro');
+        if (nums.length === 11) {
+            const ok = validarCPF(nums);
+            input.classList.add(ok ? 'cpf-valido' : 'cpf-invalido');
+            hint.textContent = ok ? 'CPF válido' : 'CPF inválido (dígito verificador não confere)';
+            hint.className = 'doc-hint ' + (ok ? 'ok' : 'erro');
+        } else {
+            hint.textContent = '';
+        }
+    }
+
+    function mascaraCEP(input) {
+        let v = input.value.replace(/\D/g, "").substring(0, 8);
+        v = v.replace(/(\d{5})(\d)/, "$1-$2");
+        input.value = v;
+    }
+
+    function validarCPF(cpf) {
+        if (/^(\d)\1{10}$/.test(cpf)) return false;
+        let soma = 0;
+        for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
+        let resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.charAt(9))) return false;
+
+        soma = 0;
+        for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
+        resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.charAt(10))) return false;
+
+        return true;
+    }
+
+    function formatarDataBR(isoStr) {
+        if (!isoStr) return '';
+        const partes = isoStr.split('-');
+        return partes[2] + '/' + partes[1] + '/' + partes[0];
+    }
+
+    /* ===================== VALOR POR EXTENSO (portado do Gerador de Parcelas por Extenso) ===================== */
+    function escreverNumero(n) {
+        if (n === 0) return "";
+        if (n === 100) return "cem";
+
+        const unidades = ["", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove"];
+        const dezDezenove = ["dez", "onze", "doze", "treze", "quatorze", "quinze", "dezesseis", "dezessete", "dezoito", "dezenove"];
+        const dezenas = ["", "", "vinte", "trinta", "quarenta", "cinquenta", "sessenta", "setenta", "oitenta", "noventa"];
+        const centenas = ["", "cento", "duzentos", "trezentos", "quatrocentos", "quinhentos", "seiscentos", "setecentos", "oitocentos", "novecentos"];
+
+        let arr = [];
+
+        if (n >= 100) {
+            arr.push(centenas[Math.floor(n / 100)]);
+            n %= 100;
+        }
+
+        if (n >= 10 && n <= 19) {
+            arr.push(dezDezenove[n - 10]);
+        } else {
+            if (n >= 20) {
+                arr.push(dezenas[Math.floor(n / 10)]);
+                n %= 10;
+            }
+            if (n > 0) {
+                arr.push(unidades[n]);
+            }
+        }
+
+        return arr.filter(Boolean).join(" e ");
+    }
+
+    function valorPorExtenso(valor) {
+        let inteiros = Math.floor(valor);
+        let centavos = Math.round((valor - inteiros) * 100);
+
+        let textoReais = escreverNumero(inteiros) + (inteiros === 1 ? " real" : " reais");
+        let textoCentavos = escreverNumero(centavos) + (centavos === 1 ? " centavo" : " centavos");
+
+        if (inteiros === 0 && centavos === 0) return "zero reais";
+        if (inteiros > 0 && centavos > 0) return textoReais + " e " + textoCentavos;
+        if (inteiros > 0) return textoReais;
+        if (centavos > 0) return textoCentavos;
+    }
+
+    /* ===================== CÁLCULO AUTOMÁTICO DAS PARCELAS ===================== */
+    function calcularParcelas() {
+        const valor = parseFloat(document.getElementById('f_valorParcela').value);
+        const qtd = parseInt(document.getElementById('f_qtdParcelas').value, 10);
+        const dataInput = document.getElementById('f_primeiroVencimento').value;
+
+        parcelasGeradas = [];
+        if (!valor || valor <= 0 || !qtd || qtd < 1 || !dataInput) return;
+
+        const partes = dataInput.split('-');
+        let dataAtual = new Date(parseInt(partes[0], 10), parseInt(partes[1], 10) - 1, parseInt(partes[2], 10));
+
+        const valorFormatado = valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const textoExtenso = valorPorExtenso(valor);
+
+        for (let i = 1; i <= qtd; i++) {
+            const d = String(dataAtual.getDate()).padStart(2, '0');
+            const m = String(dataAtual.getMonth() + 1).padStart(2, '0');
+            const a = dataAtual.getFullYear();
+            const dataBR = d + '/' + m + '/' + a;
+
+            const linha = i + 'ª Parcela – R$ ' + valorFormatado + ' (' + textoExtenso + ') – Vencimento ' + dataBR;
+            parcelasGeradas.push({ dataBR: dataBR, linha: linha });
+
+            dataAtual.setMonth(dataAtual.getMonth() + 1);
+        }
+
+        // sugere automaticamente o prazo (meses) da Cláusula 4 com base na quantidade de parcelas
+        const campoPrazo = document.getElementById('f_prazo');
+        if (campoPrazo) campoPrazo.value = qtd;
+    }
+
+    function atualizarPreviewParcelas() {
+        calcularParcelas();
+        const box = document.getElementById('previewParcelas');
+        if (parcelasGeradas.length === 0) {
+            box.style.display = 'none';
+            box.innerHTML = '';
+            return;
+        }
+        box.style.display = 'block';
+        box.innerHTML = '<strong>Pré-visualização (' + parcelasGeradas.length + ' parcela' + (parcelasGeradas.length > 1 ? 's' : '') + '):</strong><br><br>' +
+            parcelasGeradas.map(function (p) { return p.linha; }).join('<br>');
+    }
+
+    /* ===================== COLETA DE DADOS ===================== */
+    function coletarValores() {
+        const g = function (id) { return document.getElementById(id).value.trim(); };
+        const ultimaParcela = parcelasGeradas.length ? parcelasGeradas[parcelasGeradas.length - 1].dataBR : '';
+        return {
+            nome: g('f_nome'), cpf: g('f_cpf'), rg: g('f_rg'),
+            rua: g('f_rua'), numero: g('f_numero'), bairro: g('f_bairro'),
+            complemento: g('f_complemento'), cidade: g('f_cidade'), cep: g('f_cep'),
+            modelo: g('f_modelo'), imei: g('f_imei'), serie: g('f_serie'), detalhes: g('f_detalhes'),
+            prazo: g('f_prazo'),
+            dataVendaBR: formatarDataBR(g('f_dataVenda')),
+            dataUltimaBR: ultimaParcela,
+            parcelas: parcelasGeradas.map(function (p) { return p.linha; })
+        };
+    }
+
+    /* ===================== GERAÇÃO DO CONTRATO ===================== */
+    function gerarContrato() {
+        const v = coletarValores();
+
+        document.querySelectorAll('[data-f]').forEach(function (el) {
+            const chave = el.getAttribute('data-f');
+            el.textContent = (v[chave] !== undefined) ? v[chave] : '';
+        });
+
+        const parcelasContainer = document.getElementById('listaParcelas');
+        let htmlParcelas = '';
+        v.parcelas.forEach(function (p) {
+            htmlParcelas += '<p class="parcela-linha">' + p + '</p>';
+        });
+        parcelasContainer.innerHTML = htmlParcelas;
+
+        document.getElementById('wizardForm').style.display = 'none';
+        const resultsSection = document.getElementById('resultsSection');
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

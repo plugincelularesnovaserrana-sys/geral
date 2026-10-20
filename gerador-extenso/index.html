@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Parcelas por Extenso - Plugin Financeiro</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0B0C10; /* Fundo escuro premium idêntico ao index */
+            color: #FFFFFF;
+            display: block; /* Alterado para se adequar ao fluxo do topo */
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            background-color: #11141a; /* Container escuro levemente contrastante */
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto; /* Centraliza o contêiner na tela */
+        }
+
+        /* Estrutura de Cabeçalho Superior idêntica aos outros simuladores */
+        .logo-back-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .logo-back-container img {
+            max-width: 250px;
+            height: auto;
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #1f4068, #162447);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(135deg, #0056b3, #1f4068);
+            border-color: #45F3FF;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+            color: #FFFFFF;
+            margin-bottom: 30px;
+            font-size: 22px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #45F3FF;
+            padding-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #b0b3b8;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #162447;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #FFFFFF;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #45F3FF;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+        }
+
+        /* Botão Principal no padrão do index */
+        button.btn-principal {
+            width: 100%;
+            padding: 18px;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #1f4068, #162447);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-top: 15px;
+        }
+
+        button.btn-principal:hover {
+            background: linear-gradient(135deg, #0056b3, #1f4068);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(69, 243, 255, 0.2);
+            border-color: #45F3FF;
+        }
+
+        .resultado {
+            margin-top: 35px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 25px;
+        }
+
+        .resultado h3 {
+            color: #45F3FF;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 14px;
+            background-color: #162447;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            transition: border-color 0.3s;
+        }
+
+        li:hover {
+            border-color: rgba(69, 243, 255, 0.3);
+        }
+
+        .texto-parcela {
+            flex-grow: 1;
+            line-height: 1.4;
+            color: #e2e8f0;
+        }
+
+        .texto-parcela strong {
+            color: #45F3FF;
+            font-weight: normal;
+        }
+
+        /* Botão Copiar estilizado no conceito complementar do destaque */
+        .btn-copiar {
+            padding: 8px 15px;
+            background: #0f172a;
+            color: #FFFFFF;
+            border: 1px solid #45F3FF;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-copiar:hover {
+            background: #45F3FF;
+            color: #0B0C10;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.4);
+        }
+
+        .btn-copiar.copiado {
+            background-color: #27ae60 !important;
+            border-color: #27ae60 !important;
+            color: white !important;
+            box-shadow: none !important;
+        }
+
+        /* Ajuste do calendário nativo para combinar com o tema escuro */
+        input[type="date"]::-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Bloco superior com a Logo e botão Voltar adicionados no mesmo layout padrão -->
+    <div class="logo-back-container">
+        <img src="assets/LOGO.png" alt="Plugin Celulares & Acessórios">
+        <a href="../index.html" class="btn-back">⬅ Voltar ao Painel</a>
+    </div>
+
+    <h2>Gerador de Parcelas por Extenso</h2>
+    
+    <div class="form-group">
+        <label for="qtd">Quantidade de Parcelas (Máx. 15):</label>
+        <input type="number" id="qtd" value="3" min="1" max="15">
+    </div>
+    
+    <div class="form-group">
+        <label for="data">Vencimento da 1ª Parcela:</label>
+        <input type="date" id="data" value="2026-08-10">
+    </div>
+    
+    <div class="form-group">
+        <label for="valor">Valor de cada Parcela (R$):</label>
+        <input type="number" id="valor" value="123.45" step="0.01" min="0">
+    </div>
+    
+    <button class="btn-principal" onclick="gerarParcelas()">Gerar Lista Automática</button>
+    
+    <div class="resultado" id="resultado-box" style="display:none;">
+        <h3>Resultado Gerado:</h3>
+        <ul id="lista-parcelas"></ul>
+    </div>
+</div>
+
+<script>
+function valorPorExtenso(valor) {
+    let inteiros = Math.floor(valor);
+    let centavos = Math.round((valor - inteiros) * 100);
+    
+    let textoReais = escreverNumero(inteiros) + (inteiros === 1 ? " real" : " reais");
+    let textoCentavos = escreverNumero(centavos) + (centavos === 1 ? " centavo" : " centavos");
+    
+    if (inteiros === 0 && centavos === 0) return "zero reais";
+    if (inteiros > 0 && centavos > 0) return `${textoReais} e ${textoCentavos}`;
+    if (inteiros > 0) return textoReais;
+    if (centavos > 0) return textoCentavos;
+}
+
+function escreverNumero(n) {
+    if (n === 0) return "";
+    if (n === 100) return "cem";
+
+    const unidades = ["", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove"];
+    const dezDezenove = ["dez", "onze", "doze", "treze", "quatorze", "quinze", "dezesseis", "dezessete", "dezoito", "dezenove"];
+    const dezenas = ["", "", "vinte", "trinta", "quarenta", "cinquenta", "sessenta", "setenta", "oitenta", "noventa"];
+    const centenas = ["", "cento", "duzentos", "trezentos", "quatrocentos", "quinhentos", "seiscentos", "setecentos", "oitobentos", "novecentos"];
+    
+    let arr = [];
+    
+    if (n >= 100) {
+        arr.push(centenas[Math.floor(n / 100)]);
+        n %= 100;
+    }
+    
+    if (n >= 10 && n <= 19) {
+        arr.push(dezDezenove[n - 10]);
+    } else {
+        if (n >= 20) {
+            arr.push(dezenas[Math.floor(n / 10)]);
+            n %= 10;
+        }
+        if (n > 0) {
+            arr.push(unidades[n]);
+        }
+    }
+    
+    return arr.filter(Boolean).join(" e ");
+}
+
+function copiarTexto(botao, texto) {
+    navigator.clipboard.writeText(texto).then(() => {
+        const textoOriginal = botao.innerText;
+        botao.innerText = "Copiado! ✓";
+        botao.classList.add("copiado");
+        
+        setTimeout(() => {
+            botao.innerText = textoOriginal;
+            botao.classList.remove("copiado");
+        }, 1500);
+    });
+}
+
+function gerarParcelas() {
+    let qtd = parseInt(document.getElementById('qtd').value);
+    const dataInput = document.getElementById('data').value;
+    const valor = parseFloat(document.getElementById('valor').value);
+    
+    if (qtd > 15) {
+        alert("O limite máximo permitido é de 15 parcelas.");
+        document.getElementById('qtd').value = 15;
+        qtd = 15;
+    }
+    
+    if (!dataInput || isNaN(qtd) || isNaN(valor) || qtd < 1) {
+        alert("Por favor, preencha todos os campos corretamente.");
+        return;
+    }
+    
+    let partesData = dataInput.split("-");
+    let ano = parseInt(partesData[0]);
+    let mes = parseInt(partesData[1]) - 1;
+    let dia = parseInt(partesData[2]);
+    
+    let dataAtual = new Date(ano, mes, dia);
+    let listaUL = document.getElementById('lista-parcelas');
+    listaUL.innerHTML = "";
+    
+    const textoExtenso = valorPorExtenso(valor);
+    const valorFormatado = valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    
+    for (let i = 1; i <= qtd; i++) {
+        let d = dataAtual.getDate().toString().padStart(2, '0');
+        let m = (dataAtual.getMonth() + 1).toString().padStart(2, '0');
+        let a = dataAtual.getFullYear();
+        let dataFormatada = `${d}/${m}/${a}`;
+        
+        let numParcela = `${i.toString().padStart(2, '0')}/${qtd.toString().padStart(2, '0')}`;
+        
+        let textoParaCopiar = `* ${numParcela} — ${dataFormatada} — R$ ${valorFormatado} (${textoExtenso})`;
+        
+        let li = document.createElement('li');
+        
+        let spanTexto = document.createElement('span');
+        spanTexto.className = "texto-parcela";
+        spanTexto.innerHTML = `* <strong>${numParcela} — ${dataFormatada}</strong> — R$ ${valorFormatado} (<strong>${textoExtenso}</strong>)`;
+        
+        let btnCopiar = document.createElement('button');
+        btnCopiar.className = "btn-copiar";
+        btnCopiar.innerText = "Copiar";
+        btnCopiar.onclick = function() { copiarTexto(this, textoParaCopiar); };
+        
+        li.appendChild(spanTexto);
+        li.appendChild(btnCopiar);
+        listaUL.appendChild(li);
+        
+        dataAtual.setMonth(dataAtual.getMonth() + 1);
+    }
+    
+    document.getElementById('resultado-box').style.display = "block";
+}
+</script>
+
+</body>
+</html>

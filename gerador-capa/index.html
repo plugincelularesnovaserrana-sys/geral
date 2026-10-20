@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Capa de Carnê - Plugin Financeiro</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0B0C10;
+            color: #FFFFFF;
+            display: block;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            background-color: #11141a;
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .logo-back-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .logo-back-container img {
+            max-width: 250px;
+            height: auto;
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #1f4068, #162447);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(135deg, #0056b3, #1f4068);
+            border-color: #45F3FF;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+        }
+
+        h2 {
+            text-align: center;
+            color: #FFFFFF;
+            margin-bottom: 30px;
+            font-size: 22px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #45F3FF;
+            padding-bottom: 15px;
+        }
+
+        /* SISTEMA DE GRID PARA ALINHAMENTO PERFEITO */
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.2fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-grid-uf {
+            display: grid;
+            grid-template-columns: 2fr 2fr 0.8fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        /* Remove a margem interna do grupo quando dentro do grid */
+        .form-grid-3 .form-group, .form-grid-uf .form-group {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #b0b3b8;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #162447;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #FFFFFF;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            height: 48px; /* Altura idêntica para todas as caixas */
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #45F3FF;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+        }
+
+        button.btn-principal {
+            width: 100%;
+            padding: 18px;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #1f4068, #162447);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-top: 15px;
+        }
+
+        button.btn-principal:hover {
+            background: linear-gradient(135deg, #0056b3, #1f4068);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(69, 243, 255, 0.2);
+            border-color: #45F3FF;
+        }
+
+        .resultado {
+            margin-top: 35px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 25px;
+        }
+
+        .resultado h3 {
+            color: #45F3FF;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .preview-container-wrapper {
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+
+        /* Área de visualização na tela */
+        .preview-carne {
+            position: relative;
+            width: 500px;
+            height: 707px;
+            margin: 0 auto;
+            background-image: url('../assets/CAPA CARNE NS.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            background-color: #11141a;
+        }
+
+        /* Box de dados na capa */
+        .box-dados-pagador {
+            position: absolute;
+            top: 298px;
+            left: 24px;
+            width: 185px;
+            height: 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            font-size: 6.5px;
+            line-height: 1.4;
+            color: #000000;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .box-dados-pagador div {
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn-imprimir {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 15px;
+            background: #0f172a;
+            color: #FFFFFF;
+            border: 1px solid #45F3FF;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-imprimir:hover {
+            background: #45F3FF;
+            color: #0B0C10;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.4);
+        }
+
+        /* REGRAS DE IMPRESSÃO */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0;
+            }
+            html, body {
+                width: 210mm;
+                height: 297mm;
+                background: #FFFFFF !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .logo-back-container, h2, .form-group, .form-grid-3, .form-grid-uf, .btn-principal, .resultado h3, .btn-imprimir { 
+                display: none !important; 
+            }
+            .container {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+            }
+            .preview-container-wrapper {
+                padding: 0;
+                overflow: visible;
+            }
+            .preview-carne { 
+                border: none !important; 
+                box-shadow: none !important;
+                background-color: transparent !important;
+                width: 210mm;
+                height: 297mm;
+                position: absolute;
+                top: 0;
+                left: 0;
+                background-image: url('../assets/CAPA CARNE NS.png') !important;
+                background-size: contain !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .box-dados-pagador {
+                top: 125mm;
+                left: 10mm;
+                width: 78mm;
+                height: 20mm;
+                font-size: 7.5pt;
+                color: #000000 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-back-container">
+        <img src="../assets/LOGO.png" alt="Plugin Celulares & Acessórios">
+        <a href="../index.html" class="btn-back">⬅ Voltar ao Painel</a>
+    </div>
+
+    <h2>Gerador de Capa de Carnê</h2>
+    
+    <div class="form-group">
+        <label for="nome">Nome do Pagador:</label>
+        <input type="text" id="nome" placeholder="Ex: JOÃO SILVA SAURO" oninput="forçarMaiusculas(this)">
+    </div>
+    
+    <div class="form-grid-3">
+        <div class="form-group">
+            <label for="endereco">Endereço:</label>
+            <input type="text" id="endereco" placeholder="Ex: RUA CEL. MARTINHO FERREIRA" oninput="forçarMaiusculas(this)">
+        </div>
+        <div class="form-group">
+            <label for="numero">Nº:</label>
+            <input type="text" id="numero" placeholder="Ex: 264" oninput="forçarMaiusculas(this)">
+        </div>
+        <div class="form-group">
+            <label for="complemento">Complemento (Opcional):</label>
+            <input type="text" id="complemento" placeholder="Ex: APTO 101" oninput="forçarMaiusculas(this)">
+        </div>
+    </div>
+
+    <div class="form-grid-uf">
+        <div class="form-group">
+            <label for="bairro">Bairro:</label>
+            <input type="text" id="bairro" placeholder="Ex: CENTRO" oninput="forçarMaiusculas(this)">
+        </div>
+        <div class="form-group">
+            <label for="cidade">Cidade:</label>
+            <input type="text" id="cidade" placeholder="Ex: NOVA SERRANA" oninput="forçarMaiusculas(this)">
+        </div>
+        <div class="form-group">
+            <label for="estado">UF:</label>
+            <input type="text" id="estado" maxlength="2" placeholder="Ex: MG" oninput="forçarMaiusculas(this)">
+        </div>
+    </div>
+    
+    <button class="btn-principal" onclick="gerarCapa()">Gerar Capa de Carnê</button>
+    
+    <div class="resultado" id="resultado-box" style="display:none;">
+        <h3>Visualização da Capa:</h3>
+        <div class="preview-container-wrapper">
+            <div class="preview-carne" id="carne-box">
+                <div class="box-dados-pagador">
+                    <div>PAGADOR: <span id="lbl-linha1"></span></div>
+                    <div>END: <span id="lbl-linha2"></span></div>
+                    <div><span id="lbl-linha3"></span></div>
+                </div>
+            </div>
+        </div>
+        <button class="btn-imprimir" onclick="window.print()">Imprimir Capa</button>
+    </div>
+</div>
+
+<script>
+function forçarMaiusculas(input) {
+    input.value = input.value.toUpperCase();
+}
+
+function gerarCapa() {
+    const nome = document.getElementById('nome').value.trim();
+    const endereco = document.getElementById('endereco').value.trim();
+    const numero = document.getElementById('numero').value.trim();
+    const complemento = document.getElementById('complemento').value.trim();
+    const bairro = document.getElementById('bairro').value.trim();
+    const cidade = document.getElementById('cidade').value.trim();
+    const estado = document.getElementById('estado').value.trim();
+    
+    if (!nome || !endereco || !numero || !bairro || !cidade || !estado) {
+        alert("Por favor, preencha todos os campos obrigatórios.");
+        return;
+    }
+    
+    let textoLinha2 = `${endereco}, Nº ${numero}`;
+    if (complemento) {
+        textoLinha2 += ` - ${complemento}`;
+    }
+    
+    let textoLinha3 = `${bairro} - ${cidade}/${estado}`;
+    
+    document.getElementById('lbl-linha1').innerText = nome;
+    document.getElementById('lbl-linha2').innerText = textoLinha2;
+    document.getElementById('lbl-linha3').innerText = textoLinha3;
+    
+    document.getElementById('resultado-box').style.display = "block";
+}
+</script>
+
+</body>
+</html>

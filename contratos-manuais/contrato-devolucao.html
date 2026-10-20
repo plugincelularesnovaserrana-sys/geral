@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Termo de Recebimento de Aparelho - Central de Ferramentas</title>
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+        background-color: #0B0C10;
+        color: #FFFFFF;
+        min-height: 100vh;
+        padding: 40px 20px;
+    }
+
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #162447, #0f172a);
+        padding: 30px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .logo-back-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 20px;
+    }
+
+    .logo-back-container img {
+        max-width: 250px;
+        height: auto;
+    }
+
+    .btn-back {
+        padding: 10px 20px;
+        color: #FFFFFF;
+        background: linear-gradient(135deg, #1f4068, #162447);
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 11px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-back:hover {
+        background: linear-gradient(135deg, #0056b3, #1f4068);
+        border-color: #45F3FF;
+        box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    header h1 {
+        margin: 0;
+        color: #45F3FF;
+        font-size: 24px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    header .subtitle {
+        margin: 6px 0 0 0;
+        color: #94a3b8;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    /* ===== BARRA DE PROGRESSO (fluxo estilo Clicksign) ===== */
+    .progress-wrap {
+        margin-bottom: 25px;
+    }
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    .progress-step {
+        flex: 1 1 0;
+        text-align: center;
+        font-size: 10px;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: #64748b;
+        font-weight: 600;
+        padding-bottom: 6px;
+        border-bottom: 3px solid rgba(255,255,255,0.08);
+        transition: all 0.3s ease;
+    }
+    .progress-step.ativo {
+        color: #45F3FF;
+        border-bottom-color: #45F3FF;
+    }
+    .progress-step.concluido {
+        color: #16a34a;
+        border-bottom-color: #16a34a;
+    }
+
+    .step-panel {
+        display: none;
+        background: rgba(15, 23, 42, 0.4);
+        padding: 25px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .step-panel.ativo { display: block; }
+
+    .step-titulo {
+        color: #45F3FF;
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+        font-weight: bold;
+    }
+    .step-desc {
+        color: #94a3b8;
+        font-size: 12.5px;
+        margin-bottom: 20px;
+        line-height: 1.4;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .form-group.full { grid-column: 1 / -1; }
+
+    .form-group label {
+        margin-bottom: 8px;
+        font-weight: 600;
+        font-size: 12px;
+        color: #cbd5e1;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .form-group label .opcional {
+        color: #64748b;
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+        padding: 12px;
+        background-color: #0B0C10;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        font-size: 14px;
+        color: #FFFFFF;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        resize: vertical;
+    }
+
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: #45F3FF;
+        box-shadow: 0 0 8px rgba(69, 243, 255, 0.2);
+    }
+
+    .cpf-valido { border: 1px solid #16a34a !important; box-shadow: 0 0 8px rgba(22, 163, 74, 0.3); }
+    .cpf-invalido { border: 1px solid #dc2626 !important; box-shadow: 0 0 8px rgba(220, 38, 38, 0.3); }
+    .campo-obrigatorio-erro { border: 1px solid #dc2626 !important; background-color: rgba(220, 38, 38, 0.05); }
+
+    .doc-hint {
+        margin-top: 4px;
+        font-size: 10.5px;
+        color: #94a3b8;
+    }
+    .doc-hint.ok { color: #16a34a; }
+    .doc-hint.erro { color: #dc2626; }
+
+    .bloco-titulo {
+        color: #45F3FF;
+        font-size: 12.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 22px 0 4px 0;
+        padding-top: 14px;
+        border-top: 1px dashed rgba(255,255,255,0.08);
+    }
+    .bloco-titulo:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+    .bloco-subdesc {
+        color: #64748b;
+        font-size: 11.5px;
+        margin-bottom: 12px;
+        line-height: 1.4;
+    }
+
+    .radio-opcoes {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .radio-opcao {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px;
+        background-color: #0B0C10;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .radio-opcao:hover { border-color: rgba(69, 243, 255, 0.4); }
+    .radio-opcao input[type="radio"] { margin-top: 3px; accent-color: #45F3FF; width: 16px; height: 16px; flex-shrink: 0; }
+    .radio-opcao .radio-texto { font-size: 13.5px; color: #e2e8f0; line-height: 1.4; }
+    .radio-opcao .radio-texto strong { color: #FFFFFF; }
+
+    .nav-botoes {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 25px;
+    }
+
+    button {
+        cursor: pointer;
+        border: none;
+        font-family: inherit;
+    }
+
+    .btn-primario, .btn-print {
+        background: linear-gradient(135deg, #1f4068, #162447);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 14px 22px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+    }
+    .btn-primario:hover, .btn-print:hover {
+        background: linear-gradient(135deg, #0056b3, #1f4068);
+        border-color: #45F3FF;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(69, 243, 255, 0.2);
+    }
+
+    .btn-secundario {
+        background: transparent;
+        color: #94a3b8;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 14px 22px;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .btn-secundario:hover { border-color: #94a3b8; color: #fff; }
+    .btn-secundario:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-print {
+        width: 100%;
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 25px;
+    }
+
+    .resumo-box {
+        background: rgba(69, 243, 255, 0.05);
+        border: 1px solid rgba(69, 243, 255, 0.15);
+        border-radius: 6px;
+        padding: 16px 20px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        line-height: 1.9;
+    }
+    .resumo-box strong { color: #45F3FF; }
+    .resumo-box .linha { border-bottom: 1px dashed rgba(255,255,255,0.08); padding-bottom: 4px; margin-bottom: 4px; }
+
+    .results-section {
+        margin-top: 30px;
+        display: none;
+    }
+    .results-section h2 {
+        color: #45F3FF;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        font-size: 18px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* ===== DOCUMENTO / TERMO — medidas extraídas do XML do .docx original =====
+       Fonte: Times New Roman 11pt (w:sz 22) | Página: A4 | Margens: 1134 twips = 2cm
+       Título: 14pt negrito centralizado | Subtítulo: 9pt negrito itálico centralizado
+       Cabeçalhos de seção: 11pt negrito | Tabelas: cabeçalho 9,5pt negrito fundo #DDDDDD, corpo 9,5pt */
+    #docContrato {
+        background: #fff;
+        color: #000;
+        width: 210mm;
+        max-width: 210mm;
+        margin: 0 auto;
+        padding: 20mm;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 11pt;
+        line-height: 1.25;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 6px 16px rgba(0,0,0,0.25);
+    }
+    #docContrato p { margin: 0 0 8pt 0; text-align: justify; }
+    #docContrato .titulo-principal {
+        text-align: center;
+        font-weight: bold;
+        font-size: 14pt;
+        margin-bottom: 3pt;
+    }
+    #docContrato .subtitulo {
+        text-align: center;
+        font-size: 9pt;
+        font-weight: bold;
+        font-style: italic;
+        line-height: 1.3;
+        margin-bottom: 12pt;
+    }
+    #docContrato .secao-titulo {
+        font-weight: bold;
+        font-size: 11pt;
+        margin-top: 15pt;
+        margin-bottom: 7pt;
+    }
+    #docContrato .campo-linha { margin: 0 0 5pt 0; text-align: left; }
+    #docContrato .campo-linha strong { font-weight: bold; }
+    #docContrato .checklist-intro { margin-bottom: 6pt; }
+    #docContrato .checkbox-lista { margin: 0 0 8pt 0; }
+    #docContrato .checkbox-lista .item { margin: 0 0 3pt 0; text-align: left; }
+    #docContrato .estado-geral-linha { margin: 0 0 5pt 0; }
+    #docContrato table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 0 8pt 0;
+        font-size: 9.5pt;
+    }
+    #docContrato table th, #docContrato table td {
+        border: 0.75pt solid #000;
+        padding: 4pt 5pt;
+        text-align: left;
+        vertical-align: middle;
+    }
+    #docContrato table th {
+        background-color: #DDDDDD;
+        font-weight: bold;
+        text-align: center;
+    }
+    #docContrato table td.centro { text-align: center; }
+    #docContrato .checklist-table tr { page-break-inside: avoid; break-inside: avoid; }
+    #docContrato .col-item { width: 46%; }
+    #docContrato .col-conforme, #docContrato .col-avaria { width: 13%; }
+    #docContrato .col-obs { width: 28%; }
+    #docContrato .bloco-encargos-titulo { font-weight: bold; font-style: italic; font-size: 10.5pt; margin: 10pt 0 5pt 0; }
+    #docContrato .col-desc { width: 55%; }
+    #docContrato .col-base { width: 20%; }
+    #docContrato .col-valor { width: 25%; text-align: right; }
+    #docContrato table td.col-valor { text-align: right; }
+    #docContrato .subtotal-linha { font-weight: bold; margin: 0 0 8pt 0; }
+    #docContrato .obs-italica { font-style: italic; font-size: 9.5pt; margin: 0 0 8pt 0; }
+    #docContrato .valor-total { font-weight: bold; margin: 10pt 0 6pt 0; }
+    #docContrato .declaracao { margin: 0 0 8pt 0; text-align: justify; }
+    #docContrato .nota-final { font-style: italic; margin: 10pt 0 12pt 0; text-align: justify; }
+    #docContrato .data-local {
+        text-align: center;
+        margin: 6pt 0 30pt 0;
+    }
+    #docContrato .assinatura {
+        margin: 30pt 0 4pt 0;
+        border-top: 1px solid #000;
+        text-align: center;
+        padding-top: 4pt;
+        font-weight: bold;
+    }
+    #docContrato .assinatura .obs-preposto {
+        font-weight: normal;
+        font-style: italic;
+        font-size: 10pt;
+        display: block;
+        margin-top: 2pt;
+    }
+    #docContrato .dado-testemunha {
+        font-weight: normal;
+        font-size: 10.5pt;
+        margin-top: 8pt;
+    }
+    #docContrato .bloco-assinaturas {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    /* ===== IMPRESSÃO ===== */
+    @media print {
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+        html, body {
+            background-color: #fff;
+            padding: 0;
+            color: #111827;
+        }
+        .container {
+            box-shadow: none;
+            padding: 0;
+            max-width: 100%;
+            background: #fff;
+            border: none;
+        }
+        header, #wizardForm, .btn-print, .btn-secundario, .results-section h2, .logo-back-container, .progress-wrap {
+            display: none !important;
+        }
+        .results-section {
+            display: block !important;
+            margin-top: 0;
+        }
+        #docContrato {
+            box-shadow: none;
+            max-width: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-back-container">
+        <img src="../assets/LOGO.png" alt="Plugin Celulares & Acessórios" onerror="this.style.display='none'">
+        <a href="../index.html" class="btn-back">⬅ Voltar ao Painel</a>
+    </div>
+
+    <header>
+        <h1>Gerador de Termo de Recebimento de Aparelho</h1>
+        <p class="subtitle">Preencha os dados em etapas e gere o termo completo, pronto para impressão, na mesma formatação do modelo original</p>
+    </header>
+
+    <form id="wizardForm" onsubmit="return false;">
+
+        <div class="progress-wrap">
+            <div class="progress-steps" id="progressSteps">
+                <div class="progress-step" data-step="1">1. Locatário</div>
+                <div class="progress-step" data-step="2">2. Endereço</div>
+                <div class="progress-step" data-step="3">3. Contrato</div>
+                <div class="progress-step" data-step="4">4. Aparelho</div>
+                <div class="progress-step" data-step="5">5. Motivo</div>
+                <div class="progress-step" data-step="6">6. Recebimento</div>
+                <div class="progress-step" data-step="7">7. Valores</div>
+                <div class="progress-step" data-step="8">8. Situação Final</div>
+                <div class="progress-step" data-step="9">9. Revisão</div>
+            </div>
+        </div>
+
+        <!-- ETAPA 1 -->
+        <div class="step-panel ativo" data-step="1">
+            <div class="step-titulo">Dados do Locatário</div>
+            <div class="step-desc">Informações pessoais de quem está devolvendo/teve o aparelho recolhido.</div>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="f_nome">Nome completo</label>
+                    <input type="text" id="f_nome" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_cpf">CPF</label>
+                    <input type="text" id="f_cpf" inputmode="numeric" required oninput="mascaraCPF(this)">
+                    <span class="doc-hint" id="hintCpf"></span>
+                </div>
+                <div class="form-group">
+                    <label for="f_rg">RG</label>
+                    <input type="text" id="f_rg" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 2 -->
+        <div class="step-panel" data-step="2">
+            <div class="step-titulo">Endereço do Locatário</div>
+            <div class="step-desc">Endereço completo de residência e domicílio.</div>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="f_rua">Rua</label>
+                    <input type="text" id="f_rua" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_numero">Número</label>
+                    <input type="text" id="f_numero" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_bairro">Bairro</label>
+                    <input type="text" id="f_bairro" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_complemento">Complemento <span class="opcional">(opcional)</span></label>
+                    <input type="text" id="f_complemento">
+                </div>
+                <div class="form-group">
+                    <label for="f_cidade">Cidade</label>
+                    <input type="text" id="f_cidade" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_cep">CEP</label>
+                    <input type="text" id="f_cep" inputmode="numeric" maxlength="9" required oninput="mascaraCEP(this)">
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 3 -->
+        <div class="step-panel" data-step="3">
+            <div class="step-titulo">Referência do Contrato</div>
+            <div class="step-desc">Dados do contrato de locação original ao qual este termo se refere.</div>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="f_recibo">Nº do contrato / recibo de referência (Mercado Phone)</label>
+                    <input type="text" id="f_recibo" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_dataVenda">Data da venda / início do contrato</label>
+                    <input type="date" id="f_dataVenda" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 4 -->
+        <div class="step-panel" data-step="4">
+            <div class="step-titulo">Dados do Aparelho</div>
+            <div class="step-desc">Características do aparelho celular objeto do recebimento.</div>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="f_modelo">Modelo do celular</label>
+                    <input type="text" id="f_modelo" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_imei">IMEI</label>
+                    <input type="text" id="f_imei" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_serie">Número de série</label>
+                    <input type="text" id="f_serie" required>
+                </div>
+                <div class="form-group full">
+                    <label for="f_detalhes">Detalhes do aparelho</label>
+                    <input type="text" id="f_detalhes" placeholder="Ex: cor, capacidade de armazenamento, estado de conservação" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 5 -->
+        <div class="step-panel" data-step="5">
+            <div class="step-titulo">Motivo do Recebimento</div>
+            <div class="step-desc">Assinale a(s) hipótese(s) aplicável(is), conforme Cláusulas 6, 8 e 11 do contrato. É possível marcar mais de uma.</div>
+            <div class="radio-opcoes">
+                <label class="radio-opcao">
+                    <input type="checkbox" class="chk-motivo" id="f_motivo_termino">
+                    <span class="radio-texto">Término natural do prazo contratual, sem aquisição pelo LOCATÁRIO</span>
+                </label>
+                <label class="radio-opcao">
+                    <input type="checkbox" class="chk-motivo" id="f_motivo_inadimplencia">
+                    <span class="radio-texto">Inadimplência superior a 30 (trinta) dias — Cláusula 6.4 / 8.1</span>
+                </label>
+                <label class="radio-opcao">
+                    <input type="checkbox" class="chk-motivo" id="f_motivo_infracao">
+                    <span class="radio-texto">Infração contratual gravíssima (violação de MDM, resistência à devolução, tentativa de alienação) — Cláusula 8.1</span>
+                </label>
+                <label class="radio-opcao">
+                    <input type="checkbox" class="chk-motivo" id="f_motivo_rescisao">
+                    <span class="radio-texto">Rescisão de comum acordo / a pedido do LOCATÁRIO</span>
+                </label>
+                <label class="radio-opcao">
+                    <input type="checkbox" class="chk-motivo" id="f_motivo_recolhimento">
+                    <span class="radio-texto">Recolhimento por decisão da LOCADORA (Cláusula 9)</span>
+                </label>
+                <label class="radio-opcao">
+                    <input type="checkbox" class="chk-motivo" id="f_motivo_falha">
+                    <span class="radio-texto">Falha/defeito com constatação de mau uso — Cláusula 14</span>
+                </label>
+                <label class="radio-opcao">
+                    <input type="checkbox" class="chk-motivo" id="f_motivo_outro">
+                    <span class="radio-texto">Outro motivo — especificar:</span>
+                </label>
+            </div>
+            <div class="form-grid" style="margin-top:16px;">
+                <div class="form-group full">
+                    <label for="f_motivoOutroTexto">Especificação do "outro motivo" <span class="opcional">(preencher apenas se marcou a opção acima)</span></label>
+                    <input type="text" id="f_motivoOutroTexto" placeholder="Descreva o outro motivo">
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 6 -->
+        <div class="step-panel" data-step="6">
+            <div class="step-titulo">Dados do Recebimento</div>
+            <div class="step-desc">Data, local e responsável pelo recebimento do aparelho. O checklist de conferência e o estado geral do aparelho saem em branco no documento, para preenchimento manual no ato da vistoria.</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="f_dataRecebimento">Data do recebimento</label>
+                    <input type="date" id="f_dataRecebimento" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_local">Local</label>
+                    <input type="text" id="f_local" required>
+                </div>
+                <div class="form-group">
+                    <label for="f_preposto">Recebido por (preposto da LOCADORA)</label>
+                    <input type="text" id="f_preposto" required>
+                </div>
+                <div class="form-group full">
+                    <label for="f_descricaoAvarias">Descrição das avarias / divergências constatadas <span class="opcional">(opcional)</span></label>
+                    <textarea id="f_descricaoAvarias" rows="3" placeholder="Deixe em branco se não houver avarias a descrever"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 7 -->
+        <div class="step-panel" data-step="7">
+            <div class="step-titulo">Valores Apurados (Encargos)</div>
+            <div class="step-desc">Preencha apenas os valores efetivamente aplicáveis a este recebimento. Campos deixados em branco não aparecem no documento gerado — nem a linha, nem o bloco, nem o subtotal correspondente.</div>
+
+            <div class="bloco-titulo">6.1 — Inadimplência</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="f_v_parcelasVencidas">Parcelas vencidas e não pagas (R$) <span class="opcional">(opcional)</span></label>
+                    <input type="number" id="f_v_parcelasVencidas" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="f_v_multaMoratoria">Multa moratória — 2% (R$) <span class="opcional">(opcional)</span></label>
+                    <input type="number" id="f_v_multaMoratoria" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="f_v_jurosMora">Juros de mora — 1% a.m. (R$) <span class="opcional">(opcional)</span></label>
+                    <input type="number" id="f_v_jurosMora" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="f_v_correcaoMonetaria">Correção monetária (R$) <span class="opcional">(opcional)</span></label>
+                    <input type="number" id="f_v_correcaoMonetaria" step="0.01" min="0">
+                </div>
+            </div>
+
+            <div class="bloco-titulo">6.2 — Infração Contratual Gravíssima</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="f_v_multaInfracao">Multa por infração gravíssima — 20% (R$) <span class="opcional">(opcional)</span></label>
+                    <input type="number" id="f_v_multaInfracao" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="f_v_vincendas50">50% das parcelas vincendas (R$) <span class="opcional">(opcional)</span></label>
+                    <input type="number" id="f_v_vincendas50" step="0.01" min="0">
+                </div>
+            </div>
+
+            <div class="bloco-titulo">6.3 — Perda, Furto, Roubo ou Dano Irreversível</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="f_v_valorMercado">Valor integral de mercado do aparelho (R$) <span class="opcional">(opcional)</span></label>
+                    <input type="number" id="f_v_valorMercado" step="0.01" min="0">
+                </div>
+            </div>
+
+            <div class="bloco-titulo">6.4 — Falha/Defeito com Mau Uso</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="f_v_custoReparo">Custo de reparo por mau uso (R$) <span class="opcional">(opcional)</span></label>
+                    <input type="number" id="f_v_custoReparo" step="0.01" min="0">
+                </div>
+            </div>
+
+            <div class="bloco-titulo">6.5 — Outros Encargos</div>
+            <div class="bloco-subdesc">Aplicável a qualquer motivo, quando houver.</div>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="f_outrosDescricao">Descrição do encargo <span class="opcional">(opcional)</span></label>
+                    <input type="text" id="f_outrosDescricao" value="Outros encargos administrativos/tarifários">
+                </div>
+                <div class="form-group">
+                    <label for="f_outrosBase">Base contratual <span class="opcional">(opcional)</span></label>
+                    <input type="text" id="f_outrosBase" placeholder="Ex: Cláusula X.X">
+                </div>
+                <div class="form-group">
+                    <label for="f_v_outros">Valor (R$) <span class="opcional">(opcional)</span></label>
+                    <input type="number" id="f_v_outros" step="0.01" min="0">
+                </div>
+            </div>
+
+            <div class="bloco-titulo">Forma de Pagamento do Saldo</div>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="f_formaPagamento">Forma e prazo de pagamento do saldo apurado <span class="opcional">(opcional)</span></label>
+                    <input type="text" id="f_formaPagamento" placeholder="Ex: à vista, no ato, via boleto em X dias">
+                </div>
+            </div>
+        </div>
+
+        <!-- ETAPA 8 -->
+        <div class="step-panel" data-step="8">
+            <div class="step-titulo">Situação Final</div>
+            <div class="step-desc">Marcação obrigatória — define a situação de quitação encerrada com este termo.</div>
+            <div class="radio-opcoes">
+                <label class="radio-opcao">
+                    <input type="radio" name="f_situacaoFinal" value="quitado" required>
+                    <span class="radio-texto"><strong>Débitos integralmente quitados neste ato</strong></span>
+                </label>
+                <label class="radio-opcao">
+                    <input type="radio" name="f_situacaoFinal" value="saldo" required>
+                    <span class="radio-texto"><strong>Saldo devedor remanescente</strong> conforme item 6 acima</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- ETAPA 9 -->
+        <div class="step-panel" data-step="9">
+            <div class="step-titulo">Revisão</div>
+            <div class="step-desc">Confira os dados antes de gerar o termo para impressão.</div>
+            <div class="resumo-box" id="resumoBox"></div>
+            <button type="button" class="btn-primario" style="width:100%" onclick="gerarTermo()">Gerar Termo para Impressão</button>
+        </div>
+
+        <div class="nav-botoes">
+            <button type="button" class="btn-secundario" id="btnVoltar" onclick="mudarEtapa(-1)" disabled>Voltar</button>
+            <button type="button" class="btn-primario" id="btnAvancar" onclick="mudarEtapa(1)">Avançar</button>
+        </div>
+    </form>
+
+    <div id="resultsSection" class="results-section">
+        <h2>Termo Gerado</h2>
+        <button class="btn-print" onclick="window.print()">🖨️ Imprimir Termo</button>
+        <div id="docContrato">
+
+<p class="titulo-principal">TERMO DE RECEBIMENTO DE APARELHO</p>
+<p class="subtitulo">(DEVOLUÇÃO / RECOLHIMENTO DE BEM OBJETO DE CONTRATO DE LOCAÇÃO OPERACIONAL COM OPÇÃO DE AQUISIÇÃO)</p>
+
+<p>Pelo presente instrumento, as partes abaixo qualificadas formalizam o RECEBIMENTO, pela LOCADORA, do aparelho celular objeto do Contrato de Locação Operacional de Aparelho Celular referenciado abaixo, nos termos e para os fins das Cláusulas 3, 8, 9, 10 e 14 do referido contrato.</p>
+
+<p class="secao-titulo">1. IDENTIFICAÇÃO DAS PARTES</p>
+<p class="campo-linha"><strong>LOCADORA:</strong> PLUGIN CELULARES ACESSÓRIOS E INFORMÁTICA LTDA, CNPJ nº 59.032.702/0001-08, com sede à Rua Coronel Martinho Ferreira do Amaral, nº 264, Centro, Nova Serrana-MG, CEP 35.520-122</p>
+<p class="campo-linha"><strong>LOCATÁRIO(A):</strong> <span data-f="nome"></span>, CPF nº <span data-f="cpf"></span>, RG nº <span data-f="rg"></span>, residente e domiciliado(a) à <span id="linhaEndereco"></span></p>
+<p class="campo-linha"><strong>Nº DO CONTRATO / RECIBO DE REFERÊNCIA (Mercado Phone):</strong> <span data-f="recibo"></span></p>
+<p class="campo-linha"><strong>DATA DA VENDA / INÍCIO DO CONTRATO:</strong> <span data-f="dataVendaBR"></span></p>
+
+<p class="secao-titulo">2. DADOS DO APARELHO</p>
+<p class="campo-linha"><strong>Modelo:</strong> <span data-f="modelo"></span></p>
+<p class="campo-linha"><strong>IMEI:</strong> <span data-f="imei"></span></p>
+<p class="campo-linha"><strong>Número de Série:</strong> <span data-f="serie"></span></p>
+<p class="campo-linha"><strong>Detalhes do aparelho:</strong> <span data-f="detalhes"></span></p>
+
+<p class="secao-titulo">3. MOTIVO DO RECEBIMENTO</p>
+<p class="checklist-intro">Assinalar a(s) hipótese(s) aplicável(is), conforme Cláusulas 6, 8 e 11 do contrato:</p>
+<div class="checkbox-lista" id="motivoLista"></div>
+
+<p class="secao-titulo">4. DATA, LOCAL E RESPONSÁVEL PELO RECEBIMENTO</p>
+<p class="campo-linha"><strong>Data do recebimento:</strong> <span data-f="dataRecebimentoBR"></span></p>
+<p class="campo-linha"><strong>Local:</strong> <span data-f="local"></span></p>
+<p class="campo-linha"><strong>Recebido por (preposto da LOCADORA):</strong> <span data-f="preposto"></span></p>
+
+<p class="secao-titulo">5. CHECKLIST DE CONFERÊNCIA DO APARELHO</p>
+<p class="checklist-intro">Vistoria realizada no ato da devolução/recolhimento, para fins de apuração de eventuais danos, avarias ou débitos, nos termos da Cláusula 10 do contrato.</p>
+<table class="checklist-table">
+<thead>
+<tr><th class="col-item">ITEM VERIFICADO</th><th class="col-conforme">CONFORME</th><th class="col-avaria">COM AVARIA / DIVERGÊNCIA</th><th class="col-obs">OBSERVAÇÕES</th></tr>
+</thead>
+<tbody id="checklistBody"></tbody>
+</table>
+
+<p class="campo-linha"><strong>Estado geral do aparelho no recebimento:</strong></p>
+<p class="estado-geral-linha">☐ Perfeito estado&nbsp;&nbsp;&nbsp;☐ Desgaste natural de uso&nbsp;&nbsp;&nbsp;☐ Com avarias (detalhar abaixo)&nbsp;&nbsp;&nbsp;☐ Inoperante</p>
+<p class="campo-linha"><strong>Descrição das avarias / divergências constatadas:</strong> <span data-f="descricaoAvarias"></span></p>
+
+<p class="secao-titulo">6. ENCARGOS, MULTAS E VALORES APURADOS</p>
+<p>Os encargos abaixo são segregados por motivo do recebimento (item 3) e devem ser preenchidos apenas nos blocos correspondentes ao(s) motivo(s) efetivamente assinalado(s), vedada a cumulação de penalidades que resulte em enriquecimento sem causa (Cláusula 6.5 do contrato).</p>
+<div id="blocoEncargos"></div>
+
+<p class="secao-titulo">7. SITUAÇÃO DO GERENCIAMENTO REMOTO (MDM)</p>
+<div class="checkbox-lista">
+<p class="item">☐ MDM removido/desvinculado no ato da devolução</p>
+<p class="item">☐ MDM permanece ativo até quitação integral dos valores apurados</p>
+</div>
+
+<p class="secao-titulo">8. DECLARAÇÕES FINAIS</p>
+<p class="declaracao">O LOCATÁRIO declara ter entregue o aparelho voluntariamente e estar ciente de que a posse exercida sobre o bem era precária e resolúvel (Cláusula 3), não lhe cabendo qualquer direito de retenção, indenização ou compensação em razão da devolução.</p>
+<p class="declaracao">A LOCADORA declara ter recebido o aparelho nas condições descritas no checklist acima, ressalvando o direito de cobrança dos valores e encargos apurados neste termo, sem prejuízo de outras cominações previstas no contrato original.</p>
+<p class="declaracao">Este termo não quita, por si só, eventuais débitos pendentes, que permanecem exigíveis nos termos do contrato original, salvo quitação expressa indicada no campo abaixo.</p>
+<p class="declaracao">As partes reconhecem que a relação contratual subjacente está sujeita, no que couber, ao Código de Defesa do Consumidor, não sendo este termo interpretado como renúncia a direitos de ordem pública ou como afastamento de eventual revisão judicial de valores apurados.</p>
+<div class="checkbox-lista">
+<p class="item" id="linhaQuitado">☐ Débitos integralmente quitados neste ato</p>
+<p class="item" id="linhaSaldo">☐ Saldo devedor remanescente conforme item 6 acima</p>
+</div>
+
+<p class="nota-final">E por estarem justas e contratadas, assinam o presente termo em 02 (duas) vias de igual teor, na presença de 02 (duas) testemunhas, condição indispensável para fazer valer, também em relação a este termo, a natureza de título executivo extrajudicial prevista na Cláusula 16 do contrato original.</p>
+
+<p class="data-local">NOVA SERRANA-MG, <span data-f="dataRecebimentoBR2"></span>.</p>
+
+<div class="bloco-assinaturas">
+<div class="assinatura">LOCATÁRIO(A)</div>
+<div class="assinatura">PLUGIN CELULARES ACESSÓRIOS E INFORMÁTICA LTDA<span class="obs-preposto">(Preposto responsável pelo recebimento)</span></div>
+<div class="assinatura">TESTEMUNHA 1
+<div class="dado-testemunha">Nome: _________________________________________________</div>
+<div class="dado-testemunha">CPF: _________________________________________________</div>
+</div>
+<div class="assinatura">TESTEMUNHA 2
+<div class="dado-testemunha">Nome: _________________________________________________</div>
+<div class="dado-testemunha">CPF: _________________________________________________</div>
+</div>
+</div>
+
+        </div>
+        <button class="btn-secundario" style="width:100%; margin-top:15px;" onclick="location.reload()">Preencher Novo Termo</button>
+    </div>
+</div>
+
+<script>
+    /* ===================== NAVEGAÇÃO DO FLUXO ===================== */
+    let etapaAtual = 1;
+    const TOTAL_ETAPAS = 9;
+
+    function validarEtapaAtual() {
+        const painel = document.querySelector('.step-panel[data-step="' + etapaAtual + '"]');
+        const campos = painel.querySelectorAll('input[required]');
+        let ok = true;
+        let primeiro = null;
+        campos.forEach(function (c) {
+            if (c.type === 'radio') return;
+            c.classList.remove('campo-obrigatorio-erro');
+            if (!c.value.trim()) {
+                c.classList.add('campo-obrigatorio-erro');
+                ok = false;
+                if (!primeiro) primeiro = c;
+            }
+        });
+        if (etapaAtual === 1) {
+            const cpf = document.getElementById('f_cpf');
+            const nums = cpf.value.replace(/\D/g, "");
+            if (nums.length === 11 && !validarCPF(nums)) {
+                cpf.classList.add('campo-obrigatorio-erro');
+                ok = false;
+                if (!primeiro) primeiro = cpf;
+            }
+        }
+        if (etapaAtual === 5) {
+            const algumMotivo = Array.prototype.some.call(painel.querySelectorAll('.chk-motivo'), function (c) { return c.checked; });
+            if (!algumMotivo) {
+                ok = false;
+                alert('Selecione ao menos um motivo do recebimento antes de avançar.');
+            } else {
+                const outroMarcado = document.getElementById('f_motivo_outro').checked;
+                const outroTexto = document.getElementById('f_motivoOutroTexto').value.trim();
+                if (outroMarcado && !outroTexto) {
+                    ok = false;
+                    alert('Você marcou "Outro motivo" — especifique o motivo no campo abaixo.');
+                }
+            }
+        }
+        if (etapaAtual === 8) {
+            const marcado = painel.querySelector('input[name="f_situacaoFinal"]:checked');
+            if (!marcado) {
+                ok = false;
+                alert('Selecione a situação final (débitos quitados ou saldo devedor) antes de avançar.');
+            }
+        }
+        if (!ok && etapaAtual !== 5 && etapaAtual !== 8) {
+            alert('Preencha corretamente todos os campos obrigatórios desta etapa antes de avançar.');
+            if (primeiro) primeiro.focus();
+        }
+        return ok;
+    }
+
+    function mudarEtapa(direcao) {
+        if (direcao > 0 && !validarEtapaAtual()) return;
+
+        if (etapaAtual === 9 && direcao > 0) montarResumo();
+
+        const novaEtapa = etapaAtual + direcao;
+        if (novaEtapa < 1 || novaEtapa > TOTAL_ETAPAS) return;
+
+        document.querySelector('.step-panel[data-step="' + etapaAtual + '"]').classList.remove('ativo');
+        etapaAtual = novaEtapa;
+        document.querySelector('.step-panel[data-step="' + etapaAtual + '"]').classList.add('ativo');
+
+        if (etapaAtual === 9) montarResumo();
+
+        document.querySelectorAll('.progress-step').forEach(function (el) {
+            const n = parseInt(el.getAttribute('data-step'), 10);
+            el.classList.remove('ativo', 'concluido');
+            if (n === etapaAtual) el.classList.add('ativo');
+            else if (n < etapaAtual) el.classList.add('concluido');
+        });
+
+        document.getElementById('btnVoltar').disabled = (etapaAtual === 1);
+        document.getElementById('btnAvancar').style.display = (etapaAtual === TOTAL_ETAPAS) ? 'none' : 'inline-block';
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* Motivos do recebimento (item 3) — usado na etapa 5, no resumo e na geração do documento */
+    const MOTIVOS = [
+        { id: 'f_motivo_termino', texto: 'Término natural do prazo contratual, sem aquisição pelo LOCATÁRIO' },
+        { id: 'f_motivo_inadimplencia', texto: 'Inadimplência superior a 30 (trinta) dias — Cláusula 6.4 / 8.1' },
+        { id: 'f_motivo_infracao', texto: 'Infração contratual gravíssima (violação de MDM, resistência à devolução, tentativa de alienação) — Cláusula 8.1' },
+        { id: 'f_motivo_rescisao', texto: 'Rescisão de comum acordo / a pedido do LOCATÁRIO' },
+        { id: 'f_motivo_recolhimento', texto: 'Recolhimento por decisão da LOCADORA (Cláusula 9)' },
+        { id: 'f_motivo_falha', texto: 'Falha/defeito com constatação de mau uso — Cláusula 14' }
+    ];
+
+    function motivosSelecionadosTexto() {
+        const selecionados = MOTIVOS.filter(function (m) { return document.getElementById(m.id).checked; }).map(function (m) { return m.texto; });
+        if (document.getElementById('f_motivo_outro').checked) {
+            const txt = document.getElementById('f_motivoOutroTexto').value.trim();
+            selecionados.push('Outro motivo' + (txt ? ': ' + txt : ''));
+        }
+        return selecionados;
+    }
+
+    function montarResumo() {
+        const v = coletarValores();
+        const box = document.getElementById('resumoBox');
+        const situacaoTexto = v.situacaoFinal === 'quitado' ? 'Débitos integralmente quitados' : (v.situacaoFinal === 'saldo' ? 'Saldo devedor remanescente' : '(não selecionado)');
+        const motivos = motivosSelecionadosTexto();
+        const motivosTexto = motivos.length ? motivos.join('; ') : '(nenhum selecionado)';
+        box.innerHTML =
+            '<div class="linha"><strong>Locatário:</strong> ' + v.nome + ' — CPF ' + v.cpf + ' — RG ' + v.rg + '</div>' +
+            '<div class="linha"><strong>Referência:</strong> Contrato/recibo ' + v.recibo + ' — venda em ' + v.dataVendaBR + '</div>' +
+            '<div class="linha"><strong>Aparelho:</strong> ' + v.modelo + ' — IMEI ' + v.imei + ' — Série ' + v.serie + '</div>' +
+            '<div class="linha"><strong>Motivo(s) do recebimento:</strong> ' + motivosTexto + '</div>' +
+            '<div class="linha"><strong>Recebimento:</strong> ' + v.dataRecebimentoBR + ' em ' + v.local + ' — por ' + v.preposto + '</div>' +
+            '<div class="linha"><strong>Valor total apurado:</strong> ' + (v.grandTotal > 0 ? ('R$ ' + formatarMoeda(v.grandTotal)) : 'nenhum valor preenchido') + '</div>' +
+            '<div><strong>Situação final:</strong> ' + situacaoTexto + '</div>';
+    }
+
+    /* ===================== MÁSCARAS ===================== */
+    function mascaraCPF(input) {
+        let v = input.value.replace(/\D/g, "").substring(0, 11);
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        input.value = v;
+
+        const hint = document.getElementById('hintCpf');
+        const nums = v.replace(/\D/g, "");
+        input.classList.remove('cpf-valido', 'cpf-invalido', 'campo-obrigatorio-erro');
+        if (nums.length === 11) {
+            const ok = validarCPF(nums);
+            input.classList.add(ok ? 'cpf-valido' : 'cpf-invalido');
+            hint.textContent = ok ? 'CPF válido' : 'CPF inválido (dígito verificador não confere)';
+            hint.className = 'doc-hint ' + (ok ? 'ok' : 'erro');
+        } else {
+            hint.textContent = '';
+        }
+    }
+
+    function mascaraCEP(input) {
+        let v = input.value.replace(/\D/g, "").substring(0, 8);
+        v = v.replace(/(\d{5})(\d)/, "$1-$2");
+        input.value = v;
+    }
+
+    function validarCPF(cpf) {
+        if (/^(\d)\1{10}$/.test(cpf)) return false;
+        let soma = 0;
+        for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
+        let resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.charAt(9))) return false;
+
+        soma = 0;
+        for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
+        resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.charAt(10))) return false;
+
+        return true;
+    }
+
+    function formatarDataBR(isoStr) {
+        if (!isoStr) return '';
+        const partes = isoStr.split('-');
+        return partes[2] + '/' + partes[1] + '/' + partes[0];
+    }
+
+    function formatarMoeda(n) {
+        return n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    /* Lê um input numérico opcional; retorna null se vazio/zero/inválido */
+    function lerValorOpcional(id) {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        const raw = el.value;
+        if (raw === null || raw === undefined || raw.toString().trim() === '') return null;
+        const n = parseFloat(raw);
+        if (isNaN(n) || n <= 0) return null;
+        return n;
+    }
+
+    /* ===================== CHECKLIST DE CONFERÊNCIA (item 5 — impressão apenas) ===================== */
+    const ITENS_CHECKLIST = [
+        'Tela (trincas, riscos, manchas, pixels queimados)',
+        'Carcaça / estrutura (amassados, rachaduras, oxidação)',
+        'Câmeras (frontal e traseira) — funcionamento e lente',
+        'Botões físicos (liga/desliga, volume, home)',
+        'Conector de carga / porta USB',
+        'Alto-falante e microfone',
+        'Bateria (inchaço, autonomia aparente)',
+        'Biometria / Face ID / leitor digital',
+        'Sinal de rede, Wi-Fi e Bluetooth',
+        'Presença de chip(s) e cartão de memória',
+        'Acessórios entregues (carregador, cabo, capa, caixa, fone)',
+        'Remoção/liberação do MDM (gerenciamento remoto)',
+        'Remoção de conta em nuvem vinculada ao LOCATÁRIO',
+        'Restauração de fábrica / apagamento de dados pessoais',
+        'IMEI conferido e compatível com o contrato original'
+    ];
+
+    function montarChecklist() {
+        const corpo = document.getElementById('checklistBody');
+        let html = '';
+        ITENS_CHECKLIST.forEach(function (item) {
+            html += '<tr><td class="col-item">' + item + '</td><td class="col-conforme centro">☐</td><td class="col-avaria centro">☐</td><td class="col-obs">&nbsp;</td></tr>';
+        });
+        corpo.innerHTML = html;
+    }
+
+    /* ===================== MOTIVO DO RECEBIMENTO (item 3 — preenchido no site) ===================== */
+    function montarMotivoLista() {
+        let html = '';
+        MOTIVOS.forEach(function (m) {
+            const marcado = document.getElementById(m.id).checked;
+            html += '<p class="item">' + (marcado ? '☒' : '☐') + ' ' + m.texto + '</p>';
+        });
+        const outroMarcado = document.getElementById('f_motivo_outro').checked;
+        const outroTexto = document.getElementById('f_motivoOutroTexto').value.trim();
+        if (outroMarcado) {
+            html += '<p class="item">☒ Outro motivo: ' + (outroTexto || '_________________________________________________') + '</p>';
+        } else {
+            html += '<p class="item">☐ Outro motivo: _________________________________________________</p>';
+        }
+        document.getElementById('motivoLista').innerHTML = html;
+    }
+
+    /* ===================== BLOCOS DE VALORES (item 6) ===================== */
+    function montarBlocoEncargos() {
+        const blocos = [
+            {
+                titulo: '6.1 — Aplicável somente se o motivo assinalado for INADIMPLÊNCIA (item 3)',
+                linhas: [
+                    { desc: 'Parcelas vencidas e não pagas', base: 'Cláusula 6.3', id: 'f_v_parcelasVencidas' },
+                    { desc: 'Multa moratória (2%) sobre parcelas vencidas', base: 'Cláusula 6.3', id: 'f_v_multaMoratoria' },
+                    { desc: 'Juros de mora (1% a.m., pro rata die)', base: 'Cláusula 6.3', id: 'f_v_jurosMora' },
+                    { desc: 'Correção monetária', base: 'Cláusula 6.3', id: 'f_v_correcaoMonetaria' }
+                ],
+                subtotalLabel: 'Subtotal 6.1'
+            },
+            {
+                titulo: '6.2 — Aplicável somente se o motivo assinalado for INFRAÇÃO CONTRATUAL GRAVÍSSIMA (item 3)',
+                linhas: [
+                    { desc: 'Multa por infração contratual gravíssima (20% do valor total do contrato)', base: 'Cláusula 8.2, a', id: 'f_v_multaInfracao' },
+                    { desc: '50% das parcelas vincendas', base: 'Cláusula 8.2, b', id: 'f_v_vincendas50' }
+                ],
+                subtotalLabel: 'Subtotal 6.2',
+                obs: 'Observação: este bloco não deve ser cumulado com o valor de mercado do aparelho (item 6.3) quando o aparelho tiver sido efetivamente devolvido em condições de uso — a cobrança conjunta de multa/vincendas e valor integral do bem pode caracterizar bis in idem.'
+            },
+            {
+                titulo: '6.3 — Aplicável somente se o motivo assinalado for PERDA, FURTO, ROUBO OU DANO IRREVERSÍVEL (item 3)',
+                linhas: [
+                    { desc: 'Valor integral de mercado do aparelho', base: 'Cláusula 10.2', id: 'f_v_valorMercado' }
+                ],
+                subtotalLabel: 'Subtotal 6.3'
+            },
+            {
+                titulo: '6.4 — Aplicável somente se o motivo assinalado for FALHA/DEFEITO COM CONSTATAÇÃO DE MAU USO (item 3)',
+                linhas: [
+                    { desc: 'Custo de reparo por avaria decorrente de mau uso', base: 'Cláusula 14.5', id: 'f_v_custoReparo' }
+                ],
+                subtotalLabel: 'Subtotal 6.4'
+            }
+        ];
+
+        let html = '';
+        let grandTotal = 0;
+        let algumBlocoExibido = false;
+
+        blocos.forEach(function (bloco) {
+            const linhasPreenchidas = bloco.linhas
+                .map(function (l) { return { desc: l.desc, base: l.base, valor: lerValorOpcional(l.id) }; })
+                .filter(function (l) { return l.valor !== null; });
+
+            if (linhasPreenchidas.length === 0) return;
+
+            algumBlocoExibido = true;
+            let subtotal = 0;
+            html += '<p class="bloco-encargos-titulo">' + bloco.titulo + '</p>';
+            html += '<table><thead><tr><th class="col-desc">DESCRIÇÃO DO ENCARGO</th><th class="col-base">BASE CONTRATUAL</th><th class="col-valor">VALOR (R$)</th></tr></thead><tbody>';
+            linhasPreenchidas.forEach(function (l) {
+                subtotal += l.valor;
+                html += '<tr><td class="col-desc">' + l.desc + '</td><td class="col-base">' + l.base + '</td><td class="col-valor">' + formatarMoeda(l.valor) + '</td></tr>';
+            });
+            html += '</tbody></table>';
+            html += '<p class="subtotal-linha">' + bloco.subtotalLabel + ': R$ ' + formatarMoeda(subtotal) + '</p>';
+            if (bloco.obs) html += '<p class="obs-italica">' + bloco.obs + '</p>';
+
+            grandTotal += subtotal;
+        });
+
+        /* 6.5 — Outros encargos (descrição e base editáveis) */
+        const valorOutros = lerValorOpcional('f_v_outros');
+        if (valorOutros !== null) {
+            algumBlocoExibido = true;
+            const descOutros = (document.getElementById('f_outrosDescricao').value.trim() || 'Outros encargos administrativos/tarifários');
+            const baseOutros = (document.getElementById('f_outrosBase').value.trim() || '—');
+            html += '<p class="bloco-encargos-titulo">6.5 — Outros encargos (aplicável a qualquer motivo, quando houver)</p>';
+            html += '<table><thead><tr><th class="col-desc">DESCRIÇÃO DO ENCARGO</th><th class="col-base">BASE CONTRATUAL</th><th class="col-valor">VALOR (R$)</th></tr></thead><tbody>';
+            html += '<tr><td class="col-desc">' + descOutros + '</td><td class="col-base">' + baseOutros + '</td><td class="col-valor">' + formatarMoeda(valorOutros) + '</td></tr>';
+            html += '</tbody></table>';
+            html += '<p class="subtotal-linha">Subtotal 6.5: R$ ' + formatarMoeda(valorOutros) + '</p>';
+            grandTotal += valorOutros;
+        }
+
+        if (!algumBlocoExibido) {
+            html += '<p>Não foram apurados encargos, multas ou valores neste recebimento.</p>';
+        } else {
+            html += '<p class="valor-total">VALOR TOTAL APURADO (soma apenas dos blocos aplicáveis ao motivo assinalado): R$ ' + formatarMoeda(grandTotal) + '</p>';
+            const formaPagamento = document.getElementById('f_formaPagamento').value.trim();
+            if (formaPagamento) {
+                html += '<p class="campo-linha">Forma e prazo de pagamento do saldo apurado: ' + formaPagamento + '</p>';
+            }
+        }
+
+        document.getElementById('blocoEncargos').innerHTML = html;
+        return grandTotal;
+    }
+
+    /* ===================== COLETA DE DADOS ===================== */
+    function coletarValores() {
+        const g = function (id) { return document.getElementById(id).value.trim(); };
+        const radio = document.querySelector('input[name="f_situacaoFinal"]:checked');
+        return {
+            nome: g('f_nome'), cpf: g('f_cpf'), rg: g('f_rg'),
+            rua: g('f_rua'), numero: g('f_numero'), bairro: g('f_bairro'),
+            complemento: g('f_complemento'), cidade: g('f_cidade'), cep: g('f_cep'),
+            recibo: g('f_recibo'), dataVendaBR: formatarDataBR(g('f_dataVenda')),
+            modelo: g('f_modelo'), imei: g('f_imei'), serie: g('f_serie'), detalhes: g('f_detalhes'),
+            dataRecebimentoBR: formatarDataBR(g('f_dataRecebimento')),
+            local: g('f_local'), preposto: g('f_preposto'),
+            descricaoAvarias: g('f_descricaoAvarias'),
+            situacaoFinal: radio ? radio.value : null,
+            grandTotal: 0
+        };
+    }
+
+    /* ===================== GERAÇÃO DO TERMO ===================== */
+    function gerarTermo() {
+        const v = coletarValores();
+
+        document.querySelectorAll('[data-f]').forEach(function (el) {
+            const chave = el.getAttribute('data-f');
+            if (chave === 'dataRecebimentoBR2') { el.textContent = v.dataRecebimentoBR; return; }
+            el.textContent = (v[chave] !== undefined) ? v[chave] : '';
+        });
+
+        /* Endereço — monta a linha omitindo o complemento quando vazio */
+        let endereco = v.rua + ', ' + v.numero + ', ' + v.bairro;
+        if (v.complemento) endereco += ', ' + v.complemento;
+        endereco += ', ' + v.cidade + ' - MG, ' + v.cep;
+        document.getElementById('linhaEndereco').textContent = endereco;
+
+        montarChecklist();
+        montarMotivoLista();
+        const grandTotal = montarBlocoEncargos();
+
+        /* Marcação da situação final — única marcação interativa, conforme solicitado */
+        const linhaQuitado = document.getElementById('linhaQuitado');
+        const linhaSaldo = document.getElementById('linhaSaldo');
+        linhaQuitado.textContent = (v.situacaoFinal === 'quitado' ? '☒' : '☐') + ' Débitos integralmente quitados neste ato';
+        linhaSaldo.textContent = (v.situacaoFinal === 'saldo' ? '☒' : '☐') + ' Saldo devedor remanescente conforme item 6 acima';
+
+        document.getElementById('wizardForm').style.display = 'none';
+        const resultsSection = document.getElementById('resultsSection');
+        resultsSection.style.display = 'block';
+        resultsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

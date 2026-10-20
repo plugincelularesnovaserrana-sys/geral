@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renegociação Total / Parcial - Central de Ferramentas</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0B0C10; /* Fundo escuro premium idêntico ao INDEX */
+            color: #FFFFFF;
+            display: block;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #162447, #0f172a);
+            padding: 30px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo-back-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 20px;
+        }
+
+        .logo-back-container img {
+            max-width: 250px;
+            height: auto;
+        }
+
+        .btn-back {
+            padding: 10px 20px;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #1f4068, #162447);
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-back:hover {
+            background: linear-gradient(135deg, #0056b3, #1f4068);
+            border-color: #45F3FF;
+            box-shadow: 0 0 10px rgba(69, 243, 255, 0.2);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            margin: 0;
+            color: #45F3FF; /* Cor de destaque azul neon */
+            font-size: 24px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        header .subtitle {
+            margin: 6px 0 0 0;
+            color: #94a3b8;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .section-title {
+            grid-column: 1 / -1;
+            font-size: 14px;
+            color: #45F3FF;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+            margin-top: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+            background: rgba(15, 23, 42, 0.4);
+            padding: 25px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            color: #cbd5e1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input {
+            padding: 12px;
+            background-color: #0B0C10;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            font-size: 14px;
+            color: #FFFFFF;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #45F3FF;
+            box-shadow: 0 0 8px rgba(69, 243, 255, 0.2);
+        }
+
+        .cpf-valido {
+            border: 1px solid #16a34a !important;
+            box-shadow: 0 0 8px rgba(22, 163, 74, 0.3);
+        }
+
+        .cpf-invalido {
+            border: 1px solid #dc2626 !important;
+            box-shadow: 0 0 8px rgba(220, 38, 38, 0.3);
+        }
+
+        .campo-obrigatorio-erro {
+            border: 1px solid #dc2626 !important;
+            background-color: rgba(220, 38, 38, 0.05);
+        }
+
+        button[type="submit"] {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #1f4068, #162447);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button[type="submit"]:hover {
+            background: linear-gradient(135deg, #0056b3, #1f4068);
+            border-color: #45F3FF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(69, 243, 255, 0.2);
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #162447, #0f172a);
+            color: white;
+            border: 1px solid #45F3FF;
+            padding: 15px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            margin-bottom: 25px;
+            width: 100%;
+            display: block;
+        }
+
+        .btn-print:hover {
+            background: linear-gradient(135deg, #1f4068, #162447);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(69, 243, 255, 0.3);
+        }
+
+        .results-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results-section h2 {
+            color: #45F3FF;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .proposta-impressao {
+            background: rgba(15, 23, 42, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .cabecalho-topo {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 2px solid #162447;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .cabecalho-topo h2 {
+            margin: 0;
+            font-size: 16px;
+            color: #45F3FF;
+            text-transform: uppercase;
+        }
+
+        .data-emissao {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .dados-box {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+            background: rgba(31, 64, 104, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+        }
+
+        .dados-box > div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dado-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .resumo-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            background: rgba(69, 243, 255, 0.05);
+            border: 1px solid rgba(69, 243, 255, 0.15);
+            border-radius: 4px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+        }
+
+        .resumo-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .resumo-item span:last-child {
+            font-size: 14px;
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+
+        .titulo-secao {
+            font-size: 13px;
+            color: #45F3FF;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 4px;
+            margin: 15px 0 10px 0;
+            letter-spacing: 0.5px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+        }
+
+        th {
+            background-color: #162447;
+            color: #45F3FF;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        tr:hover {
+            background-color: rgba(31, 64, 104, 0.15);
+        }
+
+        .extenso {
+            font-style: italic;
+            color: #94a3b8;
+            font-size: 12px;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .total-container {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: right;
+            font-size: 16px;
+            font-weight: bold;
+            color: #45F3FF;
+        }
+
+        .assinatura-impressao {
+            display: none;
+        }
+
+        .linha-assinatura {
+            border-top: 1px solid #111827;
+            width: 240px;
+            margin: 0 auto 4px auto;
+        }
+
+        /* CONFIGURAÇÕES ESPECÍFICAS PARA IMPRESSÃO - LAYOUT PROFISSIONAL EM A4 */
+        @media print {
+            @page {
+                size: A4;
+                margin: 12mm 14mm;
+            }
+
+            html, body {
+                background-color: #fff;
+                padding: 0;
+                color: #111827;
+                font-size: 11px;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+                background: #fff;
+                border: none;
+            }
+
+            header, #renegociacaoForm, .btn-print, .results-section h2, .logo-back-container {
+                display: none !important;
+            }
+
+            .results-section {
+                display: block !important;
+                margin-top: 0;
+            }
+
+            .proposta-impressao {
+                border: none;
+                padding: 0;
+                background: transparent;
+            }
+
+            .cabecalho-topo h2 {
+                font-size: 15px;
+                color: #162447;
+            }
+
+            .data-emissao {
+                font-size: 10px;
+                color: #64748b;
+            }
+
+            .dados-box {
+                padding: 6px 12px;
+                margin-bottom: 10px;
+                background-color: #f8f9fa;
+                border: 1px solid #ddd;
+                color: #111827;
+            }
+
+            .dado-label {
+                font-size: 8.5px;
+                color: #64748b;
+            }
+
+            .resumo-box {
+                padding: 6px 12px;
+                margin-bottom: 10px;
+                background-color: #eaf2fb;
+                border: 1px solid #bcd6f0;
+                color: #111827;
+            }
+
+            .resumo-item span:last-child {
+                font-size: 11.5px;
+                color: #111827;
+            }
+
+            .titulo-secao {
+                font-size: 12px;
+                color: #162447;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .table-container {
+                border: none;
+            }
+
+            table {
+                page-break-inside: auto;
+                font-size: 9.5px;
+                margin-top: 8px;
+            }
+
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+
+            th, td {
+                padding: 3px 6px;
+                line-height: 1.25;
+                border-bottom: 1px solid #ddd;
+            }
+
+            th {
+                font-size: 9px;
+                background-color: #555 !important;
+                color: #fff !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            tr:nth-child(even) {
+                background-color: #f2f2f2 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            tr:hover {
+                background-color: transparent;
+            }
+
+            .extenso {
+                font-size: 8.5px;
+                color: #555;
+            }
+
+            .total-container {
+                margin-top: 10px;
+                padding-top: 6px;
+                font-size: 13px;
+                color: #111827;
+                border-top: 2px solid #162447;
+            }
+
+            .assinatura-impressao {
+                display: block !important;
+                margin-top: 26px;
+                text-align: center;
+                page-break-inside: avoid;
+            }
+
+            .assinatura-impressao p {
+                margin: 0;
+                font-size: 9.5px;
+                color: #475569;
+            }
+        }
+
+        @media (max-width: 600px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            th {
+                display: none;
+            }
+            tr {
+                margin-bottom: 15px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                padding: 10px;
+                background: rgba(15, 23, 42, 0.2);
+            }
+            td {
+                border-bottom: none;
+                padding: 6px 0;
+            }
+            td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                display: inline-block;
+                width: 120px;
+                color: #45F3FF;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-back-container">
+        <img src="assets/LOGO.png" alt="Plugin Celulares Acessórios  e Informática Ltda">
+        <a href="../index.html" class="btn-back">⬅ Voltar ao Painel</a>
+    </div>
+
+    <header>
+        <h1>Renegociação Total / Parcial</h1>
+        <p class="subtitle">Redivisão do valor total ou parcial da dívida com aplicação de taxas</p>
+    </header>
+
+    <form id="renegociacaoForm" onsubmit="calcularRenegociacao(event)">
+        <div class="form-grid">
+            <div class="section-title">Dados do Cliente</div>
+            
+            <div class="form-group" style="grid-column: span 2;">
+                <label for="nomeCliente">Nome Completo do Cliente</label>
+                <input type="text" id="nomeCliente" placeholder="Ex: JOÃO DA SILVA" style="text-transform: uppercase;" required oninput="this.value = this.value.toUpperCase()">
+            </div>
+
+            <div class="form-group">
+                <label for="cpfCliente">CPF do Cliente</label>
+                <input type="text" id="cpfCliente" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" required oninput="mascaraCPF(this)">
+            </div>
+
+            <div class="section-title">Informações Financeiras</div>
+
+            <div class="form-group">
+                <label for="valorDivida">Valor Total da Dívida (R$)</label>
+                <input type="number" id="valorDivida" step="0.01" required min="0" oninput="calcularValorPorPorcentagem()">
+            </div>
+
+            <div class="form-group">
+                <label for="porcentagemEntrada">% de Entrada sugerido</label>
+                <input type="number" id="porcentagemEntrada" step="0.01" min="0" max="100" value="20" oninput="calcularValorPorPorcentagem()">
+            </div>
+
+            <div class="form-group">
+                <label for="valorEntrada">Valor de Entrada Informado (R$)</label>
+                <input type="number" id="valorEntrada" step="0.01" required min="0" oninput="calcularPorcentagemPorValor()">
+            </div>
+
+            <div class="form-group">
+                <label for="dataPrimeiraParcela">Data da 1ª Parcela</label>
+                <input type="date" id="dataPrimeiraParcela" required>
+            </div>
+
+            <div class="form-group">
+                <label for="qtdParcelas">Quantidade de Parcelas (Máx. 48x)</label>
+                <input type="number" id="qtdParcelas" required min="1" max="48">
+            </div>
+
+            <div class="form-group">
+                <label for="taxaJuros">Taxa de Juros ao Mês (%)</label>
+                <input type="number" id="taxaJuros" step="0.1" value="5" min="3.5">
+            </div>
+
+            <div class="form-group">
+                <label for="iof">IOF (%)</label>
+                <input type="number" id="iof" step="0.01" value="0.38" min="0">
+            </div>
+
+            <div class="form-group">
+                <label for="taxaBoleto">Taxa por Boleto (R$)</label>
+                <input type="number" id="taxaBoleto" step="0.01" value="1.00" min="0">
+            </div>
+
+            <button type="submit">Gerar Proposta de Renegociação</button>
+        </div>
+    </form>
+
+    <div id="resultsSection" class="results-section">
+        <h2>Resultado da Proposta</h2>
+
+        <button class="btn-print" onclick="imprimirProposta()">🖨️ Imprimir Proposta para o Cliente</button>
+
+        <div class="proposta-impressao">
+            <div class="cabecalho-topo">
+                <h2>Proposta de Renegociação de Dívida</h2>
+                <span class="data-emissao">Emitido em <span id="printData">--/--/----</span></span>
+            </div>
+
+            <div class="dados-box">
+                <div>
+                    <span class="dado-label">Cliente</span>
+                    <span id="reciboNome">-</span>
+                </div>
+                <div>
+                    <span class="dado-label">CPF</span>
+                    <span id="reciboCPF">-</span>
+                </div>
+            </div>
+
+            <div class="resumo-box">
+                <div class="resumo-item">
+                    <span class="dado-label">Dívida Inicial</span>
+                    <span id="resumoDividaInicial">-</span>
+                </div>
+                <div class="resumo-item">
+                    <span class="dado-label">Entrada</span>
+                    <span id="resumoEntradaTxt">-</span>
+                </div>
+                <div class="resumo-item">
+                    <span class="dado-label">Parcelamento</span>
+                    <span id="resumoParcelamentoTxt">-</span>
+                </div>
+                <div class="resumo-item">
+                    <span class="dado-label">Taxas Aplicadas</span>
+                    <span id="resumoTaxasTxt">-</span>
+                </div>
+            </div>
+
+            <h3 class="titulo-secao">Cronograma de Pagamento</h3>
+
+            <div class="table-container">
+                <table id="tabelaParcelas">
+                    <thead>
+                        <tr>
+                            <th>Nº Parcela</th>
+                            <th>Vencimento</th>
+                            <th>Valor do Boleto / Extenso</th>
+                        </tr>
+                    </thead>
+                    <tbody id="corpoTabela"></tbody>
+                </table>
+            </div>
+
+            <div class="total-container" id="totalGeralProposta">Custo Total do Acordo: R$ 0,00</div>
+
+            <div class="assinatura-impressao">
+                <div class="linha-assinatura"></div>
+                <p>Assinatura do Cliente</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.onload = function() {
+        const hoje = new Date();
+        hoje.setMonth(hoje.getMonth() + 1);
+        document.getElementById('dataPrimeiraParcela').value = hoje.toISOString().split('T')[0];
+        definirDataAtual();
+    }
+
+    function definirDataAtual() {
+        const hoje = new Date();
+        const dd = String(hoje.getDate()).padStart(2, '0');
+        const mm = String(hoje.getMonth() + 1).padStart(2, '0');
+        const yyyy = hoje.getFullYear();
+        document.getElementById('printData').innerText = `${dd}/${mm}/${yyyy}`;
+    }
+
+    function imprimirProposta() {
+        if (!validarCamposObrigatorios()) return;
+        definirDataAtual();
+        window.print();
+    }
+
+    function mascaraCPF(input) {
+        let v = input.value.replace(/\D/g, "");
+        if (v.length > 11) v = v.substring(0, 11);
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d)/, "$1.$2");
+        v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        input.value = v;
+
+        const apenasNumeros = v.replace(/\D/g, "");
+        input.classList.remove('cpf-valido', 'cpf-invalido', 'campo-obrigatorio-erro');
+        if (apenasNumeros.length === 11) {
+            input.classList.add(validarCPF(apenasNumeros) ? 'cpf-valido' : 'cpf-invalido');
+        }
+    }
+
+    function validarCPF(cpf) {
+        if (/^(\d)\1{10}$/.test(cpf)) return false;
+
+        let soma = 0;
+        for (let i = 0; i < 9; i++) soma += parseInt(cpf.charAt(i)) * (10 - i);
+        let resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.charAt(9))) return false;
+
+        soma = 0;
+        for (let i = 0; i < 10; i++) soma += parseInt(cpf.charAt(i)) * (11 - i);
+        resto = (soma * 10) % 11;
+        if (resto === 10 || resto === 11) resto = 0;
+        if (resto !== parseInt(cpf.charAt(10))) return false;
+
+        return true;
+    }
+
+    function validarCamposObrigatorios() {
+        const nomeInput = document.getElementById('nomeCliente');
+        const cpfInput = document.getElementById('cpfCliente');
+        const nome = nomeInput.value.trim();
+        const cpfNumeros = cpfInput.value.replace(/\D/g, "");
+
+        nomeInput.classList.remove('campo-obrigatorio-erro');
+        cpfInput.classList.remove('campo-obrigatorio-erro', 'cpf-invalido', 'cpf-valido');
+
+        let mensagens = [];
+
+        if (!nome) {
+            nomeInput.classList.add('campo-obrigatorio-erro');
+            mensagens.push('o Nome Completo do Cliente');
+        }
+
+        if (cpfNumeros.length !== 11 || !validarCPF(cpfNumeros)) {
+            cpfInput.classList.add(cpfNumeros.length === 11 ? 'cpf-invalido' : 'campo-obrigatorio-erro');
+            mensagens.push('um CPF válido');
+        } else {
+            cpfInput.classList.add('cpf-valido');
+        }
+
+        if (mensagens.length > 0) {
+            alert(`Preencha ${mensagens.join(' e ')} antes de gerar a proposta.`);
+            return false;
+        }
+
+        return true;
+    }
+
+    function calcularValorPorPorcentagem() {
+        const divida = parseFloat(document.getElementById('valorDivida').value) || 0;
+        const pct = parseFloat(document.getElementById('porcentagemEntrada').value) || 0;
+        if(divida > 0) {
+            document.getElementById('valorEntrada').value = ((divida * pct) / 100).toFixed(2);
+        } else {
+            document.getElementById('valorEntrada').value = "";
+        }
+    }
+
+    function calcularPorcentagemPorValor() {
+        const divida = parseFloat(document.getElementById('valorDivida').value) || 0;
+        const valorEntrada = parseFloat(document.getElementById('valorEntrada').value) || 0;
+        if(divida > 0) {
+            document.getElementById('porcentagemEntrada').value = ((valorEntrada / divida) * 100).toFixed(2);
+        }
+    }
+
+    function calcularRenegociacao(event) {
+        event.preventDefault();
+
+        if (!validarCamposObrigatorios()) return;
+
+        const nome = document.getElementById('nomeCliente').value;
+        const cpf = document.getElementById('cpfCliente').value;
+
+        const divida = parseFloat(document.getElementById('valorDivida').value);
+        const entrada = parseFloat(document.getElementById('valorEntrada').value);
+        const dataOriginal = document.getElementById('dataPrimeiraParcela').value;
+        const nParcelas = parseInt(document.getElementById('qtdParcelas').value);
+        const jurosMes = parseFloat(document.getElementById('taxaJuros').value) / 100;
+        const iofPct = parseFloat(document.getElementById('iof').value) / 100;
+        const taxaBoleto = parseFloat(document.getElementById('taxaBoleto').value);
+
+        if (nParcelas > 36) {
+            alert("O limite de parcelamento máximo é de até 36x!");
+            return;
+        }
+
+        if (entrada > divida) {
+            alert("O valor de entrada não pode ser maior do que a dívida total!");
+            return;
+        }
+
+        document.getElementById('reciboNome').innerText = nome.toUpperCase();
+        document.getElementById('reciboCPF').innerText = cpf;
+
+        const saldoDevedorBase = divida - entrada;
+        const valorComIOF = saldoDevedorBase * (1 + iofPct);
+
+        let valorParcelaPura = 0;
+
+        if (jurosMes > 0) {
+            valorParcelaPura = (valorComIOF * jurosMes) / (1 - Math.pow(1 + jurosMes, -nParcelas));
+        } else {
+            valorParcelaPura = valorComIOF / nParcelas;
+        }
+
+        const valorParcelaFinal = valorParcelaPura + taxaBoleto;
+        const totalFinanciadoFinal = valorParcelaFinal * nParcelas;
+        const custoTotalAcordo = entrada + totalFinanciadoFinal;
+
+        document.getElementById('resumoDividaInicial').innerText = formatarMoeda(divida);
+        document.getElementById('resumoEntradaTxt').innerText =
+            `${formatarMoeda(entrada)} (${((entrada / divida) * 100 || 0).toFixed(1)}%)`;
+        document.getElementById('resumoParcelamentoTxt').innerText =
+            `${nParcelas}x de ${formatarMoeda(valorParcelaFinal)}`;
+        document.getElementById('resumoTaxasTxt').innerText =
+            `${(jurosMes * 100).toFixed(1)}% a.m. + IOF ${(iofPct * 100).toFixed(2)}% + ${formatarMoeda(taxaBoleto)}/parcela`;
+
+        document.getElementById('totalGeralProposta').innerText =
+            `Custo Total do Acordo: ${formatarMoeda(custoTotalAcordo)}`;
+
+        const corpoTabela = document.getElementById('corpoTabela');
+        corpoTabela.innerHTML = '';
+
+        let dataVencimento = new Date(dataOriginal + 'T00:00:00');
+
+        for (let i = 1; i <= nParcelas; i++) {
+            if (i > 1) {
+                dataVencimento.setMonth(dataVencimento.getMonth() + 1);
+            }
+
+            const dataFormatada = dataVencimento.toLocaleDateString('pt-BR');
+            const valorPorExtenso = numeroParaExtenso(valorParcelaFinal.toFixed(2));
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td data-label="Nº Parcela"><strong>${i}º</strong></td>
+                <td data-label="Vencimento">${dataFormatada}</td>
+                <td data-label="Valor do Boleto">
+                    <strong>${formatarMoeda(valorParcelaFinal)}</strong>
+                    <span class="extenso">(${valorPorExtenso})</span>
+                </td>
+            `;
+            corpoTabela.appendChild(tr);
+        }
+
+        document.getElementById('resultsSection').style.display = 'block';
+        document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function formatarMoeda(valor) {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function numeroParaExtenso(valor) {
+        const unidades = ["", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove"];
+        const dezenas10 = ["dez", "onze", "doze", "treze", "quatorze", "quinze", "dezesseis", "dezessete", "dezoito", "dezenove"];
+        const dezenas = ["", "", "vinte", "trinta", "quarenta", "quinquenta", "sessenta", "setenta", "oitenta", "noventa"];
+        const centenas = ["", "cem", "duzentos", "trezentos", "quatrocentos", "quinhentos", "seiscentos", "setecentos", "oitocentos", "novecentos"];
+
+        function converteGrupo(n) {
+            let num = parseInt(n, 10);
+            if (num === 0) return "";
+            
+            let c = Math.floor(num / 100);
+            let d = Math.floor((num % 100) / 10);
+            let u = num % 10;
+            let res = "";
+
+            if (c > 0) {
+                if (c === 1 && (d > 0 || u > 0)) res += "cento";
+                else res += centenas[c];
+            }
+
+            if (d > 0) {
+                if (res !== "") res += " e ";
+                if (d === 1) {
+                    res += dezenas10[u];
+                    return res;
+                } else {
+                    res += dezenas[d];
+                }
+            }
+
+            if (u > 0) {
+                if (res !== "") res += " e ";
+                res += unidades[u];
+            }
+
+            return res;
+        }
+
+        let partes = valor.split(".");
+        let reais = parseInt(partes[0], 10);
+        let centavos = parseInt(partes[1], 10);
+
+        let textoReais = "";
+        if (reais === 1) textoReais = "um real";
+        else if (reais > 1) {
+            if (reais < 1000) {
+                textoReais = converteGrupo(reais) + " reais";
+            } else {
+                let milhar = Math.floor(reais / 1000);
+                let resto = reais % 1000;
+                let textoMilhar = milhar === 1 ? "mil" : converteGrupo(milhar) + " mil";
+                let textoResto = converteGrupo(resto);
+                textoReais = textoMilhar + (textoResto ? (resto < 100 || resto % 100 === 0 ? " e " : " ") + textoResto : "") + " reais";
+            }
+        }
+
+        let textoCentavos = "";
+        if (centavos > 0) {
+            if (centavos === 1) textoCentavos = "um centavo";
+            else if (centavos < 10) textoCentavos = unidades[centavos] + " centavos";
+            else if (centavos < 20) textoCentavos = dezenas10[centavos - 10] + " centavos";
+            else {
+                let d = Math.floor(centavos / 10);
+                let u = centavos % 10;
+                textoCentavos = dezenas[d] + (u > 0 ? " e " : "") + unidades[u] + " centavos";
+            }
+        }
+
+        if (reais > 0 && centavos > 0) return textoReais + " e " + textoCentavos;
+        if (reais > 0) return textoReais;
+        if (centavos > 0) return textoCentavos;
+        return "zero reais";
+    }
+</script>
+
+</body>
+</html>
